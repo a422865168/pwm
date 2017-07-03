@@ -1,7 +1,7 @@
 buildscript {
     repositories {
-      maven { url "http://120.76.22.56:8081/repository/maven-public/" }
-      //maven { url "http://127.0.0.1:8081/repository/maven-public/" }
+        maven { url "http://120.76.22.56:8081/repository/maven-public/" }
+        //maven { url "http://127.0.0.1:8081/repository/maven-public/" }
     }
     ext {
         springBootVersion = '1.5.3.RELEASE'
@@ -33,7 +33,7 @@ subprojects{
     }
     
     bootRepackage {
-        enabled = false
+        enabled = true
         //mainClass=
     }
     
@@ -49,7 +49,7 @@ subprojects{
 	    dependencies {
 	        dependency 'mysql:mysql-connector-java:6.0.6'
 	        dependency 'com.hisun:lemon-framework:1.0.1-SNAPSHOT'
-	        dependency 'com.hisun:lemon-swagger:1.0.1-SNAPSHOT' 
+	        dependency 'com.hisun:lemon-swagger:1.0.1-SNAPSHOT'
 	     }
     }
     
@@ -88,5 +88,6 @@ subprojects{
         }
     }
 }
+ 
 
 description = 'lemon pwm app-group'

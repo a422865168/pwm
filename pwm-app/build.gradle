@@ -1,16 +1,51 @@
 apply plugin: 'application'
 
-configurations.all {
-        // check for updates every build
-        resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
-        resolutionStrategy.cacheDynamicVersionsFor 1, 'seconds'
-}
 dependencies {
-    compile project(":pwm-interface") 
+    compile project(":lemon-prd-interface")
+    //compile("com.hisun:lemon-swagger:1.0.1-SNAPSHOT"){ changing = true }
+    //compile("com.hisun:lemon-framework:1.0.1-SNAPSHOT"){ changing = true }
     compile("com.hisun:lemon-swagger")
     compile("com.hisun:lemon-framework")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
-    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.9")
 }
 
 mainClassName = 'com.hisun.lemon.Application'
+
+jar {
+    manifest {
+        attributes(
+                   "Implementation-Title": "Gradle",
+                   "Implementation-Version": "${version}",
+                   "Class-Path": '. config/'
+                  )
+    }
+    exclude('config/')
+}
+
+bootRepackage {
+    mainClass = 'com.hisun.lemon.Application'
+}
+
+task clearTarget(type:Delete){  
+   delete 'build/target'  
+}  
+
+task release(type: Copy,dependsOn: [clearTarget,build]) {  
+    from('build/libs') {  
+        include '*.jar'
+        exclude '*-sources.jar'  
+    }  
+    from('src/main/resources') {
+        include 'config/*'
+    }
+    into ('build/target') 
+    
+    into('bin') {
+        from 'shell'
+    } 
+} 
+
+task dist(type: Zip,dependsOn: [release]) {  
+    from ('build/target/') {
+    } 
+}
