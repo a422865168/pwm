@@ -1,0 +1,16 @@
+apply plugin: 'application'
+
+configurations.all {
+        // check for updates every build
+        resolutionStrategy.cacheChangingModulesFor 1, 'seconds'
+        resolutionStrategy.cacheDynamicVersionsFor 1, 'seconds'
+}
+dependencies {
+    compile project(":pwm-interface") 
+    compile("com.hisun:lemon-swagger")
+    compile("com.hisun:lemon-framework")
+    compile("org.springframework.boot:spring-boot-starter-thymeleaf")
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.9")
+}
+
+mainClassName = 'com.hisun.lemon.Application'

@@ -1,0 +1,92 @@
+buildscript {
+    repositories {
+      maven { url "http://120.76.22.56:8081/repository/maven-public/" }
+      //maven { url "http://127.0.0.1:8081/repository/maven-public/" }
+    }
+    ext {
+        springBootVersion = '1.5.3.RELEASE'
+        //springCloudVersion = 'Dalston.SR1'
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("io.spring.gradle:dependency-management-plugin:1.0.1.RELEASE")
+    }
+}
+
+subprojects{
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    apply plugin: 'maven'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    version = '1.0.0-SNAPSHOT'
+    group = 'com.hisun'
+    
+    sourceCompatibility = 1.8
+	targetCompatibility = 1.8
+	
+    configurations.all {
+        // check for updates every build
+        resolutionStrategy.cacheChangingModulesFor 10, 'seconds'
+        resolutionStrategy.cacheDynamicVersionsFor 60, 'seconds'
+    }
+    
+    bootRepackage {
+        enabled = false
+        //mainClass=
+    }
+    
+    repositories {
+        maven { url "http://120.76.22.56:8081/repository/maven-public/" }
+        //maven { url "http://127.0.0.1:8081/repository/maven-public/" }
+    }
+
+    dependencyManagement {
+	   // imports {
+	   // 		mavenBom 'org.springframework.cloud:spring-cloud-dependencies:Dalston.SR1'
+	  //	}
+	    dependencies {
+	        dependency 'mysql:mysql-connector-java:6.0.6'
+	        dependency 'com.hisun:lemon-framework:1.0.1-SNAPSHOT'
+	        dependency 'com.hisun:lemon-swagger:1.0.1-SNAPSHOT' 
+	     }
+    }
+    
+    dependencies {
+	    testCompile("org.springframework.boot:spring-boot-starter-test")
+	   // testCompile "junit:junit:4.12"
+	}
+	
+	jar {
+        from('src/main/resources') {
+            include '**/*.*'
+        }
+    }
+
+    //打包源代码
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+    artifacts {
+        archives jar
+        archives sourcesJar
+    }
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                snapshotRepository(url: "http://120.76.22.56:8081/repository/maven-snapshots/") {
+                //snapshotRepository(url: "http://127.0.0.1:8081/repository/maven-snapshots/") {
+                    authentication(userName:'deployment', password:'deployment@123')
+                }
+                repository(url: "http://120.76.22.56:8081/repository/maven-releases/") {
+                //repository(url: "http://127.0.0.1:8081/repository/maven-releases/") {
+                    authentication(userName:'deployment', password:'deployment@123')
+                }
+            }
+        }
+    }
+}
+
+description = 'lemon pwm app-group'
