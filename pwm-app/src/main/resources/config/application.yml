@@ -36,9 +36,9 @@ spring :
         loginPassword : druid123
   redis :
     database : 0
-    host : 123.207.246.43 
+    host : 120.76.22.56
     port : 6379
-    password :
+    password : Hisunpay2017
     pool : 
       #连接池最大连接数（使用负值表示没有限制）
       max-active : 8
@@ -60,11 +60,13 @@ spring :
   mvc :
     throw-exception-if-no-handler-found : true
   resources :
+    #是否开启默认的资源处理，默认为true, 为false swagger不可用
     add-mappings : true
   messages :
     basename : i18n/messages
     #设定加载的资源文件缓存失效时间，-1的话为永不过期，默认为-1,单位 s
     cache-seconds : 10
+    encoding : UTF-8
   thymeleaf :
     cache : false
   jackson :
@@ -72,10 +74,11 @@ spring :
       write_dates_as_timestamps : false
     
 logging :
+  config : classpath:config/logback-spring.xml
   level :
     root : DEBUG
     
-service :
+lemon :
   idgen :
     #每次从reids申请Id的数量
     delta : 500
@@ -83,8 +86,9 @@ service :
     prefix : IDGEN
     #ID sequence 最大值，默认值无穷大，配置方式是在max-value 下配置key 及长度 
     max-value :
-      MSGID.PWM : 999
-      YU : 9999999999  
+      #msgId key
+      MSGID.DM3 : 999
+      USER_ID : 999999  
     #通用的ID sequence 长度
     common-id-sequence-len : 10
     autogen :

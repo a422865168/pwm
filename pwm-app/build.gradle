@@ -4,7 +4,7 @@ dependencies {
     compile project(":pwm-interface")
     //compile("com.hisun:lemon-swagger:1.0.1-SNAPSHOT"){ changing = true }
     //compile("com.hisun:lemon-framework:1.0.1-SNAPSHOT"){ changing = true }
-    compile("com.hisun:lemon-swagger")
+    compile("com.hisun:lemon-swagger") 
     compile("com.hisun:lemon-framework")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
 }

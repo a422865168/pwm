@@ -1,7 +1,5 @@
 package com.hisun.lemon.pwm.controller;
 
-import java.util.Locale;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -56,13 +54,6 @@ public class WithdrawOrderController {
 	public GenericDTO completeOrder(@Validated @RequestBody WithdrawResultDTO withdrawResultDTO){
 		 
 		return null;
-	}
-	
-	public static void main(String[] s){
-		Locale[] localeList = Locale.getAvailableLocales();
-		for(int i=0; i<localeList.length; i++) {
-		System.out.println(localeList[i].getDisplayCountry()+"="+localeList[i].getCountry() + " " + localeList[i].getDisplayLanguage() + "=" +localeList[i].getLanguage());
-		}
-		} 
+	} 
 	
 }
