@@ -1,5 +1,6 @@
 package com.hisun.lemon.pwm.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.hisun.lemon.framework.data.BaseDO;
@@ -22,10 +23,13 @@ public class WithdrawOrderDO extends BaseDO{
     
     private String withdrawType; 
     private String cropBusType;
-    private String cropBusSubType; 
-    private Double applyAmount;
-    private Double actAmount;
-    private Double feeAmount; 
+    private String cropBusSubType;
+    //申请提现金额
+    private BigDecimal applyAmount;
+    //实际体现金额
+    private BigDecimal actAmount;
+    //手续费金额
+    private BigDecimal feeAmount;
     private String urgeFlag;
     
     private String userId;
@@ -39,9 +43,10 @@ public class WithdrawOrderDO extends BaseDO{
     private String notifyMobileNo; 
     private String orderSataus;
     private String rspOrderNo;
-    private String rspOrderSuccTm;
+    private LocalDate rspOrderSuccTm;
     private String sysChannel; 
     private String ipAddress;
+    private String payPassword;
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -96,22 +101,22 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setCropBusSubType(String cropBusSubType) {
 		this.cropBusSubType = cropBusSubType;
 	}
-	public Double getApplyAmount() {
+	public BigDecimal getApplyAmount() {
 		return applyAmount;
 	}
-	public void setApplyAmount(Double applyAmount) {
+	public void setApplyAmount(BigDecimal applyAmount) {
 		this.applyAmount = applyAmount;
 	}
-	public Double getActAmount() {
+	public BigDecimal getActAmount() {
 		return actAmount;
 	}
-	public void setActAmount(Double actAmount) {
+	public void setActAmount(BigDecimal actAmount) {
 		this.actAmount = actAmount;
 	}
-	public Double getFeeAmount() {
+	public BigDecimal getFeeAmount() {
 		return feeAmount;
 	}
-	public void setFeeAmount(Double feeAmount) {
+	public void setFeeAmount(BigDecimal feeAmount) {
 		this.feeAmount = feeAmount;
 	}
 	public String getUrgeFlag() {
@@ -186,10 +191,10 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setRspOrderNo(String rspOrderNo) {
 		this.rspOrderNo = rspOrderNo;
 	}
-	public String getRspOrderSuccTm() {
+	public LocalDate getRspOrderSuccTm() {
 		return rspOrderSuccTm;
 	}
-	public void setRspOrderSuccTm(String rspOrderSuccTm) {
+	public void setRspOrderSuccTm(LocalDate rspOrderSuccTm) {
 		this.rspOrderSuccTm = rspOrderSuccTm;
 	}
 	public String getSysChannel() {
@@ -203,5 +208,11 @@ public class WithdrawOrderDO extends BaseDO{
 	}
 	public void setIpAddress(String ipAddress) {
 		this.ipAddress = ipAddress;
-	}  
+	}
+	public String getPayPassword() {
+		return payPassword;
+	}
+	public void setPayPassword(String payPassword) {
+		this.payPassword = payPassword;
+	}
 }
