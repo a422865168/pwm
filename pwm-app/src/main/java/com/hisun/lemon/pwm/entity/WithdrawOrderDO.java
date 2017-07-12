@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.hisun.lemon.framework.data.BaseDO;
 
@@ -16,15 +17,15 @@ public class WithdrawOrderDO extends BaseDO{
     //订单号
     private String orderNo;
     //订单时间
-    private LocalDate orderTm;
+    private LocalDateTime orderTm;
     //订单失效时间
-    private LocalDate orderExpTm;
+    private LocalDateTime orderExpTm;
     //记账时间
-    private LocalDate accTm;
+    private LocalDate acTm;
     //币种
     private String orderCcy;
     //订单成功时间
-    private LocalDate orderSuccTm; 
+    private LocalDateTime orderSuccTm;
     //提现类型
     private String withdrawType; 
     //交易类型
@@ -37,7 +38,7 @@ public class WithdrawOrderDO extends BaseDO{
     private BigDecimal feeAmount;
     //付款加急标识
     private String urgeFlag;
-    
+
     private String userId;
     private String userName;
     //协议号
@@ -51,7 +52,7 @@ public class WithdrawOrderDO extends BaseDO{
     //订单状态
     private String orderSataus;
     private String rspOrderNo;
-    private LocalDate rspOrderSuccTm;
+    private LocalDateTime rspOrderSuccTm;
     private String sysChannel; 
     private String ipAddress;
     //支付密码
@@ -62,23 +63,23 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setOrderNo(String orderNo) {
 		this.orderNo = orderNo;
 	}
-	public LocalDate getOrderTm() {
+	public LocalDateTime getOrderTm() {
 		return orderTm;
 	}
-	public void setOrderTm(LocalDate orderTm) {
+	public void setOrderTm(LocalDateTime orderTm) {
 		this.orderTm = orderTm;
 	}
-	public LocalDate getOrderExpTm() {
+	public LocalDateTime getOrderExpTm() {
 		return orderExpTm;
 	}
-	public void setOrderExpTm(LocalDate orderExpTm) {
+	public void setOrderExpTm(LocalDateTime orderExpTm) {
 		this.orderExpTm = orderExpTm;
 	}
-	public LocalDate getAccTm() {
-		return accTm;
+	public LocalDate getAcTm() {
+		return acTm;
 	}
-	public void setAccTm(LocalDate accTm) {
-		this.accTm = accTm;
+	public void setAcTm(LocalDate acTm) {
+		this.acTm = acTm;
 	}
 	public String getOrderCcy() {
 		return orderCcy;
@@ -86,10 +87,10 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setOrderCcy(String orderCcy) {
 		this.orderCcy = orderCcy;
 	}
-	public LocalDate getOrderSuccTm() {
+	public LocalDateTime getOrderSuccTm() {
 		return orderSuccTm;
 	}
-	public void setOrderSuccTm(LocalDate orderSuccTm) {
+	public void setOrderSuccTm(LocalDateTime orderSuccTm) {
 		this.orderSuccTm = orderSuccTm;
 	}
 	public String getWithdrawType() {
@@ -194,10 +195,10 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setRspOrderNo(String rspOrderNo) {
 		this.rspOrderNo = rspOrderNo;
 	}
-	public LocalDate getRspOrderSuccTm() {
+	public LocalDateTime getRspOrderSuccTm() {
 		return rspOrderSuccTm;
 	}
-	public void setRspOrderSuccTm(LocalDate rspOrderSuccTm) {
+	public void setRspOrderSuccTm(LocalDateTime rspOrderSuccTm) {
 		this.rspOrderSuccTm = rspOrderSuccTm;
 	}
 	public String getSysChannel() {
