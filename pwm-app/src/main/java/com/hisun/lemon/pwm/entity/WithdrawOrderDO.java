@@ -13,39 +13,48 @@ import com.hisun.lemon.framework.data.BaseDO;
  *
  */
 public class WithdrawOrderDO extends BaseDO{
-   
+    //订单号
     private String orderNo;
+    //订单时间
     private LocalDate orderTm;
+    //订单失效时间
     private LocalDate orderExpTm;
-    private LocalDate accTm; 
-    private String orderCcy; 
+    //记账时间
+    private LocalDate accTm;
+    //币种
+    private String orderCcy;
+    //订单成功时间
     private LocalDate orderSuccTm; 
-    
+    //提现类型
     private String withdrawType; 
-    private String cropBusType;
-    private String cropBusSubType;
+    //交易类型
+    private String busType;
     //申请提现金额
     private BigDecimal applyAmount;
     //实际体现金额
     private BigDecimal actAmount;
     //手续费金额
     private BigDecimal feeAmount;
+    //付款加急标识
     private String urgeFlag;
     
     private String userId;
     private String userName;
+    //协议号
     private String agreementNo;
     private String capCorgNo; 
     private String capCardNo; 
     private String capCardType;
     private String capCardName; 
     private String remark; 
-    private String notifyMobileNo; 
+    private String notifyMobileNo;
+    //订单状态
     private String orderSataus;
     private String rspOrderNo;
     private LocalDate rspOrderSuccTm;
     private String sysChannel; 
     private String ipAddress;
+    //支付密码
     private String payPassword;
 	public String getOrderNo() {
 		return orderNo;
@@ -89,17 +98,11 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setWithdrawType(String withdrawType) {
 		this.withdrawType = withdrawType;
 	}
-	public String getCropBusType() {
-		return cropBusType;
+	public String getBusType() {
+		return busType;
 	}
-	public void setCropBusType(String cropBusType) {
-		this.cropBusType = cropBusType;
-	}
-	public String getCropBusSubType() {
-		return cropBusSubType;
-	}
-	public void setCropBusSubType(String cropBusSubType) {
-		this.cropBusSubType = cropBusSubType;
+	public void setBusType(String busType) {
+		this.busType = busType;
 	}
 	public BigDecimal getApplyAmount() {
 		return applyAmount;
