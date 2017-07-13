@@ -1,6 +1,8 @@
 package com.hisun.lemon.pwm.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.hisun.lemon.framework.data.BaseDO;
 
@@ -12,59 +14,72 @@ import com.hisun.lemon.framework.data.BaseDO;
  *
  */
 public class WithdrawOrderDO extends BaseDO{
-   
+    //订单号
     private String orderNo;
-    private LocalDate orderTm;
-    private LocalDate orderExpTm;
-    private LocalDate accTm; 
-    private String orderCcy; 
-    private LocalDate orderSuccTm; 
-    
+    //订单时间
+    private LocalDateTime orderTm;
+    //订单失效时间
+    private LocalDateTime orderExpTm;
+    //记账时间
+    private LocalDate acTm;
+    //币种
+    private String orderCcy;
+    //订单成功时间
+    private LocalDateTime orderSuccTm;
+    //提现类型
     private String withdrawType; 
-    private String cropBusType;
-    private String cropBusSubType; 
-    private Double applyAmount;
-    private Double actAmount;
-    private Double feeAmount; 
+    //交易类型
+    private String busType;
+    //申请提现金额
+    private BigDecimal applyAmount;
+    //实际体现金额
+    private BigDecimal actAmount;
+    //手续费金额
+    private BigDecimal feeAmount;
+    //付款加急标识
     private String urgeFlag;
-    
+
     private String userId;
     private String userName;
+    //协议号
     private String agreementNo;
     private String capCorgNo; 
     private String capCardNo; 
     private String capCardType;
     private String capCardName; 
     private String remark; 
-    private String notifyMobileNo; 
+    private String notifyMobileNo;
+    //订单状态
     private String orderSataus;
     private String rspOrderNo;
-    private String rspOrderSuccTm;
+    private LocalDateTime rspOrderSuccTm;
     private String sysChannel; 
     private String ipAddress;
+    //支付密码
+    private String payPassword;
 	public String getOrderNo() {
 		return orderNo;
 	}
 	public void setOrderNo(String orderNo) {
 		this.orderNo = orderNo;
 	}
-	public LocalDate getOrderTm() {
+	public LocalDateTime getOrderTm() {
 		return orderTm;
 	}
-	public void setOrderTm(LocalDate orderTm) {
+	public void setOrderTm(LocalDateTime orderTm) {
 		this.orderTm = orderTm;
 	}
-	public LocalDate getOrderExpTm() {
+	public LocalDateTime getOrderExpTm() {
 		return orderExpTm;
 	}
-	public void setOrderExpTm(LocalDate orderExpTm) {
+	public void setOrderExpTm(LocalDateTime orderExpTm) {
 		this.orderExpTm = orderExpTm;
 	}
-	public LocalDate getAccTm() {
-		return accTm;
+	public LocalDate getAcTm() {
+		return acTm;
 	}
-	public void setAccTm(LocalDate accTm) {
-		this.accTm = accTm;
+	public void setAcTm(LocalDate acTm) {
+		this.acTm = acTm;
 	}
 	public String getOrderCcy() {
 		return orderCcy;
@@ -72,10 +87,10 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setOrderCcy(String orderCcy) {
 		this.orderCcy = orderCcy;
 	}
-	public LocalDate getOrderSuccTm() {
+	public LocalDateTime getOrderSuccTm() {
 		return orderSuccTm;
 	}
-	public void setOrderSuccTm(LocalDate orderSuccTm) {
+	public void setOrderSuccTm(LocalDateTime orderSuccTm) {
 		this.orderSuccTm = orderSuccTm;
 	}
 	public String getWithdrawType() {
@@ -84,34 +99,28 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setWithdrawType(String withdrawType) {
 		this.withdrawType = withdrawType;
 	}
-	public String getCropBusType() {
-		return cropBusType;
+	public String getBusType() {
+		return busType;
 	}
-	public void setCropBusType(String cropBusType) {
-		this.cropBusType = cropBusType;
+	public void setBusType(String busType) {
+		this.busType = busType;
 	}
-	public String getCropBusSubType() {
-		return cropBusSubType;
-	}
-	public void setCropBusSubType(String cropBusSubType) {
-		this.cropBusSubType = cropBusSubType;
-	}
-	public Double getApplyAmount() {
+	public BigDecimal getApplyAmount() {
 		return applyAmount;
 	}
-	public void setApplyAmount(Double applyAmount) {
+	public void setApplyAmount(BigDecimal applyAmount) {
 		this.applyAmount = applyAmount;
 	}
-	public Double getActAmount() {
+	public BigDecimal getActAmount() {
 		return actAmount;
 	}
-	public void setActAmount(Double actAmount) {
+	public void setActAmount(BigDecimal actAmount) {
 		this.actAmount = actAmount;
 	}
-	public Double getFeeAmount() {
+	public BigDecimal getFeeAmount() {
 		return feeAmount;
 	}
-	public void setFeeAmount(Double feeAmount) {
+	public void setFeeAmount(BigDecimal feeAmount) {
 		this.feeAmount = feeAmount;
 	}
 	public String getUrgeFlag() {
@@ -186,10 +195,10 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setRspOrderNo(String rspOrderNo) {
 		this.rspOrderNo = rspOrderNo;
 	}
-	public String getRspOrderSuccTm() {
+	public LocalDateTime getRspOrderSuccTm() {
 		return rspOrderSuccTm;
 	}
-	public void setRspOrderSuccTm(String rspOrderSuccTm) {
+	public void setRspOrderSuccTm(LocalDateTime rspOrderSuccTm) {
 		this.rspOrderSuccTm = rspOrderSuccTm;
 	}
 	public String getSysChannel() {
@@ -203,5 +212,11 @@ public class WithdrawOrderDO extends BaseDO{
 	}
 	public void setIpAddress(String ipAddress) {
 		this.ipAddress = ipAddress;
-	}  
+	}
+	public String getPayPassword() {
+		return payPassword;
+	}
+	public void setPayPassword(String payPassword) {
+		this.payPassword = payPassword;
+	}
 }

@@ -1,6 +1,7 @@
 package com.hisun.lemon.pwm.service;
 
 import com.hisun.lemon.pwm.dto.RechangeResultDTO;
+import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 
 
@@ -11,7 +12,16 @@ import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
  *
  */
 public interface IWithdrawOrderService {
+
+    /**
+     * 提现申请，生成提现订单
+     * @param wdcOrderDO
+     */
     public void createOrder(WithdrawOrderDO wdcOrderDO);
-    
-    public void updateOrder(RechangeResultDTO ppdOrderResultDTO);
+
+    /**
+     * 提现结果处理：更新订单信息
+     * @param withdrawResultDTO
+     */
+    public void completeOrder(WithdrawResultDTO withdrawResultDTO);
 }
