@@ -1,7 +1,7 @@
 package com.hisun.lemon.pwm.service;
 
+import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.pwm.dto.RechangeResultDTO;
-import com.hisun.lemon.pwm.entity.RechangeOrderDO;
 
 
 /**
@@ -11,7 +11,7 @@ import com.hisun.lemon.pwm.entity.RechangeOrderDO;
  *
  */
 public interface IRechangeOrderService {
-    public void createOrder(RechangeOrderDO PpdOrderDO);
-    
+    public GenericDTO createOrder(Double amount,String psnFlag,String busType,String sysChannel ,String ipAddress);
+  
     public void updateOrder(RechangeResultDTO ppdOrderResultDTO);
 }

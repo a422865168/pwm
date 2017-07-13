@@ -1,5 +1,7 @@
 package com.hisun.lemon.pwm.controller;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -10,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hisun.lemon.common.exception.LemonException;
+import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.pwm.dto.RechangeResultDTO;
+import com.hisun.lemon.pwm.service.IRechangeOrderService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -23,9 +28,11 @@ import io.swagger.annotations.ApiResponse;
 @Api(value="处理充值")
 @RestController
 @RequestMapping(value="/pwm/recharge")
-public class RechargeOrderController {
+public class RechargeOrderController<B> {
     private static final Logger logger = LoggerFactory.getLogger(RechargeOrderController.class);
 	 
+    @Resource
+    IRechangeOrderService service;
 	
 	@ApiOperation(value="充值下单", notes="生成充值订单，调用收银台")
 	@ApiImplicitParams({
@@ -35,9 +42,21 @@ public class RechargeOrderController {
 	})
 	@ApiResponse(code = 200, message = "充值下单结果")
     @PostMapping(value = "/order")
-    public void createOrder(@RequestParam Double amount, @RequestParam String psnFlag, @RequestParam String sysChannel) {
+    public GenericDTO createOrder(@RequestParam Double amount, @RequestParam String psnFlag, @RequestParam String sysChannel) {
     
+		if(StringUtils.isBlank(sysChannel)){
+			throw new LemonException("00001");
+		}
         
+		if(amount==null){
+			throw new LemonException("00001");
+		}
+		
+		if(amount<=0){
+			throw new LemonException("00001");
+		}
+		String ip="";
+		return service.createOrder(amount, psnFlag, null,sysChannel,ip);
     }
 
 	@ApiOperation(value="充值处理结果通知", notes="接收收银台的处理结果通知")

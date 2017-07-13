@@ -12,7 +12,7 @@ import com.hisun.lemon.pwm.service.IRechangeOrderService;
 
 @Transactional
 @Service
-public class WithdrawOrderServiceImpl implements IRechangeOrderService {
+public class WithdrawOrderServiceImpl   {
     @Resource
     private IRechangeOrderDao rechangeOrderDao;
     
@@ -25,14 +25,12 @@ public class WithdrawOrderServiceImpl implements IRechangeOrderService {
     public void setUserDao(IRechangeOrderDao rechangeOrderDao) {
         this.rechangeOrderDao = rechangeOrderDao;
     }
-
-	@Override
+ 
 	public void createOrder(RechangeOrderDO PpdOrderDO) {
 		// TODO Auto-generated method stub
 		
 	}
-
-	@Override
+ 
 	public void updateOrder(RechangeResultDTO ppdOrderResultDTO) {
 		// TODO Auto-generated method stub
 		
