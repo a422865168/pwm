@@ -136,9 +136,9 @@ dataSource :
   primary :
     type : com.alibaba.druid.pool.DruidDataSource
     driverClassName : com.mysql.cj.jdbc.Driver
-    url : jdbc:mysql://127.0.0.1:3306/seatelpay?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
-    username : root
-    password : 123321
+    url : jdbc:mysql://119.23.126.119:3306/seatelpay_pwm?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    username : pwm
+    password : pwm
     initialSize : 5
     minIdle : 5
     maxActive : 20

@@ -1,11 +1,11 @@
 spring :
   application :
-    name : pwm
+    name : PWM
     
 server :
-  port : 8989
+  port : 7111
   
 eureka :
   client :
     serviceUrl :
-      defaultZone : http://localhost:9002/eureka/
+      defaultZone : http://120.76.22.56:9002/eureka/

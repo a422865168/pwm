@@ -31,7 +31,7 @@ import java.math.BigDecimal;
 public class WithdrawOrderController {
     private static final Logger logger = LoggerFactory.getLogger(WithdrawOrderController.class);
 
-    @Resource(name="withdrawOrderService")
+    @Resource
     private IWithdrawOrderService withdrawOrderService;
 
 	/**

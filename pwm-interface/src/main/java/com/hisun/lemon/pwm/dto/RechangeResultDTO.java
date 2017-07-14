@@ -13,7 +13,7 @@ import com.hisun.lemon.framework.data.GenericDTO;
  * @time 上午9:27:30
  *
  */
-public class RechangeResultDTO extends GenericDTO{ 
+public class RechangeResultDTO { 
     @NotEmpty(message="PWM10001")
     private String orderNo;
     @NotEmpty(message="PWM10002")

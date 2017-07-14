@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.pwm.dto.RechangeDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,28 +24,18 @@ import com.hisun.lemon.pwm.service.IRechangeOrderService;
 @Transactional
 @Service
 public class RechangeOrderServiceImpl implements IRechangeOrderService {
-    @Resource
-    private IRechangeOrderDao rechangeOrderDao;
-    
+	static final String PAYEE_ID="002002";
+
+	@Resource
+	RechangeOrderTransactionalService service;
     @Resource
     CshOrderClient cshOrderClient;
 
-    public IRechangeOrderDao getUserDao() {
-        return rechangeOrderDao;
-    }
-
-    public void setUserDao(IRechangeOrderDao rechangeOrderDao) {
-        this.rechangeOrderDao = rechangeOrderDao;
-    }
 
 	@Override
-	public GenericDTO createOrder(Double amount,String psnFlag,String busType,String sysChannel,String ipAddress) {
+	public GenericDTO createOrder(RechangeDTO rechangeDTO,String ipAddress) {
 		// TODO Auto-generated method stub
-		
-		if(StringUtils.isBlank(busType)){
-			busType="";
-		}
-		if(!StringUtils.isBlank(busType)&&!busType.startsWith(PwmConstants.TX_TYPE_RECHANGE)){
+		if(!rechangeDTO.getBusType().startsWith(PwmConstants.TX_TYPE_RECHANGE)){
 			throw new LemonException("001");
 		}
 		
@@ -52,28 +43,35 @@ public class RechangeOrderServiceImpl implements IRechangeOrderService {
 		String orderNo=IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE+ymd,15);  
 		RechangeOrderDO rechangeOrderDO=new RechangeOrderDO();
 		rechangeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
-		rechangeOrderDO.setBusType(busType); 
+		rechangeOrderDO.setBusType(rechangeDTO.getBusType());
 		rechangeOrderDO.setModifyOpr("");
 		rechangeOrderDO.setIpAddress(ipAddress);
-		rechangeOrderDO.setOrderAmt(new BigDecimal(amount));
+		rechangeOrderDO.setOrderAmt(rechangeDTO.getAmount());
 		rechangeOrderDO.setOrderCcy("USD");
 		rechangeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
-		rechangeOrderDO.setOrderNo(orderNo);
+		rechangeOrderDO.setOrderNo(ymd+orderNo);
 		rechangeOrderDO.setOrderStatus(PwmConstants.RECHANGE_ORD_W);
 		rechangeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
-		rechangeOrderDO.setPsnFlag(psnFlag);
+		rechangeOrderDO.setPsnFlag(rechangeDTO.getPsnFlag());
 		rechangeOrderDO.setRemark("");
-		rechangeOrderDO.setSysChannel(sysChannel);
+		rechangeOrderDO.setSysChannel(rechangeDTO.getSysChannel());
 		rechangeOrderDO.setTxType("01");
-		rechangeOrderDao.insert(rechangeOrderDO);
+		service.initOrder(rechangeOrderDO);
 		
 		//调用收银
 		InitCashierDTO initCashierDTO=new InitCashierDTO();
-//		initCashierDTO.setBusPaytype(busPaytype);
-//		GenericDTO genericDTO=new GenericDTO();
-//		genericDTO.setBody(genericDTO); 
-//		cshOrderClient.initCashier(genericDTO);
-		return null;
+	  	initCashierDTO.setBusPaytype(null);
+	  	initCashierDTO.setBusType(rechangeOrderDO.getBusType());
+	  	initCashierDTO.setCbUrl("http://pwm.com");
+	  	initCashierDTO.setExtOrderNo(rechangeOrderDO.getOrderNo());
+	  	initCashierDTO.setPayeeId(PAYEE_ID);
+	  	initCashierDTO.setSysChannel("web");
+	  	initCashierDTO.setPayerId("");
+	  	initCashierDTO.setTxType(rechangeOrderDO.getTxType());
+		initCashierDTO.setOrderAmt(rechangeDTO.getAmount());
+		GenericDTO<InitCashierDTO> genericDTO=new GenericDTO<InitCashierDTO>();
+		genericDTO.setBody(initCashierDTO);
+		return cshOrderClient.initCashier(genericDTO);
 	}
 
 	@Override
