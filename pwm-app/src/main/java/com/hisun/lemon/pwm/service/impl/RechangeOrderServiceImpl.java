@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.StringUtils;
+import com.hisun.lemon.csh.client.CshOrderClient;
+import com.hisun.lemon.csh.order.dto.InitCashierDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
@@ -24,7 +26,8 @@ public class RechangeOrderServiceImpl implements IRechangeOrderService {
     @Resource
     private IRechangeOrderDao rechangeOrderDao;
     
-     
+    @Resource
+    CshOrderClient cshOrderClient;
 
     public IRechangeOrderDao getUserDao() {
         return rechangeOrderDao;
@@ -65,7 +68,11 @@ public class RechangeOrderServiceImpl implements IRechangeOrderService {
 		rechangeOrderDao.insert(rechangeOrderDO);
 		
 		//调用收银
-		
+		InitCashierDTO initCashierDTO=new InitCashierDTO();
+//		initCashierDTO.setBusPaytype(busPaytype);
+//		GenericDTO genericDTO=new GenericDTO();
+//		genericDTO.setBody(genericDTO); 
+//		cshOrderClient.initCashier(genericDTO);
 		return null;
 	}
 

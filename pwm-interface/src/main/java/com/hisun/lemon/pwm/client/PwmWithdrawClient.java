@@ -18,5 +18,5 @@ import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
 @FeignClient("pwm")
 public interface PwmWithdrawClient {
     @GetMapping("/pwm/withdraw/result")
-    public GenericDTO withdrawNotify(@Validated @RequestBody WithdrawResultDTO withdrawResultDTO);
+    public GenericDTO withdrawNotify(@Validated @RequestBody GenericDTO<WithdrawResultDTO> withdrawResultDTO);
 }

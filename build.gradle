@@ -33,7 +33,7 @@ subprojects{
     }
     
     bootRepackage {
-        enabled = true
+        enabled = false
         //mainClass=
     }
     
@@ -50,6 +50,7 @@ subprojects{
 	        dependency 'mysql:mysql-connector-java:6.0.6'
 	        dependency 'com.hisun:lemon-framework:1.0.1-SNAPSHOT'
 	        dependency 'com.hisun:lemon-swagger:1.0.1-SNAPSHOT'
+	        dependency 'com.hisun:csh-interface:1.0.0-SNAPSHOT'
 	     }
     }
     
@@ -88,6 +89,5 @@ subprojects{
         }
     }
 }
- 
 
 description = 'SEATEL PWM app-group'

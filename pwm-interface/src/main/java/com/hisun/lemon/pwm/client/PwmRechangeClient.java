@@ -18,5 +18,5 @@ import com.hisun.lemon.pwm.dto.RechangeResultDTO;
 @FeignClient("pwm")
 public interface PwmRechangeClient {
     @GetMapping("/pwm/recharge/result")
-    public GenericDTO rechangeNotify(@Validated @RequestBody RechangeResultDTO rechangeResultDTO);
+    public GenericDTO rechangeNotify(@Validated @RequestBody GenericDTO<RechangeResultDTO> rechangeResultDTO);
 }
