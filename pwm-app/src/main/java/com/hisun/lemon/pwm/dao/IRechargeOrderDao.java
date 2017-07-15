@@ -7,9 +7,9 @@
 package com.hisun.lemon.pwm.dao;
 
 import com.hisun.lemon.framework.dao.BaseDao;
-import com.hisun.lemon.pwm.entity.RechangeOrderDO;
+import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface IRechangeOrderDao extends BaseDao<RechangeOrderDO> {
+public interface IRechargeOrderDao extends BaseDao<RechargeOrderDO> {
 }

@@ -13,11 +13,11 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
-public class RechangeDTO {
+public class RechargeDTO {
 	/**
 	 * 充值金额
 	 */
-	@Min(value=0, message="CSH10003")
+	@Min(value=0, message="PWM10001")
     private BigDecimal amount;
 	/**
 	 * 订单来源渠道
@@ -27,13 +27,13 @@ public class RechangeDTO {
 	/**
 	 * 对公对私标志
 	 */
-    @NotEmpty(message="PWM10004")
+    @NotEmpty(message="PWM10003")
     private String psnFlag;
 
 	/**
 	 * 业务类型
 	 */
-    @NotEmpty(message="PWM10005")
+    @NotEmpty(message="PWM10004")
     private String busType;
 	/**
 	 * 收款方id
