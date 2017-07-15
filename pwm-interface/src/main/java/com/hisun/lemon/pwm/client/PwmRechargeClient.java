@@ -16,7 +16,7 @@ import com.hisun.lemon.pwm.dto.RechargeResultDTO;
  *
  */
 @FeignClient("PWM")
-public interface PwmRechangeClient {
+public interface PwmRechargeClient {
     /**
      * 充值结果通知
      * @param rechargeResultDTO 通知数据
