@@ -4,6 +4,7 @@ import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +32,7 @@ import java.math.BigDecimal;
 public class WithdrawOrderController {
     private static final Logger logger = LoggerFactory.getLogger(WithdrawOrderController.class);
 
-    @Resource(name="withdrawOrderService")
+    @Autowired
     private IWithdrawOrderService withdrawOrderService;
 
 	/**
@@ -60,13 +61,11 @@ public class WithdrawOrderController {
 	})
 	@ApiResponse(code = 200, message = "申请提现")
     @PostMapping(value = "/order")
-    public void createOrder(@RequestParam String cardNo, @RequestParam BigDecimal amount, @RequestParam String orderCcy,
-							@RequestParam String withdrawMode, @RequestParam String urgeFlag, @RequestParam String capCorgNo, @RequestParam String remark,
-							@RequestParam String payPassword, @RequestParam String sysChannel) {
+    public GenericDTO createOrder(@Validated @RequestBody WithdrawOrderDO withdrawOrderDO) {
 		/**
 		 * 注入提现参数信息（少个userId）
 		 */
-		WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
+		/*WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
 		withdrawOrderDO.setCapCardNo(cardNo);
 		withdrawOrderDO.setApplyAmount(amount);
 		withdrawOrderDO.setOrderCcy(orderCcy);
@@ -75,8 +74,9 @@ public class WithdrawOrderController {
 		withdrawOrderDO.setCapCorgNo(capCorgNo);
 		withdrawOrderDO.setRemark(remark);
 		withdrawOrderDO.setPayPassword(payPassword);
-		withdrawOrderDO.setSysChannel(sysChannel);
+		withdrawOrderDO.setSysChannel(sysChannel);*/
 		withdrawOrderService.createOrder(withdrawOrderDO);
+		return null;
     }
 
 	/**

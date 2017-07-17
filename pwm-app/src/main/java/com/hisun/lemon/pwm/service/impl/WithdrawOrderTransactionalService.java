@@ -4,6 +4,7 @@ import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.pwm.dao.IWithdrawOrderDao;
 import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +19,7 @@ import javax.annotation.Resource;
 @Service
 public class WithdrawOrderTransactionalService {
 
-    @Resource
+    @Autowired
     private IWithdrawOrderDao withdrawOrderDao;
 
     /**
@@ -41,9 +42,10 @@ public class WithdrawOrderTransactionalService {
      */
     public void createOrder(WithdrawOrderDO withdrawOrderDO){
 
-        int num = withdrawOrderDao.insert(withdrawOrderDO);
+//        int num = withdrawOrderDao.insert(withdrawOrderDO);
+        int num = withdrawOrderDao.insertOnly(withdrawOrderDO);
         if(num != 1){
-            throw new LemonException("PWM0001");
+            LemonException.throwBusinessException("PWM0001");
         }
     }
 
@@ -52,9 +54,9 @@ public class WithdrawOrderTransactionalService {
      */
     public void updateOrder(WithdrawResultDTO withdrawResultDTO){
 
-        int num = withdrawOrderDao.update(withdrawResultDTO);
+        /*int num = withdrawOrderDao.update(withdrawResultDTO);
         if(num != 1){
-            throw new LemonException("PWM0003");
-        }
+            LemonException.throwBusinessException("PWM0003");
+        }*/
     }
 }

@@ -29,7 +29,7 @@ public class WithdrawResultDTO extends GenericDTO{
     @NotEmpty(message="PWM17005")
     private String rspOrderSuccTm;
     @NotEmpty(message="PWM17006")
-    private LocalDate accTm; 
+    private LocalDate acTm;
     @NotEmpty(message="PWM17007")
     private String orderSataus;
 	public String getOrderNo() {
@@ -62,11 +62,11 @@ public class WithdrawResultDTO extends GenericDTO{
 	public void setRspOrderSuccTm(String rspOrderSuccTm) {
 		this.rspOrderSuccTm = rspOrderSuccTm;
 	}
-	public LocalDate getAccTm() {
-		return accTm;
+	public LocalDate getAcTm() {
+		return acTm;
 	}
-	public void setAccTm(LocalDate accTm) {
-		this.accTm = accTm;
+	public void setAcTm(LocalDate acTm) {
+		this.acTm = acTm;
 	}
 	public String getOrderSataus() {
 		return orderSataus;

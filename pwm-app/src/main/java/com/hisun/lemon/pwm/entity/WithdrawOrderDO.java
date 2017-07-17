@@ -27,34 +27,36 @@ public class WithdrawOrderDO extends BaseDO{
     //订单成功时间
     private LocalDateTime orderSuccTm;
     //提现类型
-    private String withdrawType; 
+    private String wcType; 
     //交易类型
+	private String txType;
+	//业务类型
     private String busType;
     //申请提现金额
-    private BigDecimal applyAmount;
+    private BigDecimal wcApplyAmt;
     //实际体现金额
-    private BigDecimal actAmount;
+    private BigDecimal wcActAmt;
     //手续费金额
-    private BigDecimal feeAmount;
+    private BigDecimal feeAmt;
     //付款加急标识
-    private String urgeFlag;
+    private String payUrgeFlg;
 
     private String userId;
     private String userName;
     //协议号
-    private String agreementNo;
+    private String agrNo;
     private String capCorgNo; 
     private String capCardNo; 
     private String capCardType;
     private String capCardName; 
-    private String remark; 
-    private String notifyMobileNo;
+    private String wcRemark;
+    private String ntfMbl;
     //订单状态
-    private String orderSataus;
+    private String orderStatus;
     private String rspOrderNo;
-    private LocalDateTime rspOrderSuccTm;
-    private String sysChannel; 
-    private String ipAddress;
+    private LocalDateTime rspSuccTm;
+    private String busCnl; 
+    private String userIpAdr;
     //支付密码
     private String payPassword;
 	public String getOrderNo() {
@@ -93,11 +95,11 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setOrderSuccTm(LocalDateTime orderSuccTm) {
 		this.orderSuccTm = orderSuccTm;
 	}
-	public String getWithdrawType() {
-		return withdrawType;
+	public String getWcType() {
+		return wcType;
 	}
-	public void setWithdrawType(String withdrawType) {
-		this.withdrawType = withdrawType;
+	public void setWcType(String wcType) {
+		this.wcType = wcType;
 	}
 	public String getBusType() {
 		return busType;
@@ -105,29 +107,29 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setBusType(String busType) {
 		this.busType = busType;
 	}
-	public BigDecimal getApplyAmount() {
-		return applyAmount;
+	public BigDecimal getWcApplyAmt() {
+		return wcApplyAmt;
 	}
-	public void setApplyAmount(BigDecimal applyAmount) {
-		this.applyAmount = applyAmount;
+	public void setWcApplyAmt(BigDecimal wcApplyAmt) {
+		this.wcApplyAmt = wcApplyAmt;
 	}
-	public BigDecimal getActAmount() {
-		return actAmount;
+	public BigDecimal getWcActAmt() {
+		return wcActAmt;
 	}
-	public void setActAmount(BigDecimal actAmount) {
-		this.actAmount = actAmount;
+	public void setWcActAmt(BigDecimal wcActAmt) {
+		this.wcActAmt = wcActAmt;
 	}
-	public BigDecimal getFeeAmount() {
-		return feeAmount;
+	public BigDecimal getFeeAmt() {
+		return feeAmt;
 	}
-	public void setFeeAmount(BigDecimal feeAmount) {
-		this.feeAmount = feeAmount;
+	public void setFeeAmt(BigDecimal feeAmt) {
+		this.feeAmt = feeAmt;
 	}
-	public String getUrgeFlag() {
-		return urgeFlag;
+	public String getPayUrgeFlg() {
+		return payUrgeFlg;
 	}
-	public void setUrgeFlag(String urgeFlag) {
-		this.urgeFlag = urgeFlag;
+	public void setPayUrgeFlg(String payUrgeFlg) {
+		this.payUrgeFlg = payUrgeFlg;
 	}
 	public String getUserId() {
 		return userId;
@@ -141,11 +143,11 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	public String getAgreementNo() {
-		return agreementNo;
+	public String getAgrNo() {
+		return agrNo;
 	}
-	public void setAgreementNo(String agreementNo) {
-		this.agreementNo = agreementNo;
+	public void setAgrNo(String agrNo) {
+		this.agrNo = agrNo;
 	}
 	public String getCapCorgNo() {
 		return capCorgNo;
@@ -171,23 +173,23 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setCapCardName(String capCardName) {
 		this.capCardName = capCardName;
 	}
-	public String getRemark() {
-		return remark;
+	public String getWcRemark() {
+		return wcRemark;
 	}
-	public void setRemark(String remark) {
-		this.remark = remark;
+	public void setWcRemark(String wcRemark) {
+		this.wcRemark = wcRemark;
 	}
-	public String getNotifyMobileNo() {
-		return notifyMobileNo;
+	public String getNtfMbl() {
+		return ntfMbl;
 	}
-	public void setNotifyMobileNo(String notifyMobileNo) {
-		this.notifyMobileNo = notifyMobileNo;
+	public void setNtfMbl(String ntfMbl) {
+		this.ntfMbl = ntfMbl;
 	}
-	public String getOrderSataus() {
-		return orderSataus;
+	public String getOrderStatus() {
+		return orderStatus;
 	}
-	public void setOrderSataus(String orderSataus) {
-		this.orderSataus = orderSataus;
+	public void setOrderStatus(String orderStatus) {
+		this.orderStatus = orderStatus;
 	}
 	public String getRspOrderNo() {
 		return rspOrderNo;
@@ -195,28 +197,36 @@ public class WithdrawOrderDO extends BaseDO{
 	public void setRspOrderNo(String rspOrderNo) {
 		this.rspOrderNo = rspOrderNo;
 	}
-	public LocalDateTime getRspOrderSuccTm() {
-		return rspOrderSuccTm;
+	public LocalDateTime getrspSuccTm() {
+		return rspSuccTm;
 	}
-	public void setRspOrderSuccTm(LocalDateTime rspOrderSuccTm) {
-		this.rspOrderSuccTm = rspOrderSuccTm;
+	public void setrspSuccTm(LocalDateTime rspSuccTm) {
+		this.rspSuccTm = rspSuccTm;
 	}
-	public String getSysChannel() {
-		return sysChannel;
+	public String getBusCnl() {
+		return busCnl;
 	}
-	public void setSysChannel(String sysChannel) {
-		this.sysChannel = sysChannel;
+	public void setBusCnl(String busCnl) {
+		this.busCnl = busCnl;
 	}
-	public String getIpAddress() {
-		return ipAddress;
+	public String getUserIpAdr() {
+		return userIpAdr;
 	}
-	public void setIpAddress(String ipAddress) {
-		this.ipAddress = ipAddress;
+	public void setUserIpAdr(String userIpAdr) {
+		this.userIpAdr = userIpAdr;
 	}
 	public String getPayPassword() {
 		return payPassword;
 	}
 	public void setPayPassword(String payPassword) {
 		this.payPassword = payPassword;
+	}
+
+	public String getTxType() {
+		return txType;
+	}
+
+	public void setTxType(String txType) {
+		this.txType = txType;
 	}
 }
