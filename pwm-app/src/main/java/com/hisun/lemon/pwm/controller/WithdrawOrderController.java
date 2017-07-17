@@ -4,7 +4,6 @@ import com.hisun.lemon.pwm.dto.WithdrawComplDTO;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +15,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 
+import javax.annotation.Resource;
 
 
 @Api(value="处理提现")
@@ -24,11 +24,8 @@ import io.swagger.annotations.ApiResponse;
 public class WithdrawOrderController {
     private static final Logger logger = LoggerFactory.getLogger(WithdrawOrderController.class);
 
-<<<<<<< HEAD
-    @Autowired
-=======
+
     @Resource
->>>>>>> origin/master
     private IWithdrawOrderService withdrawOrderService;
 
 	/**
