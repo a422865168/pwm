@@ -2,6 +2,12 @@ package com.hisun.lemon.pwm.service.impl;
 
 
 import com.hisun.lemon.common.exception.LemonException;
+import com.hisun.lemon.common.utils.BeanUtils;
+import com.hisun.lemon.common.utils.DateTimeUtils;
+import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.framework.utils.IdGenUtils;
+import com.hisun.lemon.pwm.constants.PwmConstants;
+import com.hisun.lemon.pwm.dto.WithdrawComplDTO;
 import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
@@ -18,28 +24,30 @@ import java.math.BigDecimal;
 public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
 	@Resource
-	private WithdrawOrderTransactionalService withdrawOrderTransactionalService;
+    private WithdrawOrderTransactionalService withdrawOrderTransactionalService;
 
 	@Override
-	public void createOrder(WithdrawOrderDO withdrawOrderDO) {
-		//校验提现金额是否正确
-		if(withdrawOrderDO.getWcApplyAmt().compareTo(new BigDecimal(0)) <= 0) {
+	public void createOrder(GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO) {
+
+		WithdrawResultDTO withdrawResultDTO = genericWithdrawResultDTO.getBody();
+		//校验申请提现金额是否不小于0
+		if(withdrawResultDTO.getWcApplyAmt().compareTo(new BigDecimal(0)) <= 0) {
+			LemonException.throwBusinessException("PWM10006");
+		}
+		//校验手续费是否不小于0
+		if(withdrawResultDTO.getFeeAmt().compareTo(new BigDecimal(0)) <= 0) {
 			LemonException.throwBusinessException("PWM10006");
 		}
 		//查询用户是否为黑名单
 		//校验用户如为黑名单，则抛出异常信息
-		if("在黑名单中".equals(withdrawOrderDO.getUserId())){
+		if("在黑名单中".equals(withdrawResultDTO.getUserId())){
 			LemonException.throwBusinessException("PWM10005");
 		}
 		BigDecimal balance = new BigDecimal(0);
 		//查询用户账户余额，
-		//balance = GetBalanceDao(withdrawOrderDO.getUserId());
-		//调用内部接口计算提现手续费
-		//withdrawOrderDO.setFeeAmount(countWithdrawFee());
-		//申请提现余额加手续费
-		//withdrawOrderDO.setActAmount(withdrawOrderDO.getApplyAmount().add(withdrawOrderDO.getFeeAmount()));
+		//balance = GetBalanceDao(withdrawResultDTO.getUserId());
 		//校验提现余额加手续费大于用户账户余额,则抛出异常
-		/*if(balance.compareTo(withdrawOrderDO.getActAmount()) == 1){
+		/*if(balance.compareTo(withdrawResultDTO.getActAmount()) == 1){
 			LemonException.throwBusinessException("PWM10004");
 		}*/
 		//查询支付密码错误次数是否超过5次
@@ -50,7 +58,18 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		/*if(!"用户账户支付密码".equals(withdrawOrderDO.getPayPassword())){
 			LemonException.throwBusinessException("PWM10002");
 		}*/
-		//生成提现单据,把订单状态置为'W1'
+		//初始化提现订单数据
+		WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
+		BeanUtils.copyProperties(withdrawOrderDO, withdrawResultDTO);
+		String ymd= DateTimeUtils.getCurrentDateStr();
+		String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE+ymd,15);
+		withdrawOrderDO.setOrderNo(ymd+orderNo);
+		withdrawOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
+		withdrawOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
+		//不确定用户名是查还是传
+		withdrawOrderDO.setUserName("");
+		withdrawOrderDO.setOrderStatus(PwmConstants.WITHDRAW_ORD_W1);
+		//生成提现单据
 		withdrawOrderTransactionalService.createOrder(withdrawOrderDO);
 		//提现金额由账户余额转到提现银行卡
 		//withdrawOrderTransactionalService.applyAmountTransfer();
@@ -58,10 +77,20 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
 
 	}
- 
-	public void completeOrder(WithdrawResultDTO withdrawResultDTO) {
-		//若提现成功，则更新提现单据状态及相关信息
-		withdrawOrderTransactionalService.updateOrder(withdrawResultDTO);
+
+	public void completeOrder(GenericDTO<WithdrawComplDTO> genericWithdrawComplDTO) {
+
+        WithdrawComplDTO withdrawComplDTO = genericWithdrawComplDTO.getBody();
+        WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
+        BeanUtils.copyProperties(withdrawOrderDO, withdrawComplDTO);
+        //如果订单状态为'S1'，则修改订单成功时间
+        if("S1".equals(withdrawOrderDO.getOrderStatus())){
+            withdrawOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+            withdrawOrderDO.setRspSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+        }
+        withdrawOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+        //若提现成功，则更新提现单据状态及相关信息
+		withdrawOrderTransactionalService.updateOrder(withdrawOrderDO);
 		//若提现失败，则将提现金额由银行卡退回账户余额
 		//withdrawOrderTransactionalService.applyAmountBack();
 	}

@@ -1,232 +1,375 @@
+/*
+ * @ClassName WithdrawOrderDO
+ * @Description 
+ * @version 1.0
+ * @Date 2017-07-15 15:25:38
+ */
 package com.hisun.lemon.pwm.entity;
 
+import com.hisun.lemon.framework.data.BaseDO;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.hisun.lemon.framework.data.BaseDO;
-
-/**
- * WithdrawOrderDO
- * @author tone
- * @date 2017年6月7日
- * @time 下午2:08:21
- *
- */
-public class WithdrawOrderDO extends BaseDO{
-    //订单号
+public class WithdrawOrderDO extends BaseDO {
+    /**
+     * @Fields orderNo 订单号
+     */
     private String orderNo;
-    //订单时间
+    /**
+     * @Fields orderTm 订单时间
+     */
     private LocalDateTime orderTm;
-    //订单失效时间
+    /**
+     * @Fields orderExpTm 订单失效时间
+     */
     private LocalDateTime orderExpTm;
-    //记账时间
+    /**
+     * @Fields acTm 记账时间
+     */
     private LocalDate acTm;
-    //币种
+    /**
+     * @Fields orderCcy 币种
+     */
     private String orderCcy;
-    //订单成功时间
+    /**
+     * @Fields orderSuccTm 订单成功时间
+     */
     private LocalDateTime orderSuccTm;
-    //提现类型
-    private String wcType; 
-    //交易类型
-	private String txType;
-	//业务类型
+    /**
+     * @Fields wcType 提现类型 11:自主提现 21:自动结算
+     */
+    private String wcType;
+    /**
+     * @Fields txType 交易类型 01.充值 02.消费 03.转账 04.提现 05.充海币
+     */
+    private String txType;
+    /**
+     * @Fields busType 业务类型 04:提现 0401:个人提现 0402:商户提现
+     */
     private String busType;
-    //申请提现金额
+    /**
+     * @Fields wcApplyAmt 申请提现金额
+     */
     private BigDecimal wcApplyAmt;
-    //实际体现金额
+    /**
+     * @Fields wcActAmt 实际提现金额
+     */
     private BigDecimal wcActAmt;
-    //手续费金额
+    /**
+     * @Fields feeAmt 手续费金额
+     */
     private BigDecimal feeAmt;
-    //付款加急标识
+    /**
+     * @Fields payUrgeFlg 付款加急标识
+     */
     private String payUrgeFlg;
-
+    /**
+     * @Fields userId 内部用户编号
+     */
     private String userId;
+    /**
+     * @Fields userName 用户/商户名称
+     */
     private String userName;
-    //协议号
+    /**
+     * @Fields agrNo 签约协议号
+     */
     private String agrNo;
-    private String capCorgNo; 
-    private String capCardNo; 
+    /**
+     * @Fields capCorgNo 资金合作机构号
+     */
+    private String capCorgNo;
+    /**
+     * @Fields capCardNo 资金卡号
+     */
+    private String capCardNo;
+    /**
+     * @Fields capCardType 资金卡账户类型 0:借记卡 1:信用卡 2:准贷记卡 3:储蓄账户
+     */
     private String capCardType;
-    private String capCardName; 
+    /**
+     * @Fields capCardName 资金卡账户姓名
+     */
+    private String capCardName;
+    /**
+     * @Fields wcRemark 提现备注
+     */
     private String wcRemark;
+    /**
+     * @Fields ntfMbl 通知的手机号
+     */
     private String ntfMbl;
-    //订单状态
+    /**
+     * @Fields orderStatus 订单状态 W1:系统受理中 W2:资金流出已受理 S1:付款成功 F1:付款失败 F2:付款核销 R9:审批拒绝
+     */
     private String orderStatus;
+    /**
+     * @Fields rspOrderNo 资金流出模块订单号
+     */
     private String rspOrderNo;
+    /**
+     * @Fields rspSuccTm 资金流出模块成功时间
+     */
     private LocalDateTime rspSuccTm;
-    private String busCnl; 
+    /**
+     * @Fields busCnl 业务受理渠道
+     */
+    private String busCnl;
+    /**
+     * @Fields userIpAdr 用户操作IP地址
+     */
     private String userIpAdr;
-    //支付密码
-    private String payPassword;
-	public String getOrderNo() {
-		return orderNo;
-	}
-	public void setOrderNo(String orderNo) {
-		this.orderNo = orderNo;
-	}
-	public LocalDateTime getOrderTm() {
-		return orderTm;
-	}
-	public void setOrderTm(LocalDateTime orderTm) {
-		this.orderTm = orderTm;
-	}
-	public LocalDateTime getOrderExpTm() {
-		return orderExpTm;
-	}
-	public void setOrderExpTm(LocalDateTime orderExpTm) {
-		this.orderExpTm = orderExpTm;
-	}
-	public LocalDate getAcTm() {
-		return acTm;
-	}
-	public void setAcTm(LocalDate acTm) {
-		this.acTm = acTm;
-	}
-	public String getOrderCcy() {
-		return orderCcy;
-	}
-	public void setOrderCcy(String orderCcy) {
-		this.orderCcy = orderCcy;
-	}
-	public LocalDateTime getOrderSuccTm() {
-		return orderSuccTm;
-	}
-	public void setOrderSuccTm(LocalDateTime orderSuccTm) {
-		this.orderSuccTm = orderSuccTm;
-	}
-	public String getWcType() {
-		return wcType;
-	}
-	public void setWcType(String wcType) {
-		this.wcType = wcType;
-	}
-	public String getBusType() {
-		return busType;
-	}
-	public void setBusType(String busType) {
-		this.busType = busType;
-	}
-	public BigDecimal getWcApplyAmt() {
-		return wcApplyAmt;
-	}
-	public void setWcApplyAmt(BigDecimal wcApplyAmt) {
-		this.wcApplyAmt = wcApplyAmt;
-	}
-	public BigDecimal getWcActAmt() {
-		return wcActAmt;
-	}
-	public void setWcActAmt(BigDecimal wcActAmt) {
-		this.wcActAmt = wcActAmt;
-	}
-	public BigDecimal getFeeAmt() {
-		return feeAmt;
-	}
-	public void setFeeAmt(BigDecimal feeAmt) {
-		this.feeAmt = feeAmt;
-	}
-	public String getPayUrgeFlg() {
-		return payUrgeFlg;
-	}
-	public void setPayUrgeFlg(String payUrgeFlg) {
-		this.payUrgeFlg = payUrgeFlg;
-	}
-	public String getUserId() {
-		return userId;
-	}
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-	public String getUserName() {
-		return userName;
-	}
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-	public String getAgrNo() {
-		return agrNo;
-	}
-	public void setAgrNo(String agrNo) {
-		this.agrNo = agrNo;
-	}
-	public String getCapCorgNo() {
-		return capCorgNo;
-	}
-	public void setCapCorgNo(String capCorgNo) {
-		this.capCorgNo = capCorgNo;
-	}
-	public String getCapCardNo() {
-		return capCardNo;
-	}
-	public void setCapCardNo(String capCardNo) {
-		this.capCardNo = capCardNo;
-	}
-	public String getCapCardType() {
-		return capCardType;
-	}
-	public void setCapCardType(String capCardType) {
-		this.capCardType = capCardType;
-	}
-	public String getCapCardName() {
-		return capCardName;
-	}
-	public void setCapCardName(String capCardName) {
-		this.capCardName = capCardName;
-	}
-	public String getWcRemark() {
-		return wcRemark;
-	}
-	public void setWcRemark(String wcRemark) {
-		this.wcRemark = wcRemark;
-	}
-	public String getNtfMbl() {
-		return ntfMbl;
-	}
-	public void setNtfMbl(String ntfMbl) {
-		this.ntfMbl = ntfMbl;
-	}
-	public String getOrderStatus() {
-		return orderStatus;
-	}
-	public void setOrderStatus(String orderStatus) {
-		this.orderStatus = orderStatus;
-	}
-	public String getRspOrderNo() {
-		return rspOrderNo;
-	}
-	public void setRspOrderNo(String rspOrderNo) {
-		this.rspOrderNo = rspOrderNo;
-	}
-	public LocalDateTime getrspSuccTm() {
-		return rspSuccTm;
-	}
-	public void setrspSuccTm(LocalDateTime rspSuccTm) {
-		this.rspSuccTm = rspSuccTm;
-	}
-	public String getBusCnl() {
-		return busCnl;
-	}
-	public void setBusCnl(String busCnl) {
-		this.busCnl = busCnl;
-	}
-	public String getUserIpAdr() {
-		return userIpAdr;
-	}
-	public void setUserIpAdr(String userIpAdr) {
-		this.userIpAdr = userIpAdr;
-	}
-	public String getPayPassword() {
-		return payPassword;
-	}
-	public void setPayPassword(String payPassword) {
-		this.payPassword = payPassword;
-	}
+    /**
+     * @Fields userOprSys 用户操作系统信息
+     */
+    private String userOprSys;
+    /**
+     * @Fields userBrowInfo 用户浏览器信息
+     */
+    private String userBrowInfo;
+    /**
+     * @Fields tmSmp 时间戳
+     */
+    private LocalDateTime tmSmp;
 
-	public String getTxType() {
-		return txType;
-	}
+    public String getOrderNo() {
+        return orderNo;
+    }
 
-	public void setTxType(String txType) {
-		this.txType = txType;
-	}
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
+    public LocalDateTime getOrderTm() {
+        return orderTm;
+    }
+
+    public void setOrderTm(LocalDateTime orderTm) {
+        this.orderTm = orderTm;
+    }
+
+    public LocalDateTime getOrderExpTm() {
+        return orderExpTm;
+    }
+
+    public void setOrderExpTm(LocalDateTime orderExpTm) {
+        this.orderExpTm = orderExpTm;
+    }
+
+    public LocalDate getAcTm() {
+        return acTm;
+    }
+
+    public void setAcTm(LocalDate acTm) {
+        this.acTm = acTm;
+    }
+
+    public String getOrderCcy() {
+        return orderCcy;
+    }
+
+    public void setOrderCcy(String orderCcy) {
+        this.orderCcy = orderCcy;
+    }
+
+    public LocalDateTime getOrderSuccTm() {
+        return orderSuccTm;
+    }
+
+    public void setOrderSuccTm(LocalDateTime orderSuccTm) {
+        this.orderSuccTm = orderSuccTm;
+    }
+
+    public String getWcType() {
+        return wcType;
+    }
+
+    public void setWcType(String wcType) {
+        this.wcType = wcType;
+    }
+
+    public String getTxType() {
+        return txType;
+    }
+
+    public void setTxType(String txType) {
+        this.txType = txType;
+    }
+
+    public String getBusType() {
+        return busType;
+    }
+
+    public void setBusType(String busType) {
+        this.busType = busType;
+    }
+
+    public BigDecimal getWcApplyAmt() {
+        return wcApplyAmt;
+    }
+
+    public void setWcApplyAmt(BigDecimal wcApplyAmt) {
+        this.wcApplyAmt = wcApplyAmt;
+    }
+
+    public BigDecimal getWcActAmt() {
+        return wcActAmt;
+    }
+
+    public void setWcActAmt(BigDecimal wcActAmt) {
+        this.wcActAmt = wcActAmt;
+    }
+
+    public BigDecimal getFeeAmt() {
+        return feeAmt;
+    }
+
+    public void setFeeAmt(BigDecimal feeAmt) {
+        this.feeAmt = feeAmt;
+    }
+
+    public String getPayUrgeFlg() {
+        return payUrgeFlg;
+    }
+
+    public void setPayUrgeFlg(String payUrgeFlg) {
+        this.payUrgeFlg = payUrgeFlg;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getAgrNo() {
+        return agrNo;
+    }
+
+    public void setAgrNo(String agrNo) {
+        this.agrNo = agrNo;
+    }
+
+    public String getCapCorgNo() {
+        return capCorgNo;
+    }
+
+    public void setCapCorgNo(String capCorgNo) {
+        this.capCorgNo = capCorgNo;
+    }
+
+    public String getCapCardNo() {
+        return capCardNo;
+    }
+
+    public void setCapCardNo(String capCardNo) {
+        this.capCardNo = capCardNo;
+    }
+
+    public String getCapCardType() {
+        return capCardType;
+    }
+
+    public void setCapCardType(String capCardType) {
+        this.capCardType = capCardType;
+    }
+
+    public String getCapCardName() {
+        return capCardName;
+    }
+
+    public void setCapCardName(String capCardName) {
+        this.capCardName = capCardName;
+    }
+
+    public String getWcRemark() {
+        return wcRemark;
+    }
+
+    public void setWcRemark(String wcRemark) {
+        this.wcRemark = wcRemark;
+    }
+
+    public String getNtfMbl() {
+        return ntfMbl;
+    }
+
+    public void setNtfMbl(String ntfMbl) {
+        this.ntfMbl = ntfMbl;
+    }
+
+    public String getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(String orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public String getRspOrderNo() {
+        return rspOrderNo;
+    }
+
+    public void setRspOrderNo(String rspOrderNo) {
+        this.rspOrderNo = rspOrderNo;
+    }
+
+    public LocalDateTime getRspSuccTm() {
+        return rspSuccTm;
+    }
+
+    public void setRspSuccTm(LocalDateTime rspSuccTm) {
+        this.rspSuccTm = rspSuccTm;
+    }
+
+    public String getBusCnl() {
+        return busCnl;
+    }
+
+    public void setBusCnl(String busCnl) {
+        this.busCnl = busCnl;
+    }
+
+    public String getUserIpAdr() {
+        return userIpAdr;
+    }
+
+    public void setUserIpAdr(String userIpAdr) {
+        this.userIpAdr = userIpAdr;
+    }
+
+    public String getUserOprSys() {
+        return userOprSys;
+    }
+
+    public void setUserOprSys(String userOprSys) {
+        this.userOprSys = userOprSys;
+    }
+
+    public String getUserBrowInfo() {
+        return userBrowInfo;
+    }
+
+    public void setUserBrowInfo(String userBrowInfo) {
+        this.userBrowInfo = userBrowInfo;
+    }
+
+    public LocalDateTime getTmSmp() {
+        return tmSmp;
+    }
+
+    public void setTmSmp(LocalDateTime tmSmp) {
+        this.tmSmp = tmSmp;
+    }
 }

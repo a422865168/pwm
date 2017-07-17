@@ -51,19 +51,49 @@ public class PwmConstants {
 	/**
 	 * 充值订单状态：等待充值
 	 */
-	public  static final String RECHANGE_ORD_W="W";
+	public static final String RECHANGE_ORD_W="W";
 	/**
 	 * 充值订单状态：充值成功
 	 */
-	public  static final String RECHANGE_ORD_S="S";
+	public static final String RECHANGE_ORD_S="S";
 	
 	/**
 	 * 充值订单状态：交易逾期
 	 */
-	public  static final String RECHANGE_ORD_TO="T";
+	public static final String RECHANGE_ORD_TO="T";
 	
 	/**
 	 * 充值订单状态：交易失败
 	 */
-	public  static final String RECHANGE_ORD_F="F";
+	public static final String RECHANGE_ORD_F="F";
+
+	/**
+	 * 提现订单状态W1：系统受理中
+	 */
+	public static final String WITHDRAW_ORD_W1="W1";
+
+	/**
+	 * 提现订单状态W2：资金流出已受理
+	 */
+	public static final String WITHDRAW_ORD_W2="W2";
+
+	/**
+	 * 提现订单状态S1：付款成功
+	 */
+	public static final String WITHDRAW_ORD_S1="S1";
+
+	/**
+	 * 提现订单状态F1：付款失败
+	 */
+	public static final String WITHDRAW_ORD_F1="F1";
+
+	/**
+	 * 提现订单状态F2：付款核销
+	 */
+	public static final String WITHDRAW_ORD_F2="F2";
+
+	/**
+	 * 提现订单状态R9：审批拒绝
+	 */
+	public static final String WITHDRAW_ORD_R9="R9";
 }

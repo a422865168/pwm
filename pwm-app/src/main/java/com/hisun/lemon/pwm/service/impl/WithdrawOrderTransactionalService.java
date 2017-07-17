@@ -42,8 +42,7 @@ public class WithdrawOrderTransactionalService {
      */
     public void createOrder(WithdrawOrderDO withdrawOrderDO){
 
-//        int num = withdrawOrderDao.insert(withdrawOrderDO);
-        int num = withdrawOrderDao.insertOnly(withdrawOrderDO);
+        int num = withdrawOrderDao.insert(withdrawOrderDO);
         if(num != 1){
             LemonException.throwBusinessException("PWM0001");
         }
@@ -52,11 +51,11 @@ public class WithdrawOrderTransactionalService {
     /**
      * 提现成功，更新提现单据信息
      */
-    public void updateOrder(WithdrawResultDTO withdrawResultDTO){
+    public void updateOrder(WithdrawOrderDO withdrawOrderDO){
 
-        /*int num = withdrawOrderDao.update(withdrawResultDTO);
+        int num = withdrawOrderDao.update(withdrawOrderDO);
         if(num != 1){
             LemonException.throwBusinessException("PWM0003");
-        }*/
+        }
     }
 }

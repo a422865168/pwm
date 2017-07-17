@@ -19,6 +19,4 @@ public interface IWithdrawOrderDao extends BaseDao<WithdrawOrderDO>{
      * @return
      */
     int insert(WithdrawOrderDO wdcOrderDO);
-
-    int insertOnly(WithdrawOrderDO withdrawOrderDO);
 }
