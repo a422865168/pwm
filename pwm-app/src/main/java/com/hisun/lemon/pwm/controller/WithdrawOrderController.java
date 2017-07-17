@@ -24,7 +24,11 @@ import io.swagger.annotations.ApiResponse;
 public class WithdrawOrderController {
     private static final Logger logger = LoggerFactory.getLogger(WithdrawOrderController.class);
 
+<<<<<<< HEAD
     @Autowired
+=======
+    @Resource
+>>>>>>> origin/master
     private IWithdrawOrderService withdrawOrderService;
 
 	/**

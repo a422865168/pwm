@@ -8,6 +8,6 @@ build/
 .svn*
 catalina*
 /logs/
-.iml
+*.iml
 .idea
 .DS_Store

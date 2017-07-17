@@ -5,67 +5,72 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class RechangeOrderDO extends BaseDO {
+public class RechargeOrderDO extends BaseDO {
     /**
-     * @Fields orderNo 
+     * @Fields orderNo 订单号
      */
     private String orderNo;
     /**
-     * @Fields orderTm 
+     * @Fields orderTm 订单时间
      */
     private LocalDateTime orderTm;
     /**
-     * @Fields acTm 
+     * @Fields acTm  会计日期
      */
     private LocalDate acTm;
     /**
-     * @Fields txType 
+     * @Fields txType 交易类型
      */
     private String txType;
     /**
-     * @Fields busType 
+     * @Fields busType  业务类型
      */
     private String busType;
     /**
-     * @Fields orderCcy 
+     * @Fields orderCcy 币种
      */
     private String orderCcy;
     /**
-     * @Fields orderAmt 
+     * @Fields orderAmt 订单金额
      */
     private BigDecimal orderAmt;
     /**
-     * @Fields orderStatus 
+     * @Fields orderStatus  订单状态
      */
     private String orderStatus;
     /**
-     * @Fields orderSuccTm 
+     * @Fields orderSuccTm 订单成功时间
      */
     private LocalDateTime orderSuccTm;
     /**
-     * @Fields psnFlag 
+     * @Fields psnFlag 个企标志
      */
     private String psnFlag;
     /**
-     * @Fields orderExpTm 
+     * @Fields orderExpTm 过期时间
      */
     private LocalDateTime orderExpTm;
     /**
-     * @Fields sysChannel 
+     * @Fields sysChannel 订单渠道
      */
     private String sysChannel;
     /**
-     * @Fields ipAddress 
+     * @Fields ipAddress ip地址
      */
     private String ipAddress;
     /**
-     * @Fields remark 
+     * @Fields remark 备注
      */
     private String remark;
     /**
-     * @Fields modifyOpr 
+     * @Fields modifyOpr  最后修改人
      */
     private String modifyOpr;
+
+    /**
+     * @Fields extOrderNo  外部订单号
+     */
+    private String extOrderNo;
   
 
     public String getOrderNo() {
@@ -187,5 +192,12 @@ public class RechangeOrderDO extends BaseDO {
     public void setModifyOpr(String modifyOpr) {
         this.modifyOpr = modifyOpr;
     }
- 
+
+    public void setExtOrderNo(String extOrderNo) {
+        this.extOrderNo = extOrderNo;
+    }
+
+    public String getExtOrderNo() {
+        return extOrderNo;
+    }
 }

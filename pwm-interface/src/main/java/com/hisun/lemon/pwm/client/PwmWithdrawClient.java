@@ -15,7 +15,7 @@ import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
  * @time 下午3:06:23
  *
  */
-@FeignClient("pwm")
+@FeignClient("PWM")
 public interface PwmWithdrawClient {
     @GetMapping("/pwm/withdraw/result")
     public GenericDTO withdrawNotify(@Validated @RequestBody GenericDTO<WithdrawResultDTO> withdrawResultDTO);

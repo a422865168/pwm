@@ -2,6 +2,8 @@ package com.hisun.lemon.pwm.controller;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.pwm.dto.RechargeDTO;
+import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -9,18 +11,14 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
-import com.hisun.lemon.pwm.dto.RechangeResultDTO;
-import com.hisun.lemon.pwm.service.IRechangeOrderService;
+import com.hisun.lemon.pwm.service.IRechargeOrderService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 
@@ -32,55 +30,28 @@ public class RechargeOrderController<B> {
     private static final Logger logger = LoggerFactory.getLogger(RechargeOrderController.class);
 	 
     @Resource
-    IRechangeOrderService service;
+	IRechargeOrderService service;
 	
 	@ApiOperation(value="充值下单", notes="生成充值订单，调用收银台")
-	@ApiImplicitParams({
-		@ApiImplicitParam(name = "amount", value = "充值金额", required = true, paramType="form", dataType = "Double"),
-		@ApiImplicitParam(name = "psnFlag", value = "对公对私标志", required = true, paramType="form", dataType = "String"),
-		@ApiImplicitParam(name = "sysChannel", value = "订单来源渠道", required = true, paramType="form", dataType = "String")
-	})
-	@ApiResponse(code = 200, message = "充值下单结果")
+	@ApiImplicitParam(name = "genRechangeDTO", value = "业务模块传递的充值数据", required = true,paramType="body", dataType = "GenericDTO")
+	@ApiResponse(code = 200, message = "充值下单")
     @PostMapping(value = "/order")
-    public GenericDTO createOrder(@RequestParam Double amount, @RequestParam String psnFlag, @RequestParam String sysChannel) {
-    
-		if(StringUtils.isBlank(sysChannel)){
-			throw new LemonException("00001");
-		}
-        
-		if(amount==null){
-			throw new LemonException("00001");
-		}
-		
-		if(amount<=0){
-			throw new LemonException("00001");
-		}
+    public GenericDTO createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechangeDTO) {
 		String ip="";
-		return service.createOrder(amount, psnFlag, null,sysChannel,ip);
+		RechargeDTO rechargeDTO =genRechangeDTO.getBody();
+		if(StringUtils.isBlank(rechargeDTO.getPayerId())){
+			rechargeDTO.setPayerId(genRechangeDTO.getUserId());
+		}
+		GenericDTO genericDTO=service.createOrder(rechargeDTO, ip);
+		return genericDTO;
     }
 
 	@ApiOperation(value="充值处理结果通知", notes="接收收银台的处理结果通知")
-//	@ApiImplicitParams({
-//		@ApiImplicitParam(name = "orderNo", value = "充值订单号", required = true, dataType = "String"),
-//		@ApiImplicitParam(name = "amount", value = "充值金额", required = true, dataType = "Double"),
-//		@ApiImplicitParam(name = "orderCcy", value = "币种", required = true, dataType = "String"),
-//		@ApiImplicitParam(name = "mobileNo", value = "手机号", required = false, dataType = "String"),
-//		@ApiImplicitParam(name = "capCorgNo", value = "资金合作机构", required = true, dataType = "String"),
-//		@ApiImplicitParam(name = "rutCorgNo", value = "路径合作机构", required = true, dataType = "String"),
-//		@ApiImplicitParam(name = "corpBusType", value = "业务合作类型", required = true, dataType = "String"),
-//		@ApiImplicitParam(name = "corpBusSubType", value = "业务合作子类型", required = true, dataType = "String"),
-//		@ApiImplicitParam(name = "capCardType", value = "银行卡类型", required = false, dataType = "String"),
-//		@ApiImplicitParam(name = "cardNoHide", value = "脱敏银行卡号", required = true, dataType = "String"),
-//		@ApiImplicitParam(name = "cardNoLast", value = "卡末四位", required = true, dataType = "String"),
-//		@ApiImplicitParam(name = "cardUserNameHide", value = "脱敏用户名", required = true, dataType = "String"),
-//		@ApiImplicitParam(name = "idType", value = "证件类型", required = true, dataType = "String"),
-//		@ApiImplicitParam(name = "idNoHide", value = "脱敏证件号", required = true, dataType = "String")
-//	})
-	@ApiImplicitParam(name = "rechangeResultDTO", value = "充值通知详细数据", required = true,paramType="body", dataType = "RechangeResultDTO")
+	@ApiImplicitParam(name = "genericResultDTO", value = "充值通知详细数据", required = true,paramType="body", dataType = "RechargeResultDTO")
 	@ApiResponse(code = 200, message = "处理通知结果")
 	@PatchMapping(value = "/result")
-	public GenericDTO completeOrder(@Validated @RequestBody RechangeResultDTO rechangeResultDTO){
-		 
+	public GenericDTO completeOrder(@Validated @RequestBody GenericDTO<RechargeResultDTO> genericResultDTO){
+		service.handleResult(genericResultDTO);
 		return null;
 	}
 }
