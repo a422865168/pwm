@@ -67,7 +67,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	  	initCashierDTO.setPayerId("");
 	  	initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
-		GenericDTO<InitCashierDTO> genericDTO=new GenericDTO<InitCashierDTO>();
+		GenericDTO<InitCashierDTO> genericDTO=new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		return cshOrderClient.initCashier(genericDTO);
 	}

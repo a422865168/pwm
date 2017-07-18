@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiResponse;
 @Api(value="处理充值")
 @RestController
 @RequestMapping(value="/pwm/recharge")
-public class RechargeOrderController<B> {
+public class RechargeOrderController {
     private static final Logger logger = LoggerFactory.getLogger(RechargeOrderController.class);
 	 
     @Resource
@@ -40,10 +40,10 @@ public class RechargeOrderController<B> {
 		String ip="";
 		RechargeDTO rechargeDTO =genRechargeDTO.getBody();
 		if(StringUtils.isBlank(rechargeDTO.getPayerId())){
+			logger.debug("默认设置当前用户为的付款方");
 			rechargeDTO.setPayerId(genRechargeDTO.getUserId());
 		}
-		GenericDTO genericDTO=service.createOrder(rechargeDTO, ip);
-		return genericDTO;
+		return service.createOrder(rechargeDTO, ip);
     }
 
 	@ApiOperation(value="充值处理结果通知", notes="接收收银台的处理结果通知")
