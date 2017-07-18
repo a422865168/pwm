@@ -53,8 +53,8 @@ public class WithdrawOrderControllerTest {
         withdrawResultDTO.setUserId("userId");
         withdrawResultDTO.setPayPassWord("password2");
         withdrawResultDTO.setCapCardNo("666667888");
-        withdrawResultDTO.setWcApplyAmt(new BigDecimal(33.34));
-        withdrawResultDTO.setFeeAmt(new BigDecimal(2.66));
+        withdrawResultDTO.setWcApplyAmt(BigDecimal.valueOf(33.44));
+        withdrawResultDTO.setFeeAmt(BigDecimal.valueOf(2.66));
         withdrawResultDTO.setOrderCcy("RMB");
         withdrawResultDTO.setWcType("11");
         withdrawResultDTO.setPayUrgeFlg("0");

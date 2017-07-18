@@ -2,7 +2,7 @@ package com.hisun.lemon.pwm.client;
 
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.hisun.lemon.framework.data.GenericDTO;
@@ -22,6 +22,6 @@ public interface PwmRechargeClient {
      * @param rechargeResultDTO 通知数据
      * @return
      */
-    @GetMapping("/pwm/recharge/result")
+    @PatchMapping("/pwm/recharge/result")
     public GenericDTO rechargeNotify(@Validated @RequestBody GenericDTO<RechargeResultDTO> rechargeResultDTO);
 }

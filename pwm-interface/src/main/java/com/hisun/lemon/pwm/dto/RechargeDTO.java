@@ -3,6 +3,7 @@ package com.hisun.lemon.pwm.dto;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 
 
@@ -21,8 +22,13 @@ public class RechargeDTO {
     private BigDecimal amount;
 	/**
 	 * 订单来源渠道
+	 * WEB:WEB站点 <br/>
+	 * APP:手机APP<br/>
+	 * HALL:营业厅<br/>
+	 * OTHER:其他渠道<br/>
 	 */
     @NotEmpty(message="PWM10002")
+	@Pattern(regexp="WEB|APP|HALL|OTHER",message="PWM10002")
     private String sysChannel;
 	/**
 	 * 对公对私标志
@@ -44,6 +50,12 @@ public class RechargeDTO {
 	 * 付款方id
 	 */
 	private String payerId;
+
+	/**
+	 * 充值手续费
+	 */
+	@Min(value=0, message="PWM10016")
+	private BigDecimal fee;
 
 	public BigDecimal getAmount() {
 		return amount;

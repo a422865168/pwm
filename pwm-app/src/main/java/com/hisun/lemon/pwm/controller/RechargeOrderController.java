@@ -33,14 +33,14 @@ public class RechargeOrderController<B> {
 	IRechargeOrderService service;
 	
 	@ApiOperation(value="充值下单", notes="生成充值订单，调用收银台")
-	@ApiImplicitParam(name = "genRechangeDTO", value = "业务模块传递的充值数据", required = true,paramType="body", dataType = "GenericDTO")
+	@ApiImplicitParam(name = "genRechargeDTO", value = "业务模块传递的充值数据", required = true,paramType="body", dataType = "GenericDTO")
 	@ApiResponse(code = 200, message = "充值下单")
     @PostMapping(value = "/order")
-    public GenericDTO createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechangeDTO) {
+    public GenericDTO createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
 		String ip="";
-		RechargeDTO rechargeDTO =genRechangeDTO.getBody();
+		RechargeDTO rechargeDTO =genRechargeDTO.getBody();
 		if(StringUtils.isBlank(rechargeDTO.getPayerId())){
-			rechargeDTO.setPayerId(genRechangeDTO.getUserId());
+			rechargeDTO.setPayerId(genRechargeDTO.getUserId());
 		}
 		GenericDTO genericDTO=service.createOrder(rechargeDTO, ip);
 		return genericDTO;
@@ -52,6 +52,6 @@ public class RechargeOrderController<B> {
 	@PatchMapping(value = "/result")
 	public GenericDTO completeOrder(@Validated @RequestBody GenericDTO<RechargeResultDTO> genericResultDTO){
 		service.handleResult(genericResultDTO);
-		return null;
+		return GenericDTO.newSuccessInstance();
 	}
 }
