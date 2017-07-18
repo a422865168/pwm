@@ -84,7 +84,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
         BeanUtils.copyProperties(withdrawOrderDO, withdrawComplDTO);
         //如果订单状态为'S1'，则修改订单成功时间
-        if("S1".equals(withdrawOrderDO.getOrderStatus())){
+        if(PwmConstants.WITHDRAW_ORD_S1.equals(withdrawOrderDO.getOrderStatus())){
             withdrawOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
             withdrawOrderDO.setRspSuccTm(DateTimeUtils.getCurrentLocalDateTime());
         }
