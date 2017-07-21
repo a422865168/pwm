@@ -1,7 +1,12 @@
 package com.hisun.lemon.pwm.service;
 
 import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeDTO;
+
+import java.math.BigDecimal;
 
 
 /**
@@ -18,4 +23,14 @@ public interface IRechargeOrderService {
      * @param resultDto
      */
     public void handleResult(GenericDTO resultDto);
+
+    /**
+     * 查询用户信息
+     * @param userId
+     * @return
+     */
+    public HallQueryResultDTO queryUserInfo(String userId,BigDecimal amount);
+    public HallRechargeResultDTO hallRecharge(HallRechargeApplyDTO dto);
+
+    public HallRechargeResultDTO hallRechargeConfirm(HallRechargeApplyDTO dto);
 }

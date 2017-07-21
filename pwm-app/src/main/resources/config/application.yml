@@ -177,7 +177,3 @@ swagger :
   show : true
   swaggerDescription : "请使用swagger做好api文档"
   swaggerServiceUrl : "github 目录"
-
-pwm :
-    defaultPayeeId : 10000
-    rechargeCbUrl : http://pwm.com
