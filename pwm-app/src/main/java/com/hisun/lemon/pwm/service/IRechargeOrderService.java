@@ -1,11 +1,16 @@
 package com.hisun.lemon.pwm.service;
 
 import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeDTO;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeSeaDTO;
 import com.hisun.lemon.pwm.dto.RechargeSeaResultDTO;
 import com.hisun.lemon.pwm.entity.RechargeSeaDO;
+
+import java.math.BigDecimal;
 
 
 /**
@@ -22,16 +27,14 @@ public interface IRechargeOrderService {
      * @param resultDto
      */
     public void handleResult(GenericDTO resultDto);
+
     /**
-     * 充海币下单
-     * @param genRechargeSeaDTO
+     * 查询用户信息
+     * @param userId
      * @return
      */
-    public RechargeSeaDO createSeaOrder(GenericDTO<RechargeSeaDTO> genRechargeSeaDTO);
-    
-    /**
-     * 海币充值的结果通知
-     * @param resultDto
-     */
-    public void seaResult(GenericDTO<RechargeSeaDTO> rechargeSeaDTO);
+    public HallQueryResultDTO queryUserInfo(String userId,BigDecimal amount);
+    public HallRechargeResultDTO hallRecharge(HallRechargeApplyDTO dto);
+
+    public HallRechargeResultDTO hallRechargeConfirm(HallRechargeApplyDTO dto);
 }

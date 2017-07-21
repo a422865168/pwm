@@ -2,8 +2,7 @@ package com.hisun.lemon.pwm.controller;
 
 import javax.annotation.Resource;
 
-import com.hisun.lemon.pwm.dto.RechargeDTO;
-import com.hisun.lemon.pwm.dto.RechargeResultDTO;
+import com.hisun.lemon.pwm.dto.*;
 import com.hisun.lemon.pwm.dto.RechargeSeaDTO;
 import com.hisun.lemon.pwm.entity.RechargeSeaDO;
 
@@ -25,6 +24,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
+
 
  
 @Api(value="处理充值")
@@ -57,6 +57,33 @@ public class RechargeOrderController {
 	public GenericDTO completeOrder(@Validated @RequestBody GenericDTO<RechargeResultDTO> genericResultDTO){
 		service.handleResult(genericResultDTO);
 		return GenericDTO.newSuccessInstance();
+	}
+
+	@ApiOperation(value="营业厅查询", notes="查询用户信息")
+	@ApiImplicitParam(name = "genericResultDTO", value = "查询条件信息", required = true,paramType="body", dataType = "HallQueryDTO")
+	@ApiResponse(code = 200, message = "查询到的用户信息")
+	@PostMapping(value = "/hall/info")
+	public GenericDTO queryUserInfo(@Validated @RequestBody GenericDTO<HallQueryDTO> genericResultDTO){
+		HallQueryResultDTO resultDTO=service.queryUserInfo(genericResultDTO.getBody().getKey(),genericResultDTO.getBody().getAmount());
+		return GenericDTO.newSuccessInstance(resultDTO);
+	}
+
+	@ApiOperation(value="营业厅充值申请", notes="接收营业厅的充值申请请求")
+	@ApiImplicitParam(name = "genericResultDTO", value = "营业厅充值申请信息", required = true,paramType="body", dataType = "HallRechargeApplyDTO")
+	@ApiResponse(code = 200, message = "营业厅充值申请结果")
+	@PatchMapping(value = "/hall/application")
+	public GenericDTO hallRecharge(@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO){
+		HallRechargeResultDTO resultDTO=service.hallRecharge(genericResultDTO.getBody());
+		return GenericDTO.newSuccessInstance(resultDTO);
+	}
+
+	@ApiOperation(value="营业厅充值确认", notes="接收营业厅的充值确认请求")
+	@ApiImplicitParam(name = "genericResultDTO", value = "营业厅充值申请信息", required = true,paramType="body", dataType = "HallRechargeApplyDTO")
+	@ApiResponse(code = 200, message = "营业厅充值确认结果")
+	@PatchMapping(value = "/hall/acknowledgement")
+	public GenericDTO hallRechargeConfirm(@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO){
+		HallRechargeResultDTO resultDTO=service.hallRechargeConfirm(genericResultDTO.getBody());
+		return GenericDTO.newSuccessInstance(resultDTO);
 	}
 	
 	@ApiOperation(value="海币充值下单", notes="生成充值订单，调用收银台")

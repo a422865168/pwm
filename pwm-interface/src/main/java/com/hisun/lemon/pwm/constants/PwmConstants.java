@@ -23,19 +23,19 @@ public class PwmConstants {
 	/**
 	 * 业务类型：充值--快捷充值
 	 */
-	public static final String BUS_TYPE_RECHANGE_QP="0101";
+	public static final String BUS_TYPE_RECHARGE_QP ="0101";
 	/**
 	 * 业务类型：充值--线下充值
 	 */
-	public static final String BUS_TYPE_RECHANGE_OFL="0102";
+	public static final String BUS_TYPE_RECHARGE_OFL ="0102";
 	/**
 	 * 业务类型：充值--营业厅充值
 	 */
-	public static final String BUS_TYPE_RECHANGE_HALL="0103";
+	public static final String BUS_TYPE_RECHARGE_HALL ="0103";
 	/**
 	 * 业务类型：充值--企业网银充值
 	 */
-	public static final String BUS_TYPE_RECHANGE_BNB="0104";
+	public static final String BUS_TYPE_RECHARGE_BNB ="0104";
 	
 	
 	/**
