@@ -104,6 +104,8 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10023','zh','内部用户号不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10024','zh','充值金额不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10025','zh','充海币操作状态非法!',now(),now());
 
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)

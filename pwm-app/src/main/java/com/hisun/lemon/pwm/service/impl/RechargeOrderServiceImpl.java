@@ -1,14 +1,13 @@
 package com.hisun.lemon.pwm.service.impl;
 
 import java.math.BigDecimal;
+
 import javax.annotation.Resource;
 
-import com.hisun.lemon.framework.utils.LemonUtils;
-import com.hisun.lemon.pwm.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
@@ -20,11 +19,15 @@ import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
+import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeSeaDTO;
+import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
-import com.hisun.lemon.pwm.entity.RechargeSeaDO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
 
 @Service
@@ -40,14 +43,16 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	 * 海币充值下单
 	 */
 	@Override
-	public RechargeSeaDO createSeaOrder(GenericDTO<RechargeSeaDTO> genRechargeSeaDTO) {
-		RechargeSeaDTO rechargeDTO = genRechargeSeaDTO.getBody();
-		RechargeSeaDO rechargeDO = new RechargeSeaDO();
+	public RechargeHCouponDO createHCcouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
+		RechargeHCouponDTO rechargeDTO = rechargeHCouponDTO.getBody();
+		RechargeHCouponDO rechargeDO = new RechargeHCouponDO();
 		BeanUtils.copyProperties(rechargeDO, rechargeDTO);
-		rechargeDO.setAcTm(genRechargeSeaDTO.getAccDate());
+		rechargeDO.setAcTm(rechargeHCouponDTO.getAccDate());
 		rechargeDO.setOrderStatus(PwmConstants.RECHANGE_ORD_W);
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = IdGenUtils.generateId(PwmConstants.R_SEA_GEN_PRE + ymd, 15);
+		BigDecimal hCouponAmt=rechargeDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
+		rechargeDO.sethCouponAmt(hCouponAmt);
 		rechargeDO.setOrderNo(ymd + orderNo);
 		// 会计日期
 		rechargeDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
@@ -80,9 +85,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	 * 海币充值下单结果通知
 	 */
 	@Override
-	public void seaResult(GenericDTO<RechargeSeaDTO> rechargeSeaDTO) {
-		RechargeSeaDTO rechargSeaDTO = rechargeSeaDTO.getBody();
-		RechargeSeaDO rechargeSeaDO = this.service.getRechangeSea(rechargSeaDTO.getOrderNo());
+	public void hCouponResult(GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO) {
+		RechargeHCouponResultDTO rechargSeaDTO = rechargeHCouponDTO.getBody();
+		RechargeHCouponDO rechargeSeaDO = this.service.getHCoupon(rechargSeaDTO.getOrderNo());
+		
 		// 原订单不存在
 		if (JudgeUtils.isNull(rechargeSeaDO)) {
 			throw new LemonException("PWM20008");
@@ -93,10 +99,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 		// 订单失败
 		if (!StringUtils.equals(rechargSeaDTO.getOrderStatus(), PwmConstants.RECHANGE_ORD_S)) {
-			RechargeSeaDO updateSeaDTO = new RechargeSeaDO();
+			RechargeHCouponDO updateSeaDTO = new RechargeHCouponDO();
 			updateSeaDTO.setOrderCcy(rechargSeaDTO.getOrderCcy());
 			updateSeaDTO.setOrderNo(rechargSeaDTO.getOrderNo());
-			updateSeaDTO.setAcTm(rechargeSeaDTO.getAccDate());
+			updateSeaDTO.setAcTm(rechargeHCouponDTO.getAccDate());
 			updateSeaDTO.setOrderStatus(PwmConstants.RECHANGE_ORD_F);
 			this.service.updateSeaOrder(updateSeaDTO);
 			return;
@@ -113,16 +119,14 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		// 更新订单
 		//计算海币数量  1:100multiply
 		BigDecimal hCouponAmt=rechargSeaDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
-	    RechargeSeaDO update=new RechargeSeaDO();
-	    update.setAcTm(rechargeSeaDTO.getAccDate());
+		RechargeHCouponDO update=new RechargeHCouponDO();
+	    update.setAcTm(rechargeHCouponDTO.getAccDate());
 	    update.sethCouponAmt(hCouponAmt);
 	    update.setOrderAmt(rechargSeaDTO.getOrderAmt());
 		update.setOrderStatus(PwmConstants.RECHANGE_ORD_S);
-		update.setAcTm(rechargeSeaDTO.getAccDate());
 		update.setOrderCcy(rechargSeaDTO.getOrderCcy());
 		update.setOrderNo(rechargSeaDTO.getOrderNo());
 		service.updateSeaOrder(update);
-
 	}
 
 	@Override
@@ -150,16 +154,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setTxType("01");
 		service.initOrder(rechargeOrderDO);
 
-		// 调用收银
-		InitCashierDTO initCashierDTO = new InitCashierDTO();
-		initCashierDTO.setBusPaytype(null);
-		initCashierDTO.setBusType(rechargeOrderDO.getBusType());
-		// initCashierDTO.setCbUrl(LemonUtils.getProperty("pwm.rechargeCbUrl"));
-		initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
-		initCashierDTO.setPayeeId(LemonUtils.getProperty("pwm.defaultPayeeId"));
-		initCashierDTO.setSysChannel(rechargeDTO.getSysChannel());
-		initCashierDTO.setPayerId("");
-		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		logger.info("登记充值订单成功，订单号："+rechargeOrderDO.getOrderNo());
 		//调用收银
 		InitCashierDTO initCashierDTO=new InitCashierDTO();

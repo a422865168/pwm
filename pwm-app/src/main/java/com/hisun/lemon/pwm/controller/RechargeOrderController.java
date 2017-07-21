@@ -3,8 +3,7 @@ package com.hisun.lemon.pwm.controller;
 import javax.annotation.Resource;
 
 import com.hisun.lemon.pwm.dto.*;
-import com.hisun.lemon.pwm.dto.RechargeSeaDTO;
-import com.hisun.lemon.pwm.entity.RechargeSeaDO;
+import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -90,8 +87,8 @@ public class RechargeOrderController {
 	@ApiImplicitParam(name = "genRechargeSeaDTO", value = "业务模块传递的充值数据", required = true,paramType="body", dataType = "GenericDTO")
 	@ApiResponse(code = 200, message = "充值下单")
     @PostMapping(value = "/order/sea")
-    public GenericDTO<RechargeSeaDO> createSeaOrder(@Validated @RequestBody GenericDTO<RechargeSeaDTO> genRechargeSeaDTO) {
-		RechargeSeaDO rechargeSea=this.service.createSeaOrder(genRechargeSeaDTO);
+    public GenericDTO<RechargeHCouponDO> createHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
+		RechargeHCouponDO rechargeSea=this.service.createHCcouponOrder(rechargeHCouponDTO);
 		GenericDTO dto = GenericDTO.newSuccessInstance(rechargeSea.getClass());
 		dto.setBody(rechargeSea);
 		return dto;
@@ -102,8 +99,8 @@ public class RechargeOrderController {
 	@ApiImplicitParam(name = "rechargeSeaDTO", value = "充值通知详细数据", required = true,paramType="body", dataType = "RechargeResultDTO")
 	@ApiResponse(code = 200, message = "处理通知结果")
 	@PatchMapping(value = "/result/sea")
-	public GenericDTO<NoBody> completeSeaOrder(@Validated @RequestBody GenericDTO<RechargeSeaDTO> rechargeSeaDTO){
-		service.seaResult(rechargeSeaDTO);
+	public GenericDTO<NoBody> completeHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO){
+		service.hCouponResult(rechargeHCouponDTO);
 		return GenericDTO.newSuccessInstance();
 	}
 }

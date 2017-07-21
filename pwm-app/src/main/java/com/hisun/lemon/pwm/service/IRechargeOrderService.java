@@ -5,10 +5,10 @@ import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeSeaDTO;
-import com.hisun.lemon.pwm.dto.RechargeSeaResultDTO;
-import com.hisun.lemon.pwm.entity.RechargeSeaDO;
+import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 
 import java.math.BigDecimal;
 
@@ -37,4 +37,17 @@ public interface IRechargeOrderService {
     public HallRechargeResultDTO hallRecharge(HallRechargeApplyDTO dto);
 
     public HallRechargeResultDTO hallRechargeConfirm(HallRechargeApplyDTO dto);
+    
+    /**
+     * 海币充值下单
+     * @param rechargeHCouponDTO
+     * @return
+     */
+    public RechargeHCouponDO createHCcouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
+    
+    /**
+     * 海币充值结果处理
+     * @param rechargeHCouponDTO
+     */
+    public void hCouponResult(GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO);
 }

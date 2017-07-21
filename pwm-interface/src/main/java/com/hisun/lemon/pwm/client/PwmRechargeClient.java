@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeSeaDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
 
 /**
  * 充提  充值服务接口
@@ -19,7 +19,7 @@ import com.hisun.lemon.pwm.dto.RechargeSeaDTO;
  */
 @FeignClient("PWM")
 public interface PwmRechargeClient {
-    /**
+	/**
      * 充值结果通知
      * @param rechargeResultDTO 通知数据
      * @return
@@ -33,5 +33,5 @@ public interface PwmRechargeClient {
      * @return
      */
     @PatchMapping("/pwm/recharge/result/sea")
-    public GenericDTO<NoBody> completeSeaOrder(@Validated @RequestBody GenericDTO<RechargeSeaDTO> rechargeSeaDTO);
+    public GenericDTO<NoBody> completeSeaOrder(@Validated @RequestBody GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO);
 }
