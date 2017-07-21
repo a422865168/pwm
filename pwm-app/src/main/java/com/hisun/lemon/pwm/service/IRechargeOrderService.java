@@ -5,6 +5,10 @@ import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeDTO;
+import com.hisun.lemon.pwm.dto.RechargeResultDTO;
+import com.hisun.lemon.pwm.dto.RechargeSeaDTO;
+import com.hisun.lemon.pwm.dto.RechargeSeaResultDTO;
+import com.hisun.lemon.pwm.entity.RechargeSeaDO;
 
 import java.math.BigDecimal;
 

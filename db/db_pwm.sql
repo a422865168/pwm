@@ -29,6 +29,19 @@ CREATE TABLE `pwm_rechange_order` (
   PRIMARY KEY (`order_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `pwm_rechange_sea` (
+  `order_no` varchar(24) NOT NULL COMMENT '海币充值订单编号',
+  `user_id` varchar(24) NOT NULL COMMENT '内部用户号',
+  `order_amt` decimal(13,2) NOT NULL DEFAULT '0.00' COMMENT '充值金额',
+  `order_ccy` varchar(4) NOT NULL COMMENT '币种',
+  `order_status` varchar(2) NOT NULL COMMENT '订单状态',
+  `h_coupon_amt` decimal(13,2) NOT NULL DEFAULT '0.00' COMMENT '海币数量',
+  `ac_tm` date NOT NULL COMMENT '会计日期',
+  `tx_tm` datetime NOT NULL COMMENT '交易时间',
+  `tm_smp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '时间戳',
+  PRIMARY KEY (`order_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10001','zh','充值金额非法!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
@@ -79,3 +92,26 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20004','zh','生成订单不唯一!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20005','zh','更新订单失败!',now(),now());
+
+--------------ruan
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10020','zh','币种不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10021','zh','海币充值订单号不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10022','zh','海币充值订状态不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10023','zh','内部用户号不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10024','zh','充值金额不能为空!',now(),now());
+
+
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20006','zh','生成海币充值订单不唯一!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20007','zh','更新海币充值订单失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20008','zh','原海币充值订单不存在!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20009','zh','海币充值金额不一致!',now(),now());
+-------------------------

@@ -3,6 +3,9 @@ package com.hisun.lemon.pwm.controller;
 import javax.annotation.Resource;
 
 import com.hisun.lemon.pwm.dto.*;
+import com.hisun.lemon.pwm.dto.RechargeSeaDTO;
+import com.hisun.lemon.pwm.entity.RechargeSeaDO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
 
 import io.swagger.annotations.Api;
@@ -80,5 +84,26 @@ public class RechargeOrderController {
 	public GenericDTO hallRechargeConfirm(@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO){
 		HallRechargeResultDTO resultDTO=service.hallRechargeConfirm(genericResultDTO.getBody());
 		return GenericDTO.newSuccessInstance(resultDTO);
+	}
+	
+	@ApiOperation(value="海币充值下单", notes="生成充值订单，调用收银台")
+	@ApiImplicitParam(name = "genRechargeSeaDTO", value = "业务模块传递的充值数据", required = true,paramType="body", dataType = "GenericDTO")
+	@ApiResponse(code = 200, message = "充值下单")
+    @PostMapping(value = "/order/sea")
+    public GenericDTO<RechargeSeaDO> createSeaOrder(@Validated @RequestBody GenericDTO<RechargeSeaDTO> genRechargeSeaDTO) {
+		RechargeSeaDO rechargeSea=this.service.createSeaOrder(genRechargeSeaDTO);
+		GenericDTO dto = GenericDTO.newSuccessInstance(rechargeSea.getClass());
+		dto.setBody(rechargeSea);
+		return dto;
+    }
+	
+	
+	@ApiOperation(value="海币充值处理结果通知", notes="接收收银台的处理结果通知")
+	@ApiImplicitParam(name = "rechargeSeaDTO", value = "充值通知详细数据", required = true,paramType="body", dataType = "RechargeResultDTO")
+	@ApiResponse(code = 200, message = "处理通知结果")
+	@PatchMapping(value = "/result/sea")
+	public GenericDTO<NoBody> completeSeaOrder(@Validated @RequestBody GenericDTO<RechargeSeaDTO> rechargeSeaDTO){
+		service.seaResult(rechargeSeaDTO);
+		return GenericDTO.newSuccessInstance();
 	}
 }
