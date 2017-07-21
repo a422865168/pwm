@@ -1,11 +1,10 @@
 package com.hisun.lemon.pwm.dto;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern; 
-import org.hibernate.validator.constraints.NotEmpty; 
-import com.hisun.lemon.framework.data.GenericDTO;
-
 import java.math.BigDecimal;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
+import org.hibernate.validator.constraints.NotEmpty;
 
 
 /**
