@@ -9,7 +9,6 @@ import com.hisun.lemon.pwm.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.DateTimeUtils;
@@ -49,7 +48,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setOrderCcy("USD");
 		rechargeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
 		rechargeOrderDO.setOrderNo(ymd+orderNo);
-		rechargeOrderDO.setOrderStatus(PwmConstants.RECHANGE_ORD_W);
+		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setPsnFlag(rechargeDTO.getPsnFlag());
 		rechargeOrderDO.setRemark("");
@@ -87,15 +86,15 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 
 		//订单已经成功
-		if(StringUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHANGE_ORD_S)){
+		if(StringUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_S)){
 			return;
 		}
 
 		//判断返回状态
-		if(!StringUtils.equals(rechargeResultDTO.getStatus(),PwmConstants.RECHANGE_ORD_S)){
+		if(!StringUtils.equals(rechargeResultDTO.getStatus(),PwmConstants.RECHARGE_ORD_S)){
 			RechargeOrderDO updOrderDO =new RechargeOrderDO();
 			updOrderDO.setExtOrderNo(rechargeResultDTO.getExtOrderNo());
-			updOrderDO.setOrderStatus(PwmConstants.RECHANGE_ORD_F);
+			updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
 			updOrderDO.setOrderCcy(rechargeResultDTO.getOrderCcy());
 			updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 			updOrderDO.setOrderNo(orderNo);
@@ -115,7 +114,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		RechargeOrderDO updOrderDO =new RechargeOrderDO();
 		updOrderDO.setAcTm(resultDto.getAccDate());
 		updOrderDO.setExtOrderNo(rechargeResultDTO.getExtOrderNo());
-		updOrderDO.setOrderStatus(PwmConstants.RECHANGE_ORD_S);
+		updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
 		updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
 		updOrderDO.setOrderCcy(rechargeResultDTO.getOrderCcy());
 		updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());

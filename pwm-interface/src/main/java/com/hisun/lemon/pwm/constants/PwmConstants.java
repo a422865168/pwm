@@ -51,21 +51,21 @@ public class PwmConstants {
 	/**
 	 * 充值订单状态：等待充值
 	 */
-	public static final String RECHANGE_ORD_W="W";
+	public static final String RECHARGE_ORD_W ="W";
 	/**
 	 * 充值订单状态：充值成功
 	 */
-	public static final String RECHANGE_ORD_S="S";
+	public static final String RECHARGE_ORD_S ="S";
 	
 	/**
 	 * 充值订单状态：交易逾期
 	 */
-	public static final String RECHANGE_ORD_TO="T";
+	public static final String RECHARGE_ORD_TO ="T";
 	
 	/**
 	 * 充值订单状态：交易失败
 	 */
-	public static final String RECHANGE_ORD_F="F";
+	public static final String RECHARGE_ORD_F ="F";
 
 	/**
 	 * 提现订单状态W1：系统受理中
