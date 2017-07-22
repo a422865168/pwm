@@ -15,20 +15,19 @@ import java.math.BigDecimal;
 public class WithdrawComplDTO {
 
     //提现订单号
-    @NotEmpty(message="PWM17007")
+    @NotEmpty(message="PWM10005")
     private String orderNo;
     //实际提现金额
-    @Min(value=0, message="PWM17002")
+    @Min(value=0, message="PWM10026")
     private BigDecimal wcActAmt;
     //资金流出模块订单号
-    @NotEmpty(message="PWM17007")
     private String rspOrderNo;
     //资金流出模块成功时间
     private String rspSuccTm;
     //记账时间
     private String acTm;
     //提现状态
-    @NotEmpty(message="PWM17007")
+    @NotEmpty(message="PWM10009")
     private String orderStatus;
 
     public String getOrderNo() {

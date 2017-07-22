@@ -116,22 +116,6 @@ public class WithdrawOrderDO extends BaseDO {
      * @Fields busCnl 业务受理渠道
      */
     private String busCnl;
-    /**
-     * @Fields userIpAdr 用户操作IP地址
-     */
-    private String userIpAdr;
-    /**
-     * @Fields userOprSys 用户操作系统信息
-     */
-    private String userOprSys;
-    /**
-     * @Fields userBrowInfo 用户浏览器信息
-     */
-    private String userBrowInfo;
-    /**
-     * @Fields tmSmp 时间戳
-     */
-    private LocalDateTime tmSmp;
 
     public String getOrderNo() {
         return orderNo;
@@ -341,35 +325,4 @@ public class WithdrawOrderDO extends BaseDO {
         this.busCnl = busCnl;
     }
 
-    public String getUserIpAdr() {
-        return userIpAdr;
-    }
-
-    public void setUserIpAdr(String userIpAdr) {
-        this.userIpAdr = userIpAdr;
-    }
-
-    public String getUserOprSys() {
-        return userOprSys;
-    }
-
-    public void setUserOprSys(String userOprSys) {
-        this.userOprSys = userOprSys;
-    }
-
-    public String getUserBrowInfo() {
-        return userBrowInfo;
-    }
-
-    public void setUserBrowInfo(String userBrowInfo) {
-        this.userBrowInfo = userBrowInfo;
-    }
-
-    public LocalDateTime getTmSmp() {
-        return tmSmp;
-    }
-
-    public void setTmSmp(LocalDateTime tmSmp) {
-        this.tmSmp = tmSmp;
-    }
 }

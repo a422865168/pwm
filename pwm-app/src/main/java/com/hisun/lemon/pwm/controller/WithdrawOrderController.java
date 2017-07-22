@@ -1,5 +1,6 @@
 package com.hisun.lemon.pwm.controller;
 
+import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.pwm.dto.WithdrawComplDTO;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
 import org.slf4j.Logger;
@@ -36,10 +37,12 @@ public class WithdrawOrderController {
 	@ApiImplicitParam(name = "genericWithdrawResultDTO", value = "提现通知详细数据", required = true,paramType="body", dataType = "GenericDTO<WithdrawResultDTO>")
 	@ApiResponse(code = 200, message = "申请提现")
     @PostMapping(value = "/order")
-    public GenericDTO<WithdrawResultDTO> createOrder(@Validated @RequestBody GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO) {
+    public GenericDTO createOrder(@Validated @RequestBody GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO) {
 
 		withdrawOrderService.createOrder(genericWithdrawResultDTO);
-		return null;
+		GenericDTO<WithdrawResultDTO> genericDTO = new GenericDTO<WithdrawResultDTO>();
+		genericDTO.setMsgCd(LemonUtils.getSuccessMsgCd());
+		return genericDTO;
     }
 
 	/**
@@ -51,9 +54,11 @@ public class WithdrawOrderController {
 	@ApiImplicitParam(name = "genericWithdrawComplDTO", value = "提现详细数据", required = true,paramType="body", dataType = "GenericDTO<WithdrawComplDTO>")
 	@ApiResponse(code = 200, message = "申请提现结果")
 	@PatchMapping(value = "/result")
-	public GenericDTO<WithdrawComplDTO> completeOrder(@Validated @RequestBody GenericDTO<WithdrawComplDTO> genericWithdrawComplDTO){
+	public GenericDTO completeOrder(@Validated @RequestBody GenericDTO<WithdrawComplDTO> genericWithdrawComplDTO){
 		withdrawOrderService.completeOrder(genericWithdrawComplDTO);
-		return null;
+		GenericDTO<WithdrawComplDTO> genericDTO = new GenericDTO<WithdrawComplDTO>();
+		genericDTO.setMsgCd(LemonUtils.getSuccessMsgCd());
+		return genericDTO;
 	} 
 	
 }

@@ -20,37 +20,37 @@ import com.hisun.lemon.framework.data.GenericDTO;
 public class WithdrawResultDTO {
 
 	//用户编号
-    @NotEmpty(message="PWM17007")
+    @NotEmpty(message="PWM10027")
     private String userId;
 	//提现银行卡号
-	@NotEmpty(message="PWM17001")
+	@NotEmpty(message="PWM10028")
     private String capCardNo;
 	//申请提现金额
-	@Min(value=0, message="PWM17002")
+	@Min(value=0, message="PWM10029")
 	private BigDecimal wcApplyAmt;
 	//提现手续费
-	@Min(value=0, message="PWM17002")
+	@Min(value=0, message="PWM10030")
 	private BigDecimal feeAmt;
 	//币种
-	@NotEmpty(message="PWM17001")
+	@NotEmpty(message="PWM10020")
 	private String orderCcy;
 	//提现类型
-	@NotEmpty(message="PWM17001")
+	@NotEmpty(message="PWM10031")
 	private String wcType;
 	//付款加急标识
-	@NotEmpty(message="PWM17001")
+	@NotEmpty(message="PWM10032")
 	private String payUrgeFlg;
 	//资金合作机构
-	@NotEmpty(message="PWM17001")
+	@NotEmpty(message="PWM10033")
 	private String capCorgNo;
 	//支付密码
-	@NotEmpty(message="PWM17001")
+	@NotEmpty(message="PWM10034")
 	private String payPassWord;
 	//订单渠道
-	@NotEmpty(message="PWM17001")
+	@NotEmpty(message="PWM10002")
 	private String busCnl;
 	//通知手机号
-	@NotEmpty(message="PWM17001")
+	@NotEmpty(message="PWM10035")
 	private String ntfMbl;
 	//备注
 	private String wcRemark;

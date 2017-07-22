@@ -32,31 +32,31 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		WithdrawResultDTO withdrawResultDTO = genericWithdrawResultDTO.getBody();
 		//校验申请提现金额是否不小于0
 		if(withdrawResultDTO.getWcApplyAmt().compareTo(new BigDecimal(0)) <= 0) {
-			LemonException.throwBusinessException("PWM10006");
+			LemonException.throwBusinessException("PWM10029");
 		}
 		//校验手续费是否不小于0
 		if(withdrawResultDTO.getFeeAmt().compareTo(new BigDecimal(0)) <= 0) {
-			LemonException.throwBusinessException("PWM10006");
+			LemonException.throwBusinessException("PWM10030");
 		}
 		//查询用户是否为黑名单
 		//校验用户如为黑名单，则抛出异常信息
 		if("在黑名单中".equals(withdrawResultDTO.getUserId())){
-			LemonException.throwBusinessException("PWM10005");
+			LemonException.throwBusinessException("PWM30001");
 		}
 		BigDecimal balance = new BigDecimal(0);
 		//查询用户账户余额，
 		//balance = GetBalanceDao(withdrawResultDTO.getUserId());
 		//校验提现余额加手续费大于用户账户余额,则抛出异常
 		/*if(balance.compareTo(withdrawResultDTO.getActAmount()) == 1){
-			LemonException.throwBusinessException("PWM10004");
+			LemonException.throwBusinessException("PWM30002");
 		}*/
 		//查询支付密码错误次数是否超过5次
 		/*if("支付密码错误次数是否超过5".equals(withdrawOrderDO.getUserId())){
-			LemonException.throwBusinessException("PWM10003");
+			LemonException.throwBusinessException("PWM30003");
 		}*/
 		//查询用户支付密码，校验支付密码，错误则抛异常
 		/*if(!"用户账户支付密码".equals(withdrawOrderDO.getPayPassword())){
-			LemonException.throwBusinessException("PWM10002");
+			LemonException.throwBusinessException("PWM30004");
 		}*/
 		//初始化提现订单数据
 		WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();

@@ -42,6 +42,41 @@ CREATE TABLE `pwm_rechange_sea` (
   PRIMARY KEY (`order_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `pwm_withdraw_order`;
+CREATE TABLE `pwm_withdraw_order` (
+  `order_no` varchar(24) NOT NULL COMMENT '订单号',
+  `order_tm` datetime NOT NULL COMMENT '订单时间',
+  `order_exp_tm` datetime NOT NULL COMMENT '订单失效时间',
+  `ac_tm` date DEFAULT NULL COMMENT '记账时间',
+  `order_ccy` char(3) NOT NULL COMMENT '币种',
+  `order_succ_tm` datetime DEFAULT NULL COMMENT '订单成功时间',
+  `wc_type` char(2) NOT NULL COMMENT '提现类型 11:自主提现 21:自动结算',
+  `tx_type` varchar(2) NOT NULL COMMENT '交易类型 01.充值 02.消费 03.转账 04.提现 05.充海币',
+  `bus_type` varchar(4) NOT NULL COMMENT '业务类型 04:提现 0401:个人提现 0402:商户提现',
+  `wc_apply_amt` decimal(13,2) NOT NULL COMMENT '申请提现金额',
+  `wc_act_amt` decimal(13,2) DEFAULT '0.00' COMMENT '实际提现金额',
+  `fee_amt` decimal(9,2) NOT NULL COMMENT '手续费金额',
+  `pay_urge_flg` char(1) NOT NULL DEFAULT '0' COMMENT '付款加急标识 1.是 0.否',
+  `user_id` varchar(20) NOT NULL COMMENT '内部用户编号',
+  `user_name` varchar(60) NOT NULL COMMENT '用户/商户名称',
+  `agr_no` varchar(20) DEFAULT '' COMMENT '签约协议号',
+  `cap_corg_no` varchar(16) NOT NULL DEFAULT '' COMMENT '资金合作机构号',
+  `cap_card_no` varchar(30) NOT NULL COMMENT '资金卡号',
+  `cap_card_type` char(1) NOT NULL DEFAULT '' COMMENT '资金卡账户类型 0:借记卡 1:信用卡 2:准贷记卡 3:储蓄账户',
+  `cap_card_name` varchar(60) DEFAULT '' COMMENT '资金卡账户姓名',
+  `wc_remark` varchar(100) DEFAULT '' COMMENT '提现备注',
+  `ntf_mbl` varchar(20) NOT NULL COMMENT '通知的手机号',
+  `order_status` char(2) NOT NULL COMMENT '订单状态 W1:系统受理中 W2:资金流出已受理 S1:付款成功 F1:付款失败 F2:付款核销 R9:审批拒绝',
+  `rsp_order_no` varchar(20) DEFAULT NULL COMMENT '资金流出模块订单号',
+  `rsp_succ_tm` datetime DEFAULT NULL COMMENT '资金流出模块成功时间',
+  `bus_cnl` varchar(5) NOT NULL COMMENT '业务受理渠道',
+  `modify_time` datetime NOT NULL COMMENT '修改时间',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `tm_smp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '时间戳',
+  PRIMARY KEY (`order_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10001','zh','充值金额非法!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
@@ -116,4 +151,38 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20008','zh','原海币充值订单不存在!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20009','zh','海币充值金额不一致!',now(),now());
+-------------------------
+
+
+---------------------leon
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10026','zh','实际提现金额不小于0!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10027','zh','用户编号不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10028','zh','银行卡号不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10029','zh','申请提现金额不小于0!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10030','zh','申请手续费不小于0!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10031','zh','提现类型不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10032','zh','付款加急标识不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10033','zh','资金合作机构不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10034','zh','支付密码不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10035','zh','手机号不能为空!',now(),now());
+
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30001','zh','该用户为黑名单!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30002','zh','提现余额加手续费大于用户账户余额!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30003','zh','支付密码错误次数超过5次!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30004','zh','支付密码错误!',now(),now());
+
 -------------------------
