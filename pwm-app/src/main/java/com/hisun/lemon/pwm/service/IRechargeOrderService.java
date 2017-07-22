@@ -43,11 +43,11 @@ public interface IRechargeOrderService {
      * @param rechargeHCouponDTO
      * @return
      */
-    public RechargeHCouponDO createHCcouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
+    public RechargeHCouponDO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
     
     /**
      * 海币充值结果处理
      * @param rechargeHCouponDTO
      */
-    public void hCouponResult(GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO);
+    public void handleHCouponResult(GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO);
 }

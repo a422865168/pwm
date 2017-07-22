@@ -43,12 +43,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	 * 海币充值下单
 	 */
 	@Override
-	public RechargeHCouponDO createHCcouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
+	public RechargeHCouponDO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
 		RechargeHCouponDTO rechargeDTO = rechargeHCouponDTO.getBody();
 		RechargeHCouponDO rechargeDO = new RechargeHCouponDO();
 		BeanUtils.copyProperties(rechargeDO, rechargeDTO);
 		rechargeDO.setAcTm(rechargeHCouponDTO.getAccDate());
-		rechargeDO.setOrderStatus(PwmConstants.RECHANGE_ORD_W);
+		rechargeDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = IdGenUtils.generateId(PwmConstants.R_SEA_GEN_PRE + ymd, 15);
 		BigDecimal hCouponAmt=rechargeDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
@@ -85,7 +85,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	 * 海币充值下单结果通知
 	 */
 	@Override
-	public void hCouponResult(GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO) {
+	public void handleHCouponResult(GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO) {
 		RechargeHCouponResultDTO rechargSeaDTO = rechargeHCouponDTO.getBody();
 		RechargeHCouponDO rechargeSeaDO = this.service.getHCoupon(rechargSeaDTO.getOrderNo());
 		
@@ -94,16 +94,16 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM20008");
 		}
 		// 订单已经成功
-		if (StringUtils.equals(rechargeSeaDO.getOrderStatus(), PwmConstants.RECHANGE_ORD_S)) {
+		if (StringUtils.equals(rechargeSeaDO.getOrderStatus(), PwmConstants.RECHARGE_ORD_S)) {
 			return;
 		}
 		// 订单失败
-		if (!StringUtils.equals(rechargSeaDTO.getOrderStatus(), PwmConstants.RECHANGE_ORD_S)) {
+		if (!StringUtils.equals(rechargSeaDTO.getOrderStatus(), PwmConstants.RECHARGE_ORD_S)) {
 			RechargeHCouponDO updateSeaDTO = new RechargeHCouponDO();
 			updateSeaDTO.setOrderCcy(rechargSeaDTO.getOrderCcy());
 			updateSeaDTO.setOrderNo(rechargSeaDTO.getOrderNo());
 			updateSeaDTO.setAcTm(rechargeHCouponDTO.getAccDate());
-			updateSeaDTO.setOrderStatus(PwmConstants.RECHANGE_ORD_F);
+			updateSeaDTO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
 			this.service.updateSeaOrder(updateSeaDTO);
 			return;
 		}
@@ -123,7 +123,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	    update.setAcTm(rechargeHCouponDTO.getAccDate());
 	    update.sethCouponAmt(hCouponAmt);
 	    update.setOrderAmt(rechargSeaDTO.getOrderAmt());
-		update.setOrderStatus(PwmConstants.RECHANGE_ORD_S);
+		update.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
 		update.setOrderCcy(rechargSeaDTO.getOrderCcy());
 		update.setOrderNo(rechargSeaDTO.getOrderNo());
 		service.updateSeaOrder(update);
@@ -146,7 +146,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setOrderCcy("USD");
 		rechargeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
 		rechargeOrderDO.setOrderNo(ymd + orderNo);
-		rechargeOrderDO.setOrderStatus(PwmConstants.RECHANGE_ORD_W);
+		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setPsnFlag(rechargeDTO.getPsnFlag());
 		rechargeOrderDO.setRemark("");
@@ -185,15 +185,15 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 
 		// 订单已经成功
-		if (StringUtils.equals(rechargeOrderDO.getOrderStatus(), PwmConstants.RECHANGE_ORD_S)) {
+		if (StringUtils.equals(rechargeOrderDO.getOrderStatus(), PwmConstants.RECHARGE_ORD_S)) {
 			return;
 		}
 
 		// 判断返回状态
-		if (!StringUtils.equals(rechargeResultDTO.getStatus(), PwmConstants.RECHANGE_ORD_S)) {
+		if (!StringUtils.equals(rechargeResultDTO.getStatus(), PwmConstants.RECHARGE_ORD_S)) {
 			RechargeOrderDO updOrderDO = new RechargeOrderDO();
 			updOrderDO.setExtOrderNo(rechargeResultDTO.getExtOrderNo());
-			updOrderDO.setOrderStatus(PwmConstants.RECHANGE_ORD_F);
+			updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
 			updOrderDO.setOrderCcy(rechargeResultDTO.getOrderCcy());
 			updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 			updOrderDO.setOrderNo(orderNo);
@@ -213,7 +213,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		RechargeOrderDO updOrderDO = new RechargeOrderDO();
 		updOrderDO.setAcTm(resultDto.getAccDate());
 		updOrderDO.setExtOrderNo(rechargeResultDTO.getExtOrderNo());
-		updOrderDO.setOrderStatus(PwmConstants.RECHANGE_ORD_S);
+		updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
 		updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
 		updOrderDO.setOrderCcy(rechargeResultDTO.getOrderCcy());
 		updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());

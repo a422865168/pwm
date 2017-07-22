@@ -88,7 +88,7 @@ public class RechargeOrderController {
 	@ApiResponse(code = 200, message = "充值下单")
     @PostMapping(value = "/order/sea")
     public GenericDTO<RechargeHCouponDO> createHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
-		RechargeHCouponDO rechargeSea=this.service.createHCcouponOrder(rechargeHCouponDTO);
+		RechargeHCouponDO rechargeSea=this.service.createHCouponOrder(rechargeHCouponDTO);
 		GenericDTO dto = GenericDTO.newSuccessInstance(rechargeSea.getClass());
 		dto.setBody(rechargeSea);
 		return dto;
@@ -100,7 +100,7 @@ public class RechargeOrderController {
 	@ApiResponse(code = 200, message = "处理通知结果")
 	@PatchMapping(value = "/result/sea")
 	public GenericDTO<NoBody> completeHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO){
-		service.hCouponResult(rechargeHCouponDTO);
+		service.handleHCouponResult(rechargeHCouponDTO);
 		return GenericDTO.newSuccessInstance();
 	}
 }
