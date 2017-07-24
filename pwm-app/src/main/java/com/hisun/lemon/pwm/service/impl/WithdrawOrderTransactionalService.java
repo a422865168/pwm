@@ -2,13 +2,11 @@ package com.hisun.lemon.pwm.service.impl;
 
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.pwm.dao.IWithdrawOrderDao;
-import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 
 /**
  * @author leon
