@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.hisun.lemon.framework.data.GenericDTO;
-import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
+import com.hisun.lemon.pwm.dto.WithdrawDTO;
 
 /**
  * 充提  提现服务接口
@@ -18,5 +18,5 @@ import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
 @FeignClient("PWM")
 public interface PwmWithdrawClient {
     @PatchMapping("/pwm/withdraw/result")
-    public GenericDTO withdrawNotify(@Validated @RequestBody GenericDTO<WithdrawResultDTO> withdrawResultDTO);
+    public GenericDTO withdrawNotify(@Validated @RequestBody GenericDTO<WithdrawDTO> withdrawDTO);
 }

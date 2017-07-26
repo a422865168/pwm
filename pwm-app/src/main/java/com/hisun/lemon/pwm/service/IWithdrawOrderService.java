@@ -1,8 +1,8 @@
 package com.hisun.lemon.pwm.service;
 
 import com.hisun.lemon.framework.data.GenericDTO;
-import com.hisun.lemon.pwm.dto.WithdrawComplDTO;
 import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
+import com.hisun.lemon.pwm.dto.WithdrawDTO;
 
 /**
  * @author tone
@@ -14,13 +14,13 @@ public interface IWithdrawOrderService {
 
     /**
      * 提现申请，生成提现订单
-     * @param genericWithdrawResultDTO
+     * @param genericWithdrawDTO
      */
-    public void createOrder(GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO);
+    public void createOrder(GenericDTO<WithdrawDTO> genericWithdrawDTO);
 
     /**
      * 提现结果处理：更新订单信息
-     * @param genericWithdrawComplDTO
+     * @param genericWithdrawResultDTO
      */
-    public void completeOrder(GenericDTO<WithdrawComplDTO> genericWithdrawComplDTO);
+    public void completeOrder(GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO);
 }
