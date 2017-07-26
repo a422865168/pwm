@@ -177,6 +177,9 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10035','zh','手机号不能为空!',now(),now());
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10036','zh','营业厅充值请求参数校验失败!',now(),now());
+
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30001','zh','该用户为黑名单!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30002','zh','提现余额加手续费大于用户账户余额!',now(),now());
