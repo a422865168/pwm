@@ -7,8 +7,8 @@ import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
-import com.hisun.lemon.pwm.dto.WithdrawComplDTO;
 import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
+import com.hisun.lemon.pwm.dto.WithdrawDTO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
 import org.springframework.stereotype.Service;
@@ -27,27 +27,27 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
     private WithdrawOrderTransactionalService withdrawOrderTransactionalService;
 
 	@Override
-	public void createOrder(GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO) {
+	public void createOrder(GenericDTO<WithdrawDTO> genericWithdrawDTO) {
 
-		WithdrawResultDTO withdrawResultDTO = genericWithdrawResultDTO.getBody();
+		WithdrawDTO withdrawDTO = genericWithdrawDTO.getBody();
 		//校验申请提现金额是否不小于0
-		if(withdrawResultDTO.getWcApplyAmt().compareTo(new BigDecimal(0)) <= 0) {
+		if(withdrawDTO.getWcApplyAmt().compareTo(new BigDecimal(0)) <= 0) {
 			LemonException.throwBusinessException("PWM10029");
 		}
 		//校验手续费是否不小于0
-		if(withdrawResultDTO.getFeeAmt().compareTo(new BigDecimal(0)) <= 0) {
+		if(withdrawDTO.getFeeAmt().compareTo(new BigDecimal(0)) <= 0) {
 			LemonException.throwBusinessException("PWM10030");
 		}
 		//查询用户是否为黑名单
 		//校验用户如为黑名单，则抛出异常信息
-		if("在黑名单中".equals(withdrawResultDTO.getUserId())){
+		if("在黑名单中".equals(withdrawDTO.getUserId())){
 			LemonException.throwBusinessException("PWM30001");
 		}
 		BigDecimal balance = new BigDecimal(0);
 		//查询用户账户余额，
-		//balance = GetBalanceDao(withdrawResultDTO.getUserId());
+		//balance = GetBalanceDao(withdrawDTO.getUserId());
 		//校验提现余额加手续费大于用户账户余额,则抛出异常
-		/*if(balance.compareTo(withdrawResultDTO.getActAmount()) == 1){
+		/*if(balance.compareTo(withdrawDTO.getActAmount()) == 1){
 			LemonException.throwBusinessException("PWM30002");
 		}*/
 		//查询支付密码错误次数是否超过5次
@@ -60,7 +60,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		}*/
 		//初始化提现订单数据
 		WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
-		BeanUtils.copyProperties(withdrawOrderDO, withdrawResultDTO);
+		BeanUtils.copyProperties(withdrawOrderDO, withdrawDTO);
 		String ymd= DateTimeUtils.getCurrentDateStr();
 		String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE+ymd,15);
 		withdrawOrderDO.setOrderNo(ymd+orderNo);
@@ -78,11 +78,11 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
 	}
 
-	public void completeOrder(GenericDTO<WithdrawComplDTO> genericWithdrawComplDTO) {
+	public void completeOrder(GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO) {
 
-        WithdrawComplDTO withdrawComplDTO = genericWithdrawComplDTO.getBody();
+        WithdrawResultDTO withdrawResultDTO = genericWithdrawResultDTO.getBody();
         WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
-        BeanUtils.copyProperties(withdrawOrderDO, withdrawComplDTO);
+        BeanUtils.copyProperties(withdrawOrderDO, withdrawResultDTO);
         //如果订单状态为'S1'，则修改订单成功时间
         if(PwmConstants.WITHDRAW_ORD_S1.equals(withdrawOrderDO.getOrderStatus())){
             withdrawOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());

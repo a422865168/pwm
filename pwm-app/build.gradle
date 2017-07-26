@@ -20,10 +20,11 @@ jar {
                    "Class-Path": '. config/'
                   )
     }
-    exclude('config/')
+//    exclude('config/')
 }
 
 bootRepackage {
+    enabled = true
     mainClass = 'com.hisun.lemon.Application'
 }
 
@@ -36,9 +37,9 @@ task release(type: Copy,dependsOn: [clearTarget,build]) {
         include '*.jar'
         exclude '*-sources.jar'  
     }  
-    from('src/main/resources') {
-        include 'config/*'
-    }
+//    from('src/main/resources') {
+//        include 'config/*'
+//    }
     into ('build/target') 
     
     into('bin') {
