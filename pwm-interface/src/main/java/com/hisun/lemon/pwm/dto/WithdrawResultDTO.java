@@ -4,6 +4,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
  * 提现结果处理：等待异步通知，传输对象
@@ -21,10 +22,8 @@ public class WithdrawResultDTO {
     private BigDecimal wcActAmt;
     //资金流出模块订单号
     private String rspOrderNo;
-    //资金流出模块成功时间
-    private String rspSuccTm;
     //记账时间
-    private String acTm;
+    private LocalDate acTm;
     //提现状态
     @NotEmpty(message="PWM10009")
     private String orderStatus;
@@ -53,19 +52,11 @@ public class WithdrawResultDTO {
         this.rspOrderNo = rspOrderNo;
     }
 
-    public String getRspSuccTm() {
-        return rspSuccTm;
-    }
-
-    public void setRspSuccTm(String rspSuccTm) {
-        this.rspSuccTm = rspSuccTm;
-    }
-
-    public String getAcTm() {
+    public LocalDate getAcTm() {
         return acTm;
     }
 
-    public void setAcTm(String acTm) {
+    public void setAcTm(LocalDate acTm) {
         this.acTm = acTm;
     }
 
