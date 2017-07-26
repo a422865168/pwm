@@ -1,17 +1,15 @@
 package com.hisun.lemon.pwm.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import javax.validation.constraints.Min;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
-import com.hisun.lemon.framework.data.GenericDTO;
- 
+
 
 /**
- * 提现结果通知 传输对象
+ * 提现申请 传输对象
  * @author leon
  * @date 2017年7月17日
  * @time 上午9:29:32
