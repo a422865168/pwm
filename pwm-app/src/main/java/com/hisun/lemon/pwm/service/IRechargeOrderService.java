@@ -31,6 +31,7 @@ public interface IRechargeOrderService {
     /**
      * 查询用户信息
      * @param userId
+     * @param amount
      * @return
      */
     public HallQueryResultDTO queryUserInfo(String userId,BigDecimal amount);
