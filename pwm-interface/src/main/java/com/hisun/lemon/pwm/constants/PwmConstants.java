@@ -100,4 +100,17 @@ public class PwmConstants {
 	 * 提现订单状态R9：审批拒绝
 	 */
 	public static final String WITHDRAW_ORD_R9="R9";
+
+	/**
+	 * 营业厅充值操作状态：充值申请
+	 */
+	public static final String RECHARGE_OPR_A = "A";
+	/**
+	 * 营业厅充值操作状态：充值确认
+	 */
+	public static final String RECHARGE_OPR_O = "O";
+	/**
+	 * 营业厅充值操作状态：充值撤销
+	 */
+	public static final String RECHARGE_OPR_C = "C";
 }
