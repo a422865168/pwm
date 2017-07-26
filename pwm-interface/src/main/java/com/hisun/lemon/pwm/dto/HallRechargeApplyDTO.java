@@ -3,6 +3,9 @@ package com.hisun.lemon.pwm.dto;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -16,11 +19,13 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
+@ApiModel("营业厅充值申请 传输对象")
 public class HallRechargeApplyDTO {
 
 	/**
 	 * 营业厅ID
 	 */
+	@ApiModelProperty(name = "merchantId", value = "营业厅ID")
 	@NotEmpty(message="PWM10010")
 	private String merchantId;
 
@@ -29,6 +34,7 @@ public class HallRechargeApplyDTO {
 	/**
 	 * 签名
 	 */
+	@ApiModelProperty(name = "sign", value = "签名")
 	private String sign;
 
 	public class BussinessBody{

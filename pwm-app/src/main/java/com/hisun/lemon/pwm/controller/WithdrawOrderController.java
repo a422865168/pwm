@@ -34,7 +34,6 @@ public class WithdrawOrderController {
 	 * @param genericWithdrawDTO
 	 */
 	@ApiOperation(value="申请提现", notes="生成提现订单")
-	@ApiImplicitParam(name = "genericWithdrawDTO", value = "提现通知详细数据", required = true,paramType="body", dataType = "GenericDTO<WithdrawDTO>")
 	@ApiResponse(code = 200, message = "申请提现")
     @PostMapping(value = "/order")
     public GenericDTO createOrder(@Validated @RequestBody GenericDTO<WithdrawDTO> genericWithdrawDTO) {
@@ -51,7 +50,6 @@ public class WithdrawOrderController {
 	 * @return
 	 */
 	@ApiOperation(value="提现结果同步", notes="接收资金能力的处理结果通知") 
-	@ApiImplicitParam(name = "genericWithdrawResultDTO", value = "提现详细数据", required = true,paramType="body", dataType = "GenericDTO<WithdrawResultDTO>")
 	@ApiResponse(code = 200, message = "申请提现结果")
 	@PatchMapping(value = "/result")
 	public GenericDTO completeOrder(@Validated @RequestBody GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO){

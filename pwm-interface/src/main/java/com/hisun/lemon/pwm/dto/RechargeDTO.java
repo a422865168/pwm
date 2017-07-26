@@ -2,6 +2,9 @@ package com.hisun.lemon.pwm.dto;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
@@ -14,10 +17,12 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
+@ApiModel("充值请求 传输对象")
 public class RechargeDTO {
 	/**
 	 * 充值金额
 	 */
+	@ApiModelProperty(name = "amount", value = "充值金额")
 	@Min(value=0, message="PWM10001")
     private BigDecimal amount;
 	/**
@@ -27,33 +32,39 @@ public class RechargeDTO {
 	 * HALL:营业厅<br/>
 	 * OTHER:其他渠道<br/>
 	 */
+	@ApiModelProperty(name = "sysChannel", value = "订单来源渠道")
     @NotEmpty(message="PWM10002")
 	@Pattern(regexp="WEB|APP|HALL|OTHER",message="PWM10002")
     private String sysChannel;
 	/**
 	 * 对公对私标志
 	 */
+	@ApiModelProperty(name = "psnFlag", value = "对公对私标志")
     @NotEmpty(message="PWM10003")
     private String psnFlag;
 
 	/**
 	 * 业务类型
 	 */
+	@ApiModelProperty(name = "busType", value = "业务类型")
     @NotEmpty(message="PWM10004")
     private String busType;
 	/**
 	 * 收款方id
 	 */
+	@ApiModelProperty(name = "payeeId", value = " 收款方id")
 	private String payeeId;
 
 	/**
 	 * 付款方id
 	 */
+	@ApiModelProperty(name = "payerId", value = " 付款方id")
 	private String payerId;
 
 	/**
 	 * 充值手续费
 	 */
+	@ApiModelProperty(name = "fee", value = " 充值手续费")
 	@Min(value=0, message="PWM10016")
 	private BigDecimal fee;
 

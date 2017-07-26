@@ -2,6 +2,9 @@ package com.hisun.lemon.pwm.dto;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
@@ -14,20 +17,24 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
+@ApiModel("充值请求 传输对象")
 public class RechargeHCouponResultDTO {
 	/**
 	 * @Fields userId 内部用户号
 	 */
+	@ApiModelProperty(name = "userId", value = "币内部用户号")
 	@Pattern(regexp = "S|F", message = "PWM10023")
 	private String userId;
 	/**
 	 * 充值金额
 	 */
+	@ApiModelProperty(name = "orderAmt", value = "充值金额")
 	@Min(value = 0, message = "PWM10024")
 	private BigDecimal orderAmt;
 	/**
 	 * 订单状态
 	 */
+	@ApiModelProperty(name = "orderStatus", value = "订单状态")
 	@NotEmpty(message = "PWM10022")
 	@Pattern(regexp = "S|F", message = "PWM10025")
 	private String orderStatus;
@@ -35,12 +42,14 @@ public class RechargeHCouponResultDTO {
 	/**
 	 * @Fields orderCcy 币种
 	 */
+	@ApiModelProperty(name = "orderCcy", value = "币种")
 	@NotEmpty(message = "PWM10020")
 	private String orderCcy;
 
 	/**
 	 * @Fields orderNo 海币充值订单编号
 	 */
+	@ApiModelProperty(name = "orderNo", value = "海币充值订单编号")
 	@NotEmpty(message = "PWM10021")
 	private String orderNo;
 	public String getOrderNo() {

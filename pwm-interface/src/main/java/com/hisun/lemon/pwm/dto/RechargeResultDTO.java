@@ -6,6 +6,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 
 /**
  * 充值结果通知 传输对象
@@ -14,31 +17,37 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @time 上午9:27:30
  *
  */
+@ApiModel("充值结果通知 传输对象")
 public class RechargeResultDTO {
 	/**
 	 * 充提订单号
 	 */
+	@ApiModelProperty(name = "orderNo", value = "充提订单号")
     @NotEmpty(message="PWM10005")
     private String orderNo;
 
 	/**
 	 * 币种
 	 */
+	@ApiModelProperty(name = "orderCcy", value = "币种")
     private String orderCcy;
 	/**
 	 * 订单金额
 	 */
+	@ApiModelProperty(name = "amount", value = "订单金额")
     @Min(value=0, message="PWM10006")
     private BigDecimal amount;
 
 	/**
 	 * 收银订单号
 	 */
+	@ApiModelProperty(name = "extOrderNo", value = "收银订单号")
 	@NotEmpty(message="PWM10007")
 	private String extOrderNo;
 	/**
 	 * 订单状态
 	 */
+	@ApiModelProperty(name = "status", value = "订单状态")
 	@NotEmpty(message="PWM10008")
 	@Pattern(regexp="S|F",message="PWM10009")
 	private String status;

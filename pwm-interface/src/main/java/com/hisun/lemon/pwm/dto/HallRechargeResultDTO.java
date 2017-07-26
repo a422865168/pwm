@@ -2,6 +2,9 @@ package com.hisun.lemon.pwm.dto;
 
 import java.math.BigDecimal;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
 
 /**
  * 营业厅充值响应 传输对象
@@ -10,27 +13,33 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
+@ApiModel("营业厅充值申请 传输对象")
 public class HallRechargeResultDTO {
 	/**
 	 * 营业厅订单号
 	 */
+	@ApiModelProperty(name = "hallOrderNo", value = "营业厅订单号")
     private String hallOrderNo;
 	/**
 	 * 平台订单号
 	 */
+	@ApiModelProperty(name = "orderNo", value = "平台订单号")
 	private String orderNo;
 
 	/**
 	 * 状态
 	 */
+	@ApiModelProperty(name = "status", value = "状态")
 	private  String status;
 	/**
 	 *订单金额
 	 */
+	@ApiModelProperty(name = "amount", value = "订单金额")
 	private BigDecimal amount;
 	/**
 	 * 手续费
 	 */
+	@ApiModelProperty(name = "fee", value = "手续费")
 	private BigDecimal fee;
 
 	public String getHallOrderNo() {
