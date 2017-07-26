@@ -8,11 +8,7 @@ import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.NoBody;
@@ -34,10 +30,10 @@ public class RechargeOrderController {
 	IRechargeOrderService service;
 	
 	@ApiOperation(value="充值下单", notes="生成充值订单，调用收银台")
-	@ApiImplicitParam(name = "genRechargeDTO", value = "业务模块传递的充值数据", required = true,paramType="body", dataType = "GenericDTO")
+//	@ApiImplicitParam(name = "genRechargeDTO", value = "业务模块传递的充值数据", required = true,paramType="body", dataType = "GenericDTO")
 	@ApiResponse(code = 200, message = "充值下单")
     @PostMapping(value = "/order")
-    public GenericDTO createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
+    public GenericDTO createOrder(@Validated @ModelAttribute @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
 		String ip="";
 		RechargeDTO rechargeDTO =genRechargeDTO.getBody();
 		if(StringUtils.isBlank(rechargeDTO.getPayerId())){
@@ -59,8 +55,8 @@ public class RechargeOrderController {
 	@ApiOperation(value="营业厅查询", notes="查询用户信息")
 	@ApiImplicitParam(name = "genericResultDTO", value = "查询条件信息", required = true,paramType="body", dataType = "HallQueryDTO")
 	@ApiResponse(code = 200, message = "查询到的用户信息")
-	@PostMapping(value = "/hall/info")
-	public GenericDTO queryUserInfo(@Validated @RequestBody GenericDTO<HallQueryDTO> genericResultDTO){
+	@GetMapping(value = "/hall/info")
+	public GenericDTO queryUserInfo(@Validated GenericDTO<HallQueryDTO> genericResultDTO){
 		HallQueryResultDTO resultDTO=service.queryUserInfo(genericResultDTO.getBody().getKey(),genericResultDTO.getBody().getAmount());
 		return GenericDTO.newSuccessInstance(resultDTO);
 	}
@@ -68,7 +64,7 @@ public class RechargeOrderController {
 	@ApiOperation(value="营业厅充值申请", notes="接收营业厅的充值申请请求")
 	@ApiImplicitParam(name = "genericResultDTO", value = "营业厅充值申请信息", required = true,paramType="body", dataType = "HallRechargeApplyDTO")
 	@ApiResponse(code = 200, message = "营业厅充值申请结果")
-	@PatchMapping(value = "/hall/application")
+	@PostMapping(value = "/hall/application")
 	public GenericDTO hallRecharge(@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO){
 		HallRechargeResultDTO resultDTO=service.hallRecharge(genericResultDTO.getBody());
 		return GenericDTO.newSuccessInstance(resultDTO);
