@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
-@ApiModel("转账到银行卡对象")
+@ApiModel("营业厅充值查询 传输对象")
 public class HallQueryDTO {
 	/**
 	 * 充值金额

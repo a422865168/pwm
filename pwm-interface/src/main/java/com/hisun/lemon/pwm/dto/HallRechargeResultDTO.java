@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @time 上午9:27:30
  *
  */
-@ApiModel("营业厅充值申请 传输对象")
+@ApiModel("营业厅充值申请结果 传输对象")
 public class HallRechargeResultDTO {
 	/**
 	 * 营业厅订单号
