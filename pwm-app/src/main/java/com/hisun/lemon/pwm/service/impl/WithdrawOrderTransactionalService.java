@@ -42,7 +42,7 @@ public class WithdrawOrderTransactionalService {
 
         int num = withdrawOrderDao.insert(withdrawOrderDO);
         if(num != 1){
-            LemonException.throwBusinessException("PWM0001");
+            LemonException.throwBusinessException("PWM20004");
         }
     }
 
@@ -53,7 +53,7 @@ public class WithdrawOrderTransactionalService {
 
         int num = withdrawOrderDao.update(withdrawOrderDO);
         if(num != 1){
-            LemonException.throwBusinessException("PWM0003");
+            LemonException.throwBusinessException("PWM20005");
         }
     }
 }
