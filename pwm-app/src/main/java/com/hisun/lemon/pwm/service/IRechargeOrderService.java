@@ -62,4 +62,11 @@ public interface IRechargeOrderService {
      * @param rechargeHCouponDTO
      */
     public void handleHCouponResult(GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO);
+
+    /**
+     * 营业厅充值撤销处理
+     * @param dto
+     * @return
+     */
+    public HallRechargeResultDTO hallRechargeRevocation(HallRechargeApplyDTO dto);
 }
