@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
-@ApiModel("充值请求 传输对象")
+@ApiModel("充值请请求")
 public class RechargeDTO {
 	/**
 	 * 充值金额
@@ -39,7 +39,6 @@ public class RechargeDTO {
 	/**
 	 * 对公对私标志
 	 */
-	@ApiModelProperty(name = "psnFlag", value = "对公对私标志")
     @NotEmpty(message="PWM10003")
     private String psnFlag;
 
@@ -64,7 +63,6 @@ public class RechargeDTO {
 	/**
 	 * 充值手续费
 	 */
-	@ApiModelProperty(name = "fee", value = " 充值手续费")
 	@Min(value=0, message="PWM10016")
 	private BigDecimal fee;
 

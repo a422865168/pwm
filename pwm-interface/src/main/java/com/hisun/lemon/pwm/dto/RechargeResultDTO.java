@@ -17,12 +17,11 @@ import io.swagger.annotations.ApiModelProperty;
  * @time 上午9:27:30
  *
  */
-@ApiModel("充值结果通知 传输对象")
+@ApiModel("充值结果通知")
 public class RechargeResultDTO {
 	/**
 	 * 充提订单号
 	 */
-	@ApiModelProperty(name = "orderNo", value = "充提订单号")
     @NotEmpty(message="PWM10005")
     private String orderNo;
 
@@ -41,7 +40,6 @@ public class RechargeResultDTO {
 	/**
 	 * 收银订单号
 	 */
-	@ApiModelProperty(name = "extOrderNo", value = "收银订单号")
 	@NotEmpty(message="PWM10007")
 	private String extOrderNo;
 	/**

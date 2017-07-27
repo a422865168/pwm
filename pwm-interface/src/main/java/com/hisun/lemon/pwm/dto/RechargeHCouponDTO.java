@@ -17,7 +17,7 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
-@ApiModel("充值请求 传输对象")
+@ApiModel("海币充值请求")
 public class RechargeHCouponDTO {
 	/**
 	 * @Fields orderCcy 币种
@@ -29,7 +29,6 @@ public class RechargeHCouponDTO {
 	/**
 	 * @Fields userId 内部用户号
 	 */
-	@ApiModelProperty(name = "userId", value = "内部用户号")
 	@Pattern(regexp = "S|F", message = "PWM10023")
 	private String userId;
 	/**

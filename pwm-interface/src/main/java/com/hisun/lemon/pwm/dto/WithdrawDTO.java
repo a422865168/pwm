@@ -18,7 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @time 上午9:29:32
  *
  */
-@ApiModel("提现申请 传输对象")
+@ApiModel("提现申请")
 public class WithdrawDTO {
 
 	//用户编号
