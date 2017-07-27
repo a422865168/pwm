@@ -205,4 +205,11 @@
         </set>
         where order_no = #{orderNo,jdbcType=VARCHAR}
     </update>
+
+    <select id="getRechargeOrderByExtOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_rechange_order
+        where ext_order_no = #{extOrderNo,jdbcType=VARCHAR}
+    </select>
 </mapper>
