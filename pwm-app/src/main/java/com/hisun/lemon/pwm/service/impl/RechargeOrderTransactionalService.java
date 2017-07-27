@@ -42,7 +42,7 @@ public class RechargeOrderTransactionalService {
 	/**
 	 * 生成海币充值订单
 	 * 
-	 * @param rechargeSeaDO
+	 * @param rechargeHCouponDO
 	 */
 	public void initSeaOrder(RechargeHCouponDO rechargeHCouponDO) {
 		int nums = rechargeHCouponDao.insert(rechargeHCouponDO);
@@ -54,7 +54,7 @@ public class RechargeOrderTransactionalService {
 	/**
 	 * 海币充值结果处理
 	 * 
-	 * @param rechargeSeaDO
+	 * @param rechargeHCouponDO
 	 */
 	public void updateSeaOrder(RechargeHCouponDO rechargeHCouponDO) {
 		int nums = rechargeHCouponDao.update(rechargeHCouponDO);
@@ -73,6 +73,16 @@ public class RechargeOrderTransactionalService {
 	  RechargeHCouponDO rechargeHCouponDO=this.rechargeHCouponDao.get(orderNo);
 	  return rechargeHCouponDO;
   }
+
+	/**
+	 * 根据外部充值订单号与订单状态查询充值订单
+	 * @param extOrderNo 外部充值订单号
+	 * @return
+	 */
+	public RechargeOrderDO getRechargeOrderByExtOrderNo(String extOrderNo) {
+		RechargeOrderDO rechargeOrderDO = this.rechangeOrderDao.getRechargeOrderByExtOrderNo(extOrderNo);
+		return rechargeOrderDO;
+	}
 	public IRechargeOrderDao getRechangeOrderDao() {
 		return rechangeOrderDao;
 	}

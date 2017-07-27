@@ -73,7 +73,7 @@ public class RechargeOrderController {
 	@ApiOperation(value="营业厅充值申请", notes="接收营业厅的充值申请请求")
 	@ApiResponse(code = 200, message = "营业厅充值申请结果")
 	@PostMapping(value = "/hall/application")
-	public GenericDTO hallRecharge(@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO){
+	public GenericDTO<HallRechargeResultDTO> hallRecharge(@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO){
 		HallRechargeResultDTO resultDTO=service.hallRecharge(genericResultDTO.getBody());
 		return GenericDTO.newSuccessInstance(resultDTO);
 	}
@@ -81,7 +81,7 @@ public class RechargeOrderController {
 	@ApiOperation(value="营业厅充值确认", notes="接收营业厅的充值确认请求")
 	@ApiResponse(code = 200, message = "营业厅充值确认结果")
 	@PatchMapping(value = "/hall/acknowledgement")
-	public GenericDTO hallRechargeConfirm(@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO){
+	public GenericDTO<HallRechargeResultDTO> hallRechargeConfirm(@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO){
 		HallRechargeResultDTO resultDTO=service.hallRechargeConfirm(genericResultDTO.getBody());
 		return GenericDTO.newSuccessInstance(resultDTO);
 	}
@@ -103,5 +103,13 @@ public class RechargeOrderController {
 	public GenericDTO<NoBody> completeHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO){
 		service.handleHCouponResult(rechargeHCouponDTO);
 		return GenericDTO.newSuccessInstance();
+	}
+
+	@ApiOperation(value="营业厅充值撤销", notes="接收营业厅的充值撤销请求")
+	@ApiResponse(code = 200, message = "营业厅充值撤销结果")
+	@PostMapping(value = "/hall/revocation")
+	public GenericDTO<HallRechargeResultDTO> hallRechargeRevocation(@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO){
+		HallRechargeResultDTO resultDTO=service.hallRechargeRevocation(genericResultDTO.getBody());
+		return GenericDTO.newSuccessInstance(resultDTO);
 	}
 }

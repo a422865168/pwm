@@ -239,7 +239,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
 		String md5 = md5Str(bussinessBody,key);
 		//签名校验
-		if(JudgeUtils.isNull(md5) || !JudgeUtils.equals(applySign, md5)) {
+		if(JudgeUtils.isNull(md5) || !JudgeUtils.equals(applySign, md5.toUpperCase())) {
 			throw new LemonException("PWM10036");
 		}
 		//解析校验,状态
@@ -257,7 +257,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setOrderAmt(bussinessBody.getAmount());
 		rechargeOrderDO.setOrderCcy(bussinessBody.getCcy());
 		rechargeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
-		rechargeOrderDO.setOrderNo(orderNo);
+		rechargeOrderDO.setOrderNo(ymd + orderNo);
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setOrderStatus(bussinessBody.getStatus());
 		rechargeOrderDO.setIpAddress("");
@@ -273,8 +273,13 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//调用收银
 
 		//返回
-
-		return null;
+		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
+		hallRechargeResultDTO.setAmount(bussinessBody.getAmount());
+		hallRechargeResultDTO.setStatus(PwmConstants.RECHARGE_ORD_W);
+		hallRechargeResultDTO.setFee(BigDecimal.valueOf(bussinessBody.getFee()));
+		hallRechargeResultDTO.setHallOrderNo(bussinessBody.getHallOrderNo());
+		hallRechargeResultDTO.setOrderNo(orderNo);
+		return hallRechargeResultDTO;
 	}
 
 	@Override
@@ -285,7 +290,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isNull(oriHallOrder)) {
 			throw new LemonException("PWM10011");
 		}
-		RechargeOrderDO rechargeOrderDO = this.service.getRechangeOrderDao().get(oriHallOrder);
+		RechargeOrderDO rechargeOrderDO = this.service.getRechargeOrderByExtOrderNo(oriHallOrder);
 		if(JudgeUtils.isNull(rechargeOrderDO)) {
 			throw new LemonException("PWM20010");
 		}
@@ -301,7 +306,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.equals(amount, rechargeOrderDO.getOrderAmt())) {
 			throw new LemonException("PWM20003");
 		}
-		//调用收银
+		//调用收银(更新账户余额)
 
 		//更新订单
 		RechargeOrderDO updOrderDO = new RechargeOrderDO();
@@ -312,9 +317,57 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		updOrderDO.setOrderCcy(rechargeOrderDO.getOrderCcy());
 		updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 		updOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
+		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		service.updateOrder(updOrderDO);
+		//调用平台短信能力通知充值到账
+
 		//返回
-		return null;
+		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
+		hallRechargeResultDTO.setAmount(busBody.getAmount());
+		hallRechargeResultDTO.setStatus(PwmConstants.RECHARGE_ORD_S);
+		hallRechargeResultDTO.setFee(BigDecimal.valueOf(busBody.getFee()));
+		hallRechargeResultDTO.setHallOrderNo(busBody.getHallOrderNo());
+		hallRechargeResultDTO.setOrderNo(rechargeOrderDO.getOrderNo());
+		return hallRechargeResultDTO;
+	}
+
+	@Override
+	public HallRechargeResultDTO hallRechargeRevocation(HallRechargeApplyDTO dto) {
+		HallRechargeApplyDTO.BussinessBody busBody= dto.getBody();
+
+		//充值原订单校验
+		String oriHallOrder = busBody.getHallOrderNo();
+		if(JudgeUtils.isNull(oriHallOrder)) {
+			throw new LemonException("PWM10011");
+		}
+		RechargeOrderDO rechargeOrderDO = this.service.getRechargeOrderByExtOrderNo(oriHallOrder);
+		if(JudgeUtils.isNull(rechargeOrderDO)) {
+			throw new LemonException("PWM20010");
+		}
+		if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_W)) {
+			throw new LemonException("PWM20011");
+		}
+
+		//更新订单状态
+		RechargeOrderDO updOrderDO = new RechargeOrderDO();
+		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+		updOrderDO.setExtOrderNo(rechargeOrderDO.getExtOrderNo());
+		updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
+		updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+		updOrderDO.setOrderCcy(rechargeOrderDO.getOrderCcy());
+		updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+		updOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
+		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+		service.updateOrder(updOrderDO);
+
+		//返回处理结果
+		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
+		hallRechargeResultDTO.setAmount(busBody.getAmount());
+		hallRechargeResultDTO.setStatus(PwmConstants.RECHARGE_ORD_F);
+		hallRechargeResultDTO.setFee(BigDecimal.valueOf(busBody.getFee()));
+		hallRechargeResultDTO.setHallOrderNo(busBody.getHallOrderNo());
+		hallRechargeResultDTO.setOrderNo(rechargeOrderDO.getOrderNo());
+		return hallRechargeResultDTO;
 	}
 
 	private String md5Str(HallRechargeApplyDTO.BussinessBody busBody, String key) {
@@ -329,7 +382,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			oriMap.put("payerId",busBody.getPayerId());
 			oriMap.put("status",busBody.getStatus());
 			retStr = om.writeValueAsString(oriMap);
-			retStr = getMd5(retStr+key).toUpperCase();
+			retStr = getMd5(retStr+key);
 
 		} catch (JsonProcessingException e) {
 //			logger.error("PWM:营业厅充值请求参数转换成Json格式错误!");
