@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @time 上午9:27:30
  *
  */
-@ApiModel("营业厅充值查询结")
+@ApiModel("营业厅充值查询结果传输对象")
 public class HallQueryResultDTO {
 	/**
 	 * 查询关键字
