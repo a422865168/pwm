@@ -44,7 +44,7 @@ public class RechargeOrderController {
 	@ApiOperation(value="充值下单", notes="生成充值订单，调用收银台")
 	@ApiResponse(code = 200, message = "充值下单")
     @PostMapping(value = "/order")
-    public GenericDTO createOrder(@Validated @ModelAttribute @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
+    public GenericDTO createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
 		String ip="";
 		RechargeDTO rechargeDTO =genRechargeDTO.getBody();
 		if(StringUtils.isBlank(rechargeDTO.getPayerId())){
