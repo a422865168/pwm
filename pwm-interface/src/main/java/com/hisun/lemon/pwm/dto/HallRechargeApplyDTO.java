@@ -19,7 +19,7 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
-@ApiModel("营业厅充值申请 传输对象")
+@ApiModel("营业厅充值申请")
 public class HallRechargeApplyDTO {
 
 	/**
@@ -34,7 +34,6 @@ public class HallRechargeApplyDTO {
 	/**
 	 * 签名
 	 */
-	@ApiModelProperty(name = "sign", value = "签名")
 	private String sign;
 
 	public class BussinessBody{
@@ -47,6 +46,7 @@ public class HallRechargeApplyDTO {
 		/**
 		 * 充值金额
 		 */
+		@ApiModelProperty(name = "amount", value = "充值金额")
 		@Min(value=0, message="PWM10012")
 		private BigDecimal amount;
 

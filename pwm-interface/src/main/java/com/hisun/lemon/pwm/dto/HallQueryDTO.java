@@ -1,13 +1,11 @@
 package com.hisun.lemon.pwm.dto;
 
+import java.math.BigDecimal;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
-import java.math.BigDecimal;
 
 
 /**
@@ -17,7 +15,7 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
-@ApiModel("转账到银行卡对象")
+@ApiModel("营业厅充值")
 public class HallQueryDTO {
 	/**
 	 * 充值金额

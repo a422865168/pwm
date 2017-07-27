@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @time 上午9:27:30
  *
  */
-@ApiModel("营业厅充值查询结果 传输对象")
+@ApiModel("营业厅充值查询结")
 public class HallQueryResultDTO {
 	/**
 	 * 查询关键字
@@ -35,7 +35,6 @@ public class HallQueryResultDTO {
 	/**
 	 * 手续费
 	 */
-	@ApiModelProperty(name = "fee", value = "手续费")
 	private BigDecimal fee;
 
 	public String getKey() {
