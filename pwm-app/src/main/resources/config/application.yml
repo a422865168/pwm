@@ -1,12 +1,10 @@
 spring :
-  profiles :
-    active : dev
   redis :
     database : 0
     host : 120.76.22.56
     port : 6379
     password : Hisunpay2017
-    pool :
+    pool : 
       #连接池最大连接数（使用负值表示没有限制）
       max-active : 8
       #连接池最大阻塞等待时间（使用负值表示没有限制）
@@ -37,7 +35,7 @@ spring :
   thymeleaf :
     cache : false
   jackson :
-    serialization :
+    serialization : 
       write_dates_as_timestamps : false
   cache :
     jcache :
@@ -67,8 +65,16 @@ feign :
     clearConnectionsRate : 30000
   # feign client validation
   validation :
-    enabled : true
-
+    enabled : false
+  # feign compression support
+  compression :
+    request :
+      enabled : true
+      mime-types : application/json
+      min-request-size : 2048
+    response:
+      enabled : true
+    
 #logging configuration
 logging :
   config : classpath:config/logback-spring.xml
@@ -78,7 +84,7 @@ logging :
 #lemon framework configuration
 lemon :
   #dynamic datasource
-  dynamicDataSource :
+  dynamicDataSource : 
     enabled : true
     dataSources : lemon,primary
     defaultDataSource : primary
@@ -91,12 +97,12 @@ lemon :
     delta : 500
     #在redis里Id key 的前缀，prefix+"."+ applicationName,申请ID key作为hash key.
     prefix : IDGEN
-    #ID sequence 最大值，默认值无穷大，配置方式是在max-value 下配置key 及长度
+    #ID sequence 最大值，默认值无穷大，配置方式是在max-value 下配置key 及长度 
     max-value :
       #msgId key
       MSGID_ : 999999999
       REQUESTID_ : 999999999
-      USER_ID : 999999
+      USER_ID : 999999  
     #common ID sequence length
     common-id-sequence-len : 10
     #request ID sequence length
@@ -120,7 +126,7 @@ lemon :
     redis :
       expires :
         #redis cache expire time; cacheName : expireTime/s; 0 - never expire
-        ${lemon.cache.cacheName.prefix}.user : 140
+        ${lemon.cache.cacheName.prefix}.user : 140 
   # distributed lock dependence on redisson
   redisson :
     enabled : true
@@ -132,10 +138,10 @@ lemon :
     idleTimeout : 60000
     connectionTimeout : 10000
     timeout : 5000
-  #redis distributed lock
+  #redis distributed lock 
   lock :
     defaultLeaseTime : 100
-    defaultWaitTime : 5
+    defaultWaitTime : 5    
 
 #Multiple dataSources
 dataSource :
@@ -150,18 +156,18 @@ dataSource :
     maxActive : 20
     # 配置获取连接等待超时的时间
     maxWait : 30000
-    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 
     timeBetweenEvictionRunsMillis : 60000
-    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    # 配置一个连接在池中最小生存的时间，单位是毫秒 
     minEvictableIdleTimeMillis : 300000
     validationQuery : SELECT 1
     testWhileIdle : true
     testOnBorrow : false
     testOnReturn : false
-    # 打开PSCache，并且指定每个连接上PSCache的大小
+    # 打开PSCache，并且指定每个连接上PSCache的大小 
     poolPreparedStatements : true
     maxPoolPreparedStatementPerConnectionSize : 20
-    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙 
     filters : stat,wall,log4j
     # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
     connectionProperties : druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
@@ -178,36 +184,44 @@ dataSource :
     maxActive : 20
     # 配置获取连接等待超时的时间
     maxWait : 60000
-    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 
     timeBetweenEvictionRunsMillis : 60000
-    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    # 配置一个连接在池中最小生存的时间，单位是毫秒 
     minEvictableIdleTimeMillis : 300000
     validationQuery : SELECT 1
     testWhileIdle : true
     testOnBorrow : false
     testOnReturn : false
-    # 打开PSCache，并且指定每个连接上PSCache的大小
+    # 打开PSCache，并且指定每个连接上PSCache的大小 
     poolPreparedStatements : true
     maxPoolPreparedStatementPerConnectionSize : 20
-    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙 
     filters : stat,wall,log4j
     # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
     connectionProperties : druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     # 合并多个DruidDataSource的监控数据
     useGlobalDataSourceStat : true
-
-mybatis:
+    
+mybatis: 
   mapperLocations: classpath*:com/hisun/**/mapper/*.xml
   typeAliasesPackage : com.hisun.**.entity
  # config : mybatis-config.xml
  # typeHandlersPackage 扫描typeHandlers的包
-
+ 
 #page helper
 pagehelper :
   defaultPageNum : 1
   defaultPageSize : 8
-
+  
 swagger :
+  profiles : dev,sit,ci
   show : true
-  swaggerDescription : "请使用swagger做好api文档"
-  swaggerServiceUrl : "github 目录"
+  version : 1.0
+
+security :
+  basic :
+    path : /swagger-ui.html
+    enabled : true
+  user :
+    name : lemon
+    password : lemon123
