@@ -411,7 +411,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			// 16位的加密
 			//return buf.toString().substring(8, 24);
 		} catch (NoSuchAlgorithmException e) {
-			return null;
+			return "";
 		}
 
 	}
