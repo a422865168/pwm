@@ -113,4 +113,20 @@ public class PwmConstants {
 	 * 营业厅充值操作状态：充值撤销
 	 */
 	public static final String RECHARGE_OPR_C = "C";
+	/**
+	 * 订单来源渠道 ：WEB WEB站点
+	 */
+	public static final String ORD_SYSCHANNEL_WEB = "WEB";
+	/**
+	 * 订单来源渠道 ：APP 手机APP
+	 */
+	public static final String ORD_SYSCHANNEL_APP = "APP";
+	/**
+	 * 订单来源渠道 ：HALL 营业厅
+	 */
+	public static final String ORD_SYSCHANNEL_HALL = "HALL";
+	/**
+	 * 订单来源渠道 ：OTHER 其他渠道
+	 */
+	public static final String ORD_SYSCHANNEL_OTHER = "OTHER";
 }
