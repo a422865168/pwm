@@ -35,23 +35,27 @@ public class WithdrawDTO {
 	//申请提现金额
 	@ApiModelProperty(name = "wcApplyAmt", value = "申请提现金额")
 	@Min(value=0, message="PWM10029")
+	@Length(max = 15)
 	private BigDecimal wcApplyAmt;
 	//提现手续费
 	@ApiModelProperty(name = "feeAmt", value = "提现手续费")
 	@Min(value=0, message="PWM10030")
+	@Length(max = 11)
 	private BigDecimal feeAmt;
 	//币种
-	@ApiModelProperty(name = "orderCcy", value = "币种")
+	@ApiModelProperty(name = "orderCcy", value = "币种(USD:美元)")
 	@NotEmpty(message="PWM10020")
 	@Length(max =3)
 	private String orderCcy;
 	//提现类型
 	@ApiModelProperty(name = "wcType", value = "提现类型")
 	@NotEmpty(message="PWM10031")
+	@Length(max = 2)
 	private String wcType;
 	//付款加急标识
 	@ApiModelProperty(name = "payUrgeFlg", value = "付款加急标识")
 	@NotEmpty(message="PWM10032")
+	@Length(max = 1)
 	private String payUrgeFlg;
 	//资金合作机构
 	@ApiModelProperty(name = "capCorgNo", value = "资金合作机构")
@@ -63,8 +67,9 @@ public class WithdrawDTO {
 	@NotEmpty(message="PWM10034")
 	private String payPassWord;
 	//订单渠道
-	@ApiModelProperty(name = "busCnl", value = "订单渠道")
+	@ApiModelProperty(name = "busCnl", value = "订单渠道(WEB:web站点|APP:APP手机|HALL:营业厅|OTHER:其他渠道)")
 	@NotEmpty(message="PWM10002")
+	@Length(max = 5)
 	private String busCnl;
 	//通知手机号
 	@ApiModelProperty(name = "ntfMbl", value = "通知手机号")
