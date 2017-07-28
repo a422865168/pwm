@@ -46,42 +46,51 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	 * 海币充值下单
 	 */
 	@Override
-	public RechargeHCouponDO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
+	public GenericDTO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
 		RechargeHCouponDTO rechargeDTO = rechargeHCouponDTO.getBody();
+		if (!rechargeDTO.getBusType().startsWith(PwmConstants.TX_TYPE_HCOUPON)) {
+			throw new LemonException("PWM20001");
+		}
+
 		RechargeHCouponDO rechargeDO = new RechargeHCouponDO();
-		BeanUtils.copyProperties(rechargeDO, rechargeDTO);
+
+		if (!JudgeUtils.isNull(rechargeDTO.getOrderCcy())) {
+
+			rechargeDO.setOrderCcy(rechargeDTO.getOrderCcy());
+		}
+		rechargeDO.setOrderCcy("USD");
 		rechargeDO.setAcTm(rechargeHCouponDTO.getAccDate());
 		rechargeDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = IdGenUtils.generateId(PwmConstants.R_SEA_GEN_PRE + ymd, 15);
-		BigDecimal hCouponAmt=rechargeDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
+		// 1:100的充值比例
+		BigDecimal hCouponAmt = rechargeDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
 		rechargeDO.sethCouponAmt(hCouponAmt);
 		rechargeDO.setOrderNo(ymd + orderNo);
+		rechargeDO.setOrderAmt(rechargeDTO.getOrderAmt());
 		// 会计日期
 		rechargeDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		// 交易时间
 		rechargeDO.setTxTm(DateTimeUtils.getCurrentLocalDateTime());
+		rechargeDO.setTxType(rechargeDTO.getTxType());
+		rechargeDO.setBusType(rechargeDTO.getBusType());
+		rechargeDO.setUserId(rechargeDTO.getUserId());
 		// 生成海币充值订单
 		this.service.initSeaOrder(rechargeDO);
-		// 调用收银台
-
-		
 		// 调用收银
-		/*InitCashierDTO initCashierDTO = new InitCashierDTO();
+		InitCashierDTO initCashierDTO = new InitCashierDTO();
 		initCashierDTO.setBusPaytype(null);
-		initCashierDTO.setBusType(rechargeOrderDO.getBusType());
-		// initCashierDTO.setCbUrl(LemonUtils.getProperty("pwm.rechargeCbUrl"));
-		initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
-		initCashierDTO.setPayeeId(LemonUtils.getProperty("pwm.defaultPayeeId"));
-		initCashierDTO.setSysChannel(rechargeDTO.getSysChannel());
+		initCashierDTO.setBusType(rechargeDO.getBusType());
+		initCashierDTO.setExtOrderNo(rechargeDO.getOrderNo());
+		initCashierDTO.setSysChannel("APP");
 		initCashierDTO.setPayerId("");
-		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
-		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
+		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
+		initCashierDTO.setTxType(rechargeDO.getTxType());
+		initCashierDTO.setOrderAmt(rechargeDO.getOrderAmt());
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
-		return cshOrderClient.initCashier(genericDTO);*/
-		
-		return null;
+		logger.info("订单：" + rechargeDO.getOrderNo() + " 请求收银台");
+		return cshOrderClient.initCashier(genericDTO);
 	}
 
 	/**

@@ -129,4 +129,15 @@ public class PwmConstants {
 	 * 订单来源渠道 ：OTHER 其他渠道
 	 */
 	public static final String ORD_SYSCHANNEL_OTHER = "OTHER";
+	
+	/**
+	 * 交易类型：充海币
+	 */
+	public static final String TX_TYPE_HCOUPON="05";
+	
+	/**
+	 * 业务类型：充海币
+	 */
+	public static final String BUS_TYPE_HCOUPON="0501";
+	
 }

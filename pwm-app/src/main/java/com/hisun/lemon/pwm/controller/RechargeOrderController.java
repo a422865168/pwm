@@ -6,15 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
-import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.dto.HallQueryDTO;
 import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
@@ -23,7 +22,6 @@ import com.hisun.lemon.pwm.dto.RechargeDTO;
 import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
 import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
-import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
 
 import io.swagger.annotations.Api;
@@ -89,18 +87,15 @@ public class RechargeOrderController {
 	@ApiOperation(value="海币充值下单", notes="生成充值订单，调用收银台")
 	@ApiResponse(code = 200, message = "充值下单")
     @PostMapping(value = "/order/sea")
-    public GenericDTO<RechargeHCouponDO> createHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
-		RechargeHCouponDO rechargeSea=this.service.createHCouponOrder(rechargeHCouponDTO);
-		GenericDTO dto = GenericDTO.newSuccessInstance(rechargeSea.getClass());
-		dto.setBody(rechargeSea);
-		return dto;
+    public GenericDTO createHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
+		return this.service.createHCouponOrder(rechargeHCouponDTO);
     }
 	
 	
 	@ApiOperation(value="海币充值处理结果通知", notes="接收收银台的处理结果通知")
 	@ApiResponse(code = 200, message = "处理通知结果")
 	@PatchMapping(value = "/result/sea")
-	public GenericDTO<NoBody> completeHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO){
+	public GenericDTO completeHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO){
 		service.handleHCouponResult(rechargeHCouponDTO);
 		return GenericDTO.newSuccessInstance();
 	}

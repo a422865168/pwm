@@ -130,8 +130,6 @@ values ('PWM20005','zh','更新订单失败!',now(),now());
 
 --------------ruan
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM10020','zh','币种不能为空!',now(),now());
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10021','zh','海币充值订单号不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10022','zh','海币充值订状态不能为空!',now(),now());
