@@ -39,6 +39,7 @@ public class HallRechargeResultDTO {
 	/**
 	 * 手续费
 	 */
+	@ApiModelProperty(name = "fee", value = "手续费")
 	private BigDecimal fee;
 
 	public String getHallOrderNo() {

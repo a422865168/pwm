@@ -11,6 +11,8 @@ import javax.annotation.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hisun.lemon.common.utils.*;
+import com.hisun.lemon.csh.constants.CshConstants;
+import com.hisun.lemon.csh.order.dto.CashierViewDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -235,6 +237,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		String merchantId = dto.getMerchantId();
 		String applySign = dto.getSign();
+		//签名密钥
 		String key = "";
 		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
 		String md5 = md5Str(bussinessBody,key);
@@ -246,10 +249,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(!JudgeUtils.equals(bussinessBody.getStatus(), PwmConstants.RECHARGE_OPR_O)) {
 			throw new LemonException("PWM10037");
 		}
-		String payerId = bussinessBody.getPayerId();
 		String ymd = DateTimeUtils.getCurrentDateStr();
-		String orderNo = IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
-		//生成订单
+		String orderNo = ymd + IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
+		//生成充值订单
 		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
 		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		rechargeOrderDO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
@@ -257,20 +259,40 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setOrderAmt(bussinessBody.getAmount());
 		rechargeOrderDO.setOrderCcy(bussinessBody.getCcy());
 		rechargeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
-		rechargeOrderDO.setOrderNo(ymd + orderNo);
+		rechargeOrderDO.setOrderNo(orderNo);
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setOrderStatus(bussinessBody.getStatus());
 		rechargeOrderDO.setIpAddress("");
 		rechargeOrderDO.setModifyOpr("");
 		rechargeOrderDO.setOrderSuccTm(null);
 		rechargeOrderDO.setPsnFlag(bussinessBody.getPsnFlag());
-		rechargeOrderDO.setSysChannel("WEB");
+		rechargeOrderDO.setSysChannel(PwmConstants.ORD_SYSCHANNEL_HALL);
 		rechargeOrderDO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
+		rechargeOrderDO.setModifyTime(null);
 		rechargeOrderDO.setRemark("");
 
 		this.service.initOrder(rechargeOrderDO);
 
-		//调用收银
+		//调用收银,生成收银订单
+		InitCashierDTO initCashierDTO = new InitCashierDTO();
+		initCashierDTO.setBusPaytype(PwmConstants.BUS_TYPE_RECHARGE_HALL);
+		initCashierDTO.setBusType(rechargeOrderDO.getBusType());
+		initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
+		initCashierDTO.setPayeeId(dto.getMerchantId());
+		initCashierDTO.setSysChannel(PwmConstants.ORD_SYSCHANNEL_HALL);
+		initCashierDTO.setPayerId(bussinessBody.getPayerId());
+		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
+		initCashierDTO.setOrderAmt(bussinessBody.getAmount());
+		initCashierDTO.setFee(BigDecimal.valueOf(bussinessBody.getFee()));
+		initCashierDTO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
+		initCashierDTO.setOrderCcy(CshConstants.QP_PAY_CCY);
+		initCashierDTO.setPayerName("");
+		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
+		genericDTO.setBody(initCashierDTO);
+		GenericDTO<CashierViewDTO> genericCashierViewDTO = cshOrderClient.initCashier(genericDTO);
+		//CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
+		//收银订单号与支付方式
+		//String cshierUrl = cashierViewDTO.getCashierUrl();
 
 		//返回
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
@@ -300,15 +322,32 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//状态 金额校验
 		BigDecimal amount = busBody.getAmount();
 		String status = busBody.getStatus();
-		if(!JudgeUtils.equals(status, PwmConstants.RECHARGE_OPR_C)) {
+		if(!JudgeUtils.equals(status, PwmConstants.RECHARGE_OPR_O)) {
 			throw new LemonException("PWM10037");
 		}
 		if(JudgeUtils.equals(amount, rechargeOrderDO.getOrderAmt())) {
 			throw new LemonException("PWM20003");
 		}
-		//调用收银(更新账户余额)
 
-		//更新订单
+		//调用收银,更行收银订单状态与账户余额
+/*		InitCashierDTO initCashierDTO = new InitCashierDTO();
+		initCashierDTO.setBusPaytype(PwmConstants.BUS_TYPE_RECHARGE_HALL);
+		initCashierDTO.setBusType(rechargeOrderDO.getBusType());
+		initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
+		initCashierDTO.setPayeeId(dto.getMerchantId());
+		initCashierDTO.setSysChannel(PwmConstants.ORD_SYSCHANNEL_HALL);
+		initCashierDTO.setPayerId(busBody.getPayerId());
+		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
+		initCashierDTO.setOrderAmt(busBody.getAmount());
+		initCashierDTO.setFee(BigDecimal.valueOf(busBody.getFee()));
+		initCashierDTO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
+		initCashierDTO.setOrderCcy(CshConstants.QP_PAY_CCY);
+		initCashierDTO.setPayerName("");
+		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
+		genericDTO.setBody(initCashierDTO);
+		GenericDTO<CashierViewDTO> genericCashierViewDTO = cshOrderClient.initCashier(genericDTO);*/
+
+		//更新充值订单
 		RechargeOrderDO updOrderDO = new RechargeOrderDO();
 		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		updOrderDO.setExtOrderNo(rechargeOrderDO.getExtOrderNo());
@@ -340,6 +379,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isNull(oriHallOrder)) {
 			throw new LemonException("PWM10011");
 		}
+		if(!JudgeUtils.equals(busBody.getStatus(),PwmConstants.RECHARGE_OPR_C)) {
+			throw new LemonException("PWM10037");
+		}
 		RechargeOrderDO rechargeOrderDO = this.service.getRechargeOrderByExtOrderNo(oriHallOrder);
 		if(JudgeUtils.isNull(rechargeOrderDO)) {
 			throw new LemonException("PWM20010");
@@ -359,6 +401,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		updOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
 		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		service.updateOrder(updOrderDO);
+
+		//更新收银订单状态
 
 		//返回处理结果
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
@@ -385,7 +429,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			retStr = getMd5(retStr+key);
 
 		} catch (JsonProcessingException e) {
-//			logger.error("PWM:营业厅充值请求参数转换成Json格式错误!");
+
 		}
 		return retStr;
 	}
