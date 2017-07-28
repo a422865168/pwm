@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import javax.validation.constraints.Min;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModel;
@@ -24,10 +25,12 @@ public class WithdrawDTO {
 	//用户编号
 	@ApiModelProperty(name = "userId", value = "用户编号")
     @NotEmpty(message="PWM10027")
+	@Length(max =24)
     private String userId;
 	//提现银行卡号
 	@ApiModelProperty(name = "capCardNo", value = "提现银行卡号")
 	@NotEmpty(message="PWM10028")
+	@Length(max =30)
     private String capCardNo;
 	//申请提现金额
 	@ApiModelProperty(name = "wcApplyAmt", value = "申请提现金额")
@@ -40,6 +43,7 @@ public class WithdrawDTO {
 	//币种
 	@ApiModelProperty(name = "orderCcy", value = "币种")
 	@NotEmpty(message="PWM10020")
+	@Length(max =3)
 	private String orderCcy;
 	//提现类型
 	@ApiModelProperty(name = "wcType", value = "提现类型")
@@ -52,6 +56,7 @@ public class WithdrawDTO {
 	//资金合作机构
 	@ApiModelProperty(name = "capCorgNo", value = "资金合作机构")
 	@NotEmpty(message="PWM10033")
+	@Length(max =16)
 	private String capCorgNo;
 	//支付密码
 	@ApiModelProperty(name = "payPassWord", value = "支付密码")
@@ -64,9 +69,11 @@ public class WithdrawDTO {
 	//通知手机号
 	@ApiModelProperty(name = "ntfMbl", value = "通知手机号")
 	@NotEmpty(message="PWM10035")
+	@Length(max =20)
 	private String ntfMbl;
 	//备注
 	@ApiModelProperty(name = "wcRemark", value = "备注")
+	@Length(max =100)
 	private String wcRemark;
 
 	public String getUserId() {

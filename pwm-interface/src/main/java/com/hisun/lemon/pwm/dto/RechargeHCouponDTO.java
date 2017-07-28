@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModel;
@@ -24,12 +25,14 @@ public class RechargeHCouponDTO {
 	 * @Fields orderCcy 币种
 	 */
 	@ApiModelProperty(name = "orderCcy", value = "币种")
+	@Length(max =4)
 	private String orderCcy;
 
 	/**
 	 * @Fields userId 内部用户号
 	 */
 	@NotEmpty(message="PWM10023")
+	@Length(max =20)
 	private String userId;
 	/**
 	 * 充值金额
@@ -44,12 +47,14 @@ public class RechargeHCouponDTO {
 	 */
 	@ApiModelProperty(name = "txType", value = "交易类型")
 	@NotEmpty(message = "TAM10002")
+	@Length(max =2)
 	private String txType;
 	/**
 	 * @Fields busType 业务类型 0501 充海币
 	 */
 	@ApiModelProperty(name = "busType", value = "业务类型   0501 充海币")
 	@NotEmpty(message = "TAM10003")
+	@Length(max =4)
 	private String busType;
 
 	public String getTxType() {

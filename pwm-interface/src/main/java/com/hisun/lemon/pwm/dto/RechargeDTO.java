@@ -1,5 +1,6 @@
 package com.hisun.lemon.pwm.dto;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModel;
@@ -47,6 +48,7 @@ public class RechargeDTO {
 	 */
 	@ApiModelProperty(name = "busType", value = "业务类型")
     @NotEmpty(message="PWM10004")
+	@Length(max =4)
     private String busType;
 	/**
 	 * 收款方id
