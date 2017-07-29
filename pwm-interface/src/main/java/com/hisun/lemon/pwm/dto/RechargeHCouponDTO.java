@@ -24,7 +24,7 @@ public class RechargeHCouponDTO {
 	/**
 	 * @Fields orderCcy 币种
 	 */
-	@ApiModelProperty(name = "orderCcy", value = "币种")
+	@ApiModelProperty(name = "orderCcy", value = "币种(USD:美元)")
 	@Length(max =4)
 	private String orderCcy;
 

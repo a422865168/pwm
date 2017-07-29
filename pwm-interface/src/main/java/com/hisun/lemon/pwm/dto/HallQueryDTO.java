@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.dto;
 
 import java.math.BigDecimal;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModel;
@@ -21,12 +22,15 @@ public class HallQueryDTO {
 	 * 充值金额
 	 */
 	@ApiModelProperty(name = "amount", value = "充值金额")
+	@Length(max = 15)
     private BigDecimal amount;
 
 	@NotEmpty(message = "PWM10018")
+	@Length(max = 15)
 	private  String key;
-	@ApiModelProperty(name = "type", value = "类型")
+	@ApiModelProperty(name = "type", value = "类型(U:用户|M:商户)")
 	@NotEmpty(message = "PWM10019")
+	@Length(max = 1)
 	private String type;
 
 	public BigDecimal getAmount() {
