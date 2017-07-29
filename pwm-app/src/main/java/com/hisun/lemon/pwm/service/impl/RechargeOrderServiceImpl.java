@@ -248,21 +248,21 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		String merchantId = dto.getMerchantId();
 		String applySign = dto.getSign();
-		//签名密钥
+		// 签名密钥
 		String key = "";
 		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
-		String md5 = md5Str(bussinessBody,key);
-		//签名校验
-		if(JudgeUtils.isNull(md5) || !JudgeUtils.equals(applySign, md5.toUpperCase())) {
+		String md5 = md5Str(bussinessBody, key);
+		// 签名校验
+		if (JudgeUtils.isNull(md5) || !JudgeUtils.equals(applySign, md5.toUpperCase())) {
 			throw new LemonException("PWM10036");
 		}
-		//解析校验,状态
-		if(!JudgeUtils.equals(bussinessBody.getStatus(), PwmConstants.RECHARGE_OPR_O)) {
+		// 解析校验,状态
+		if (!JudgeUtils.equals(bussinessBody.getStatus(), PwmConstants.RECHARGE_OPR_O)) {
 			throw new LemonException("PWM10037");
 		}
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = ymd + IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
-		//生成充值订单
+		// 生成充值订单
 		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
 		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		rechargeOrderDO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
@@ -284,7 +284,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		this.service.initOrder(rechargeOrderDO);
 
-		//调用收银,生成收银订单
+		// 调用收银,生成收银订单
 		InitCashierDTO initCashierDTO = new InitCashierDTO();
 		initCashierDTO.setBusPaytype(PwmConstants.BUS_TYPE_RECHARGE_HALL);
 		initCashierDTO.setBusType(rechargeOrderDO.getBusType());
@@ -301,11 +301,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		GenericDTO<CashierViewDTO> genericCashierViewDTO = cshOrderClient.initCashier(genericDTO);
-		//CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
-		//收银订单号与支付方式
-		//String cshierUrl = cashierViewDTO.getCashierUrl();
+		// CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
+		// 收银订单号与支付方式
+		// String cshierUrl = cashierViewDTO.getCashierUrl();
 
-		//返回
+		// 返回
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(bussinessBody.getAmount());
 		hallRechargeResultDTO.setStatus(PwmConstants.RECHARGE_ORD_W);
