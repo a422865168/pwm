@@ -1,5 +1,6 @@
 package com.hisun.lemon.pwm.dto;
 
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModel;
@@ -21,6 +22,7 @@ public class WithdrawResultDTO {
     //提现订单号
 	@ApiModelProperty(name = "orderNo", value = "提现订单号")
     @NotEmpty(message="PWM10005")
+	@Length(max=24)
     private String orderNo;
     //实际提现金额
 	@ApiModelProperty(name = "wcActAmt", value = "实际提现金额")

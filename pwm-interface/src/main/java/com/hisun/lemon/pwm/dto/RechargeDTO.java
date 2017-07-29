@@ -54,12 +54,14 @@ public class RechargeDTO {
 	 * 收款方id
 	 */
 	@ApiModelProperty(name = "payeeId", value = " 收款方id")
+	@Length(max=20)
 	private String payeeId;
 
 	/**
 	 * 付款方id
 	 */
 	@ApiModelProperty(name = "payerId", value = " 付款方id")
+	@Length(max=20)
 	private String payerId;
 
 	/**

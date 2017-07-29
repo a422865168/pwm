@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
+
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModel;
@@ -23,12 +25,14 @@ public class RechargeResultDTO {
 	 * 充提订单号
 	 */
     @NotEmpty(message="PWM10005")
+    @Length(max=204)
     private String orderNo;
 
 	/**
 	 * 币种
 	 */
 	@ApiModelProperty(name = "orderCcy", value = "币种")
+	@Length(max=4)
     private String orderCcy;
 	/**
 	 * 订单金额
@@ -41,6 +45,7 @@ public class RechargeResultDTO {
 	 * 收银订单号
 	 */
 	@NotEmpty(message="PWM10007")
+	@Length(max=24)
 	private String extOrderNo;
 	/**
 	 * 订单状态

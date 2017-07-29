@@ -6,8 +6,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.hisun.lemon.framework.data.GenericDTO;
-import com.hisun.lemon.framework.data.NoBody;
-import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 
 /**
@@ -33,5 +32,5 @@ public interface PwmRechargeClient {
      * @return
      */
     @PatchMapping("/pwm/recharge/result/sea")
-    public GenericDTO<NoBody> completeSeaOrder(@Validated @RequestBody GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO);
+    public GenericDTO completeSeaOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
 }

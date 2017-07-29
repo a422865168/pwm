@@ -32,7 +32,7 @@ public class RechargeHCouponDTO {
 	 * @Fields userId 内部用户号
 	 */
 	@NotEmpty(message="PWM10023")
-	@Length(max =20)
+	@Length(max =24)
 	private String userId;
 	/**
 	 * 充值金额
