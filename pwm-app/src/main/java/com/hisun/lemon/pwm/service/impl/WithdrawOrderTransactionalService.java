@@ -1,6 +1,7 @@
 package com.hisun.lemon.pwm.service.impl;
 
 import com.hisun.lemon.common.exception.LemonException;
+import com.hisun.lemon.common.utils.JudgeUtils;
 import com.hisun.lemon.pwm.dao.IWithdrawOrderDao;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,17 @@ public class WithdrawOrderTransactionalService {
         int num = withdrawOrderDao.update(withdrawOrderDO);
         if(num != 1){
             LemonException.throwBusinessException("PWM20005");
+        }
+    }
+
+    /**
+     * 校验订单是否存在
+     */
+    public void query(String orderNo){
+
+        WithdrawOrderDO withdrawOrderDO = withdrawOrderDao.get(orderNo);
+        if(JudgeUtils.isNotNull(withdrawOrderDO)){
+            LemonException.throwBusinessException("PWM30005");
         }
     }
 }

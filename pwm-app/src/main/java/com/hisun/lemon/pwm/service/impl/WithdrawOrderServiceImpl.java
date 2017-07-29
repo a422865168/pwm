@@ -4,6 +4,8 @@ package com.hisun.lemon.pwm.service.impl;
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
+import com.hisun.lemon.cpo.client.WithdrawClient;
+import com.hisun.lemon.cpo.dto.WithdrawReqDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
@@ -25,6 +27,9 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
 	@Resource
     private WithdrawOrderTransactionalService withdrawOrderTransactionalService;
+
+	@Resource
+	private WithdrawClient withdrawClient;
 
 	@Override
 	public void createOrder(GenericDTO<WithdrawDTO> genericWithdrawDTO) {
@@ -74,7 +79,9 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		//提现金额由账户余额转到提现银行卡
 		//withdrawOrderTransactionalService.applyAmountTransfer();
 		//调用资金能力的提现申请接口，等待人工线下付款到银行受理结果异步通知
-
+		WithdrawReqDTO withdrawReqDTO = new WithdrawReqDTO();
+		BeanUtils.copyProperties(withdrawReqDTO, withdrawOrderDO);
+		GenericDTO genericDTO = withdrawClient.createOrder(withdrawReqDTO);
 
 	}
 
@@ -83,7 +90,9 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         WithdrawResultDTO withdrawResultDTO = genericWithdrawResultDTO.getBody();
         WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
         BeanUtils.copyProperties(withdrawOrderDO, withdrawResultDTO);
-        //如果订单状态为'S1'，则修改订单成功时间
+        // 校验订单是否存在
+        withdrawOrderTransactionalService.query(withdrawOrderDO.getOrderNo());
+        //判断订单状态为'S1'，则修改订单成功时间
         if(PwmConstants.WITHDRAW_ORD_S1.equals(withdrawOrderDO.getOrderStatus())){
             withdrawOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
             withdrawOrderDO.setRspSuccTm(DateTimeUtils.getCurrentLocalDateTime());

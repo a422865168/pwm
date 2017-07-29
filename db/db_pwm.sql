@@ -191,5 +191,7 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30003','zh','支付密码错误次数超过5次!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30004','zh','支付密码错误!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30005','zh','提现订单号不存在!',now(),now());
 
 -------------------------
