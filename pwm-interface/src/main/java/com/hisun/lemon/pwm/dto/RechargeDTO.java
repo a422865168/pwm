@@ -1,14 +1,14 @@
 package com.hisun.lemon.pwm.dto;
 
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import java.math.BigDecimal;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
-import java.math.BigDecimal;
+
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import io.swagger.annotations.ApiModelProperty;
 
 
 /**
@@ -57,22 +57,14 @@ public class RechargeDTO {
 	 * 收款方id
 	 */
 	@ApiModelProperty(name = "payeeId", value = " 收款方id")
-<<<<<<< .mine
 	@Length(max=20)
-=======
-	@Length(max = 20)
->>>>>>> .theirs
 	private String payeeId;
 
 	/**
 	 * 付款方id
 	 */
 	@ApiModelProperty(name = "payerId", value = " 付款方id")
-<<<<<<< .mine
 	@Length(max=20)
-=======
-	@Length(max = 20)
->>>>>>> .theirs
 	private String payerId;
 
 	/**
