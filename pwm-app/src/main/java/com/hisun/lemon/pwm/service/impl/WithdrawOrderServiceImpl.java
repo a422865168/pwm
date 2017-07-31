@@ -4,7 +4,6 @@ package com.hisun.lemon.pwm.service.impl;
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
-import com.hisun.lemon.cpo.client.WithdrawClient;
 import com.hisun.lemon.cpo.dto.WithdrawReqDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.utils.IdGenUtils;
@@ -28,8 +27,8 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 	@Resource
     private WithdrawOrderTransactionalService withdrawOrderTransactionalService;
 
-	@Resource
-	private WithdrawClient withdrawClient;
+	//@Resource
+	//private WithdrawClient withdrawClient;
 
 	@Override
 	public void createOrder(GenericDTO<WithdrawDTO> genericWithdrawDTO) {
@@ -81,7 +80,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		//调用资金能力的提现申请接口，等待人工线下付款到银行受理结果异步通知
 		WithdrawReqDTO withdrawReqDTO = new WithdrawReqDTO();
 		BeanUtils.copyProperties(withdrawReqDTO, withdrawOrderDO);
-		GenericDTO genericDTO = withdrawClient.createOrder(withdrawReqDTO);
+		//GenericDTO genericDTO = withdrawClient.createOrder(withdrawReqDTO);
 
 	}
 
