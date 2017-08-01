@@ -24,7 +24,6 @@ public class RechargeDTO {
 	 */
 	@ApiModelProperty(name = "amount", value = "充值金额")
 	@Min(value=0, message="PWM10001")
-	@Length(max = 15)
     private BigDecimal amount;
 	/**
 	 * 订单来源渠道
@@ -72,7 +71,6 @@ public class RechargeDTO {
 	 */
 	@ApiModelProperty(name = "fee", value = " 充值手续费")
 	@Min(value=0, message="PWM10016")
-	@Length(max = 15)
 	private BigDecimal fee;
 
 	public BigDecimal getAmount() {

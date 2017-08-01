@@ -35,12 +35,10 @@ public class WithdrawDTO {
 	//申请提现金额
 	@ApiModelProperty(name = "wcApplyAmt", value = "申请提现金额")
 	@Min(value=0, message="PWM10029")
-	@Length(max = 15)
 	private BigDecimal wcApplyAmt;
 	//提现手续费
 	@ApiModelProperty(name = "feeAmt", value = "提现手续费")
 	@Min(value=0, message="PWM10030")
-	@Length(max = 11)
 	private BigDecimal feeAmt;
 	//币种
 	@ApiModelProperty(name = "orderCcy", value = "币种(USD:美元)")

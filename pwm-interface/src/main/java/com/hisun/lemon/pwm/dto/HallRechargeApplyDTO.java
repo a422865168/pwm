@@ -61,7 +61,6 @@ public class HallRechargeApplyDTO {
 		 */
 		@ApiModelProperty(name = "amount", value = "充值金额")
 		@Min(value=0, message="PWM10012")
-		@Length(max = 15)
 		private BigDecimal amount;
 
 		/**
@@ -86,7 +85,6 @@ public class HallRechargeApplyDTO {
 
 		@ApiModelProperty(name = "fee", value = "营业厅充值操作手续费")
 		@Min(value=0, message="PWM10016")
-		@Length(max = 15)
 		private Double fee;
 
 		@ApiModelProperty(name = "ccy", value = "营业厅充值币种")

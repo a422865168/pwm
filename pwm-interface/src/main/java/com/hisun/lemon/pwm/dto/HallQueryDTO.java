@@ -22,7 +22,6 @@ public class HallQueryDTO {
 	 * 充值金额
 	 */
 	@ApiModelProperty(name = "amount", value = "充值金额")
-	@Length(max = 15)
     private BigDecimal amount;
 
 	@NotEmpty(message = "PWM10018")
