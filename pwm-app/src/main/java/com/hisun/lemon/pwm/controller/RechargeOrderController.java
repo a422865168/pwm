@@ -63,7 +63,7 @@ public class RechargeOrderController {
 	@ApiOperation(value = "营业厅查询", notes = "查询用户信息")
 	@ApiResponse(code = 200, message = "查询到的用户信息")
 	@GetMapping(value = "/hall/info")
-	public GenericDTO queryUserInfo(@Validated GenericDTO<HallQueryDTO> genericResultDTO) {
+	public GenericDTO<HallQueryResultDTO> queryUserInfo(@Validated GenericDTO<HallQueryDTO> genericResultDTO) {
 		HallQueryResultDTO resultDTO = service.queryUserInfo(genericResultDTO.getBody().getKey(),
 				genericResultDTO.getBody().getAmount());
 		return GenericDTO.newSuccessInstance(resultDTO);

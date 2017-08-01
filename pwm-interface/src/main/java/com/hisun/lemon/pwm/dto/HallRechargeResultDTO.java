@@ -27,6 +27,12 @@ public class HallRechargeResultDTO {
 	private String orderNo;
 
 	/**
+	 * 收银台订单号
+	 */
+	@ApiModelProperty(name = "cashierOrderNo", value = "收银台订单号")
+	private String cashierOrderNo;
+
+	/**
 	 * 状态
 	 */
 	@ApiModelProperty(name = "status", value = "状态")
@@ -80,5 +86,13 @@ public class HallRechargeResultDTO {
 
 	public void setFee(BigDecimal fee) {
 		this.fee = fee;
+	}
+
+	public String getCashierOrderNo() {
+		return cashierOrderNo;
+	}
+
+	public void setCashierOrderNo(String cashierOrderNo) {
+		this.cashierOrderNo = cashierOrderNo;
 	}
 }

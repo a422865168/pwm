@@ -50,6 +50,13 @@ public class HallRechargeApplyDTO {
 		private String hallOrderNo;
 
 		/**
+		 * 收银台订单号
+		 */
+		@ApiModelProperty(name = "cashierOrderNo", value = "收银台订单号")
+		@Length(max = 24)
+		private String cashierOrderNo;
+
+		/**
 		 * 充值金额
 		 */
 		@ApiModelProperty(name = "amount", value = "充值金额")
@@ -149,6 +156,14 @@ public class HallRechargeApplyDTO {
 
 		public void setPsnFlag(String psnFlag) {
 			this.psnFlag = psnFlag;
+		}
+
+		public String getCashierOrderNo() {
+			return cashierOrderNo;
+		}
+
+		public void setCashierOrderNo(String cashierOrderNo) {
+			this.cashierOrderNo = cashierOrderNo;
 		}
 	}
 

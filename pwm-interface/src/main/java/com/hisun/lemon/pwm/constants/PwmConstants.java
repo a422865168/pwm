@@ -139,5 +139,10 @@ public class PwmConstants {
 	 * 业务类型：充海币
 	 */
 	public static final String BUS_TYPE_HCOUPON="0501";
+
+	/**
+	 * 营业厅充值币种：USD美元
+	 */
+	public static final String HALL_PAY_CCY="USD";
 	
 }
