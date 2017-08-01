@@ -45,7 +45,7 @@ public class RechargeHCouponDTO {
 	/**
 	 * @Fields txType 交易类型
 	 */
-	@ApiModelProperty(name = "txType", value = "交易类型")
+	@ApiModelProperty(name = "txType", value = "交易类型 05")
 	@NotEmpty(message = "TAM10002")
 	@Length(max =2)
 	private String txType;
