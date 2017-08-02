@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.controller;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.framework.data.GenericRspDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -39,10 +40,10 @@ public class WithdrawOrderController {
 	@ApiOperation(value = "申请提现", notes = "生成提现订单")
 	@ApiResponse(code = 200, message = "申请提现")
 	@PostMapping(value = "/order")
-	public GenericDTO createOrder(@Validated @RequestBody GenericDTO<WithdrawDTO> genericWithdrawDTO) {
+	public GenericRspDTO createOrder(@Validated @RequestBody GenericDTO<WithdrawDTO> genericWithdrawDTO) {
 
 		withdrawOrderService.createOrder(genericWithdrawDTO);
-		GenericDTO<WithdrawDTO> genericDTO = new GenericDTO<WithdrawDTO>();
+		GenericRspDTO<WithdrawDTO> genericDTO = new GenericRspDTO<WithdrawDTO>();
 		genericDTO.setMsgCd(LemonUtils.getSuccessMsgCd());
 		return genericDTO;
 	}
@@ -56,9 +57,9 @@ public class WithdrawOrderController {
 	@ApiOperation(value = "提现结果同步", notes = "接收资金能力的处理结果通知")
 	@ApiResponse(code = 200, message = "申请提现结果")
 	@PatchMapping(value = "/result")
-	public GenericDTO completeOrder(@Validated @RequestBody GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO) {
+	public GenericRspDTO completeOrder(@Validated @RequestBody GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO) {
 		withdrawOrderService.completeOrder(genericWithdrawResultDTO);
-		GenericDTO<WithdrawResultDTO> genericDTO = new GenericDTO<WithdrawResultDTO>();
+		GenericRspDTO<WithdrawResultDTO> genericDTO = new GenericRspDTO<WithdrawResultDTO>();
 		genericDTO.setMsgCd(LemonUtils.getSuccessMsgCd());
 		return genericDTO;
 	}
