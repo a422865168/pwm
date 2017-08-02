@@ -52,19 +52,6 @@ public class RechargeDTO {
     @NotEmpty(message="PWM10004")
 	@Length(max =4)
     private String busType;
-	/**
-	 * 收款方id
-	 */
-	@ApiModelProperty(name = "payeeId", value = " 收款方id")
-	@Length(max=20)
-	private String payeeId;
-
-	/**
-	 * 付款方id
-	 */
-	@ApiModelProperty(name = "payerId", value = " 付款方id")
-	@Length(max=20)
-	private String payerId;
 
 	/**
 	 * 充值手续费
@@ -103,21 +90,5 @@ public class RechargeDTO {
 
 	public void setBusType(String busType) {
 		this.busType = busType;
-	}
-
-	public String getPayeeId() {
-		return payeeId;
-	}
-
-	public String getPayerId() {
-		return payerId;
-	}
-
-	public void setPayerId(String payerId) {
-		this.payerId = payerId;
-	}
-
-	public void setPayeeId(String payeeId) {
-		this.payeeId = payeeId;
 	}
 }

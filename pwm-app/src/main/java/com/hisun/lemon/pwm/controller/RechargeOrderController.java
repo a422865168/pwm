@@ -43,13 +43,8 @@ public class RechargeOrderController {
 	@ApiResponse(code = 200, message = "充值下单")
 	@PostMapping(value = "/order")
 	public GenericDTO createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
-		String ip = "";
 		RechargeDTO rechargeDTO = genRechargeDTO.getBody();
-		if (StringUtils.isBlank(rechargeDTO.getPayerId())) {
-			logger.debug("默认设置当前用户为的付款方");
-			rechargeDTO.setPayerId(genRechargeDTO.getUserId());
-		}
-		return service.createOrder(rechargeDTO, ip);
+		return service.createOrder(rechargeDTO);
 	}
 
 	@ApiOperation(value = "充值处理结果通知", notes = "接收收银台的处理结果通知")

@@ -18,7 +18,7 @@ import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
  *
  */
 public interface IRechargeOrderService {
-    public GenericDTO createOrder(RechargeDTO rechargeDTO,String ipAddress);
+    public GenericDTO createOrder(RechargeDTO rechargeDTO);
 
     /**
      * 接收收银台的结果通知

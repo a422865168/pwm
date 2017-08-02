@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hisun.lemon.acm.constants.ACMConstants;
+import com.hisun.lemon.acm.constants.CapTypEnum;
+import com.hisun.lemon.acm.dto.AccountingReqDTO;
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.JudgeUtils;
@@ -36,6 +39,7 @@ import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
+import com.hisun.lemon.tam.component.AcmComponent;
 
 @Service
 public class RechargeOrderServiceImpl implements IRechargeOrderService {
@@ -45,6 +49,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	RechargeOrderTransactionalService service;
 	@Resource
 	CshOrderClient cshOrderClient;
+	@Resource
+	private AcmComponent acmComponent;
 
 	/**
 	 * 海币充值下单
@@ -131,6 +137,56 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 
 		// 账务处理
+		// 账务处理
+				AccountingReqDTO userAccountReqDTO = null; // 用户现金账户账务对象
+				AccountingReqDTO cshItemReqDTO = null; // 暂收收银台账务对象
+				AccountingReqDTO couponItemReqDTO = null; // 优惠账务对象
+				AccountingReqDTO crdItemReqDTO = null; // 补款账务对象
+				//流水号
+				String payJrnNo=LemonUtils.getRequestId();
+				// 查询用户帐号
+				String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
+				//先静静
+				String balAcNo = acmComponent.getAcmAcNo(rechargeHCouponDTO.getUserId(), balCapType);
+				//借:  其他应付款-暂收-收银台
+				cshItemReqDTO=acmComponent.createAccountingReqDTO(
+						rechargeSeaDO.getOrderNo(),
+						payJrnNo, 
+						rechargeSeaDO.getTxType(), 
+						ACMConstants.ACCOUNTING_NOMARL, 
+						rechargeSeaDO.getOrderAmt(),
+						null, 
+						ACMConstants.ITM_AC_TYP, 
+						balCapType, 
+						ACMConstants.AC_D_FLG, 
+						CshConstants.AC_ITEM_CSH_PAY,
+						balAcNo, 
+						null, 
+						null, 
+						null, 
+						null);  
+						
+				//其他应付款-支付账户-xx用户海币账户
+				userAccountReqDTO=acmComponent.createAccountingReqDTO(
+						rechargeSeaDO.getOrderNo(),
+						payJrnNo, 
+						rechargeSeaDO.getTxType(), 
+						ACMConstants.ACCOUNTING_NOMARL, 
+						rechargeSeaDO.gethCouponAmt(),
+						balAcNo, 
+						ACMConstants.USER_AC_TYP,
+						balCapType, 
+						ACMConstants.AC_C_FLG, 
+						"", 
+						CshConstants.AC_ITEM_HCOUPON, 
+						null, 
+						null, 
+						null, 
+						null);
+				
+				acmComponent.requestAc(userAccountReqDTO,couponItemReqDTO,crdItemReqDTO,cshItemReqDTO);
+				
+				
 
 		// 更新订单
 		//计算海币数量  1:100multiply
@@ -146,7 +202,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	}
 
 	@Override
-	public GenericDTO createOrder(RechargeDTO rechargeDTO, String ipAddress) {
+	public GenericDTO createOrder(RechargeDTO rechargeDTO) {
 		if (!rechargeDTO.getBusType().startsWith(PwmConstants.TX_TYPE_RECHANGE)) {
 			throw new LemonException("PWM20001");
 		}
@@ -157,7 +213,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		rechargeOrderDO.setBusType(rechargeDTO.getBusType());
 		rechargeOrderDO.setModifyOpr("");
-		rechargeOrderDO.setIpAddress(ipAddress);
 		rechargeOrderDO.setOrderAmt(rechargeDTO.getAmount());
 		rechargeOrderDO.setOrderCcy("USD");
 		rechargeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
