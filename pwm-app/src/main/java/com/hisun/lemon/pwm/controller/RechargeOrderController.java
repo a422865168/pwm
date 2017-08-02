@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.controller;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.framework.data.GenericRspDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -42,7 +43,7 @@ public class RechargeOrderController {
 	@ApiOperation(value = "充值下单", notes = "生成充值订单，调用收银台")
 	@ApiResponse(code = 200, message = "充值下单")
 	@PostMapping(value = "/order")
-	public GenericDTO createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
+	public GenericRspDTO createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
 		RechargeDTO rechargeDTO = genRechargeDTO.getBody();
 		return service.createOrder(rechargeDTO);
 	}
@@ -50,60 +51,60 @@ public class RechargeOrderController {
 	@ApiOperation(value = "充值处理结果通知", notes = "接收收银台的处理结果通知")
 	@ApiResponse(code = 200, message = "处理通知结果")
 	@PatchMapping(value = "/result")
-	public GenericDTO completeOrder(@Validated @RequestBody GenericDTO<RechargeResultDTO> genericResultDTO) {
+	public GenericRspDTO completeOrder(@Validated @RequestBody GenericDTO<RechargeResultDTO> genericResultDTO) {
 		service.handleResult(genericResultDTO);
-		return GenericDTO.newSuccessInstance();
+		return GenericRspDTO.newSuccessInstance();
 	}
 
 	@ApiOperation(value = "营业厅查询", notes = "查询用户信息")
 	@ApiResponse(code = 200, message = "查询到的用户信息")
 	@GetMapping(value = "/hall/info")
-	public GenericDTO<HallQueryResultDTO> queryUserInfo(@Validated GenericDTO<HallQueryDTO> genericResultDTO) {
+	public GenericRspDTO<HallQueryResultDTO> queryUserInfo(@Validated GenericDTO<HallQueryDTO> genericResultDTO) {
 		HallQueryResultDTO resultDTO = service.queryUserInfo(genericResultDTO.getBody().getKey(),
 				genericResultDTO.getBody().getAmount());
-		return GenericDTO.newSuccessInstance(resultDTO);
+		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 
 	@ApiOperation(value = "营业厅充值申请", notes = "接收营业厅的充值申请请求")
 	@ApiResponse(code = 200, message = "营业厅充值申请结果")
 	@PostMapping(value = "/hall/application")
-	public GenericDTO<HallRechargeResultDTO> hallRecharge(
+	public GenericRspDTO<HallRechargeResultDTO> hallRecharge(
 			@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO) {
 		HallRechargeResultDTO resultDTO = service.hallRecharge(genericResultDTO.getBody());
-		return GenericDTO.newSuccessInstance(resultDTO);
+		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 
 	@ApiOperation(value = "营业厅充值确认", notes = "接收营业厅的充值确认请求")
 	@ApiResponse(code = 200, message = "营业厅充值确认结果")
 	@PatchMapping(value = "/hall/acknowledgement")
-	public GenericDTO<HallRechargeResultDTO> hallRechargeConfirm(
+	public GenericRspDTO<HallRechargeResultDTO> hallRechargeConfirm(
 			@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO) {
 		HallRechargeResultDTO resultDTO = service.hallRechargeConfirm(genericResultDTO.getBody());
-		return GenericDTO.newSuccessInstance(resultDTO);
+		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 
 	@ApiOperation(value = "海币充值下单", notes = "生成充值订单，调用收银台")
 	@ApiResponse(code = 200, message = "充值下单")
 	@PostMapping(value = "/order/sea")
-	public GenericDTO createHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
+	public GenericRspDTO createHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
 		return this.service.createHCouponOrder(rechargeHCouponDTO);
 	}
 
 	@ApiOperation(value = "海币充值处理结果通知", notes = "接收收银台的处理结果通知")
 	@ApiResponse(code = 200, message = "处理通知结果")
 	@PatchMapping(value = "/result/sea")
-	public GenericDTO completeHCouponOrder(
+	public GenericRspDTO completeHCouponOrder(
 			@Validated @RequestBody GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO) {
 		service.handleHCouponResult(rechargeHCouponDTO);
-		return GenericDTO.newSuccessInstance();
+		return GenericRspDTO.newSuccessInstance();
 	}
 
 	@ApiOperation(value = "营业厅充值撤销", notes = "接收营业厅的充值撤销请求")
 	@ApiResponse(code = 200, message = "营业厅充值撤销结果")
 	@PostMapping(value = "/hall/revocation")
-	public GenericDTO<HallRechargeResultDTO> hallRechargeRevocation(
+	public GenericRspDTO<HallRechargeResultDTO> hallRechargeRevocation(
 			@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO) {
 		HallRechargeResultDTO resultDTO = service.hallRechargeRevocation(genericResultDTO.getBody());
-		return GenericDTO.newSuccessInstance(resultDTO);
+		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 }

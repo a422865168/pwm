@@ -3,6 +3,7 @@ package com.hisun.lemon.pwm.service;
 import java.math.BigDecimal;
 
 import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
@@ -18,7 +19,7 @@ import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
  *
  */
 public interface IRechargeOrderService {
-    public GenericDTO createOrder(RechargeDTO rechargeDTO);
+    public GenericRspDTO createOrder(RechargeDTO rechargeDTO);
 
     /**
      * 接收收银台的结果通知
@@ -53,7 +54,7 @@ public interface IRechargeOrderService {
      * @param rechargeHCouponDTO
      * @return
      */
-    public GenericDTO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
+    public GenericRspDTO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
     
     /**
      * 海币充值结果处理

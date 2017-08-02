@@ -1,5 +1,6 @@
 package com.hisun.lemon.pwm.client;
 
+import com.hisun.lemon.framework.data.GenericRspDTO;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,14 +24,14 @@ public interface PwmRechargeClient {
      * @return
      */
     @PatchMapping("/pwm/recharge/result")
-    public GenericDTO rechargeNotify(@Validated @RequestBody GenericDTO<RechargeResultDTO> rechargeResultDTO);
+    public GenericRspDTO rechargeNotify(@Validated @RequestBody GenericDTO<RechargeResultDTO> rechargeResultDTO);
     
 	/**
 	 * 海币充值结果通知
 	 * 
-	 * @param rechargeSeaDTO通知数据
+	 * @param genericResultDTO
 	 * @return
 	 */
 	@PatchMapping("/pwm/recharge/result/sea")
-	public GenericDTO completeSeaOrder(@Validated @RequestBody GenericDTO<RechargeResultDTO> genericResultDTO);
+	public GenericRspDTO completeSeaOrder(@Validated @RequestBody GenericDTO<RechargeResultDTO> genericResultDTO);
 }

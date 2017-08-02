@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.framework.data.GenericRspDTO;
 import org.springframework.stereotype.Component;
 
 import com.hisun.lemon.acm.client.AccountManagementClient;
@@ -147,7 +148,7 @@ public class AcmComponent {
 
 		GenericDTO<List<AccountingReqDTO>> userAccDto = new GenericDTO<>();
 		userAccDto.setBody(accList);
-		GenericDTO<NoBody> accountingTreatment = accountingTreatmentClient.accountingTreatment(userAccDto);
+		GenericRspDTO<NoBody> accountingTreatment = accountingTreatmentClient.accountingTreatment(userAccDto);
 
 		if (JudgeUtils.isNotSuccess(accountingTreatment.getMsgCd())) {
 			throw new LemonException(accountingTreatment.getMsgCd());

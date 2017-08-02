@@ -8,6 +8,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.csh.order.dto.HallRechargeOrderDTO;
+import com.hisun.lemon.csh.order.dto.HallRechargePaymentDTO;
+import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.framework.data.NoBody;
+import com.hisun.lemon.urm.client.UserBasicInfClient;
+import com.hisun.lemon.urm.dto.UserBasicInfDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,7 +45,7 @@ import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
-import com.hisun.lemon.tam.component.AcmComponent;
+import com.hisun.lemon.pwm.component.AcmComponent;
 
 @Service
 public class RechargeOrderServiceImpl implements IRechargeOrderService {
@@ -51,12 +57,15 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	CshOrderClient cshOrderClient;
 	@Resource
 	private AcmComponent acmComponent;
-
+	@Resource
+	UserBasicInfClient userBasicInfClient;
+	//	@Resource
+	//	TfmServerClient fmServerClient;
 	/**
 	 * 海币充值下单
 	 */
 	@Override
-	public GenericDTO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
+	public GenericRspDTO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
 		RechargeHCouponDTO rechargeDTO = rechargeHCouponDTO.getBody();
 		if (!rechargeDTO.getBusType().startsWith(PwmConstants.TX_TYPE_HCOUPON)) {
 			throw new LemonException("PWM20001");
@@ -202,7 +211,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	}
 
 	@Override
-	public GenericDTO createOrder(RechargeDTO rechargeDTO) {
+	public GenericRspDTO createOrder(RechargeDTO rechargeDTO) {
 		if (!rechargeDTO.getBusType().startsWith(PwmConstants.TX_TYPE_RECHANGE)) {
 			throw new LemonException("PWM20001");
 		}
@@ -294,7 +303,26 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 	@Override
 	public HallQueryResultDTO queryUserInfo(String userId, BigDecimal amount) {
-
+		//根据手机号查询平台用户基本信息
+//		GenericDTO<UserBasicInfDTO> genericUserBasicInfDTO=  userBasicInfClient.queryUserByLoginId(userId);
+//		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
+//		TradeFeeReqDTO tradeFeeReqDTO = new TradeFeeReqDTO();
+//		tradeFeeReqDTO.setBusOrderNo("");
+//		tradeFeeReqDTO.setBusOrderTime("");
+//		tradeFeeReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
+//		tradeFeeReqDTO.setTradeAmt(amount);
+//		tradeFeeReqDTO.setUserId(userBasicInfDTO.getUserId());
+//		tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
+//
+//		GenericDTO genericTradeFeeReqDTO = GenericDTO.newSuccessInstance(tradeFeeReqDTO);
+//		GenericDTO<TradeFeeRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeFee(genericTradeFeeReqDTO);
+//		TradeFeeRspDTO tradeFeeRspDTO = genericTradeFeeRspDTO.getBody();
+//
+//		HallQueryResultDTO hallQueryResultDTO = new HallQueryResultDTO();
+//		hallQueryResultDTO.setFee(tradeFeeRspDTO.getTradeFee());
+//		hallQueryResultDTO.setUmId(userBasicInfDTO.getUserId());
+//		hallQueryResultDTO.setUmName(userBasicInfDTO.getUsrNm());
+//		return hallQueryResultDTO;
 		return null;
 	}
 
@@ -351,15 +379,15 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setOrderAmt(bussinessBody.getAmount());
 		initCashierDTO.setFee(BigDecimal.valueOf(bussinessBody.getFee()));
 		initCashierDTO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
-		initCashierDTO.setOrderCcy(CshConstants.QP_PAY_CCY);
+		initCashierDTO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
 		initCashierDTO.setPayerName("");
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		GenericDTO<CashierViewDTO> genericCashierViewDTO = cshOrderClient.initCashier(genericDTO);
-		// CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
-		// 收银订单号与支付方式
-		// String cshierUrl = cashierViewDTO.getCashierUrl();
-
+		CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
+		//收银订单号与支付方式
+		String cashierUrl = cashierViewDTO.getCashierUrl();
+		String cashierOrderNo = extractOrderNo(cashierUrl);
 		// 返回
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(bussinessBody.getAmount());
@@ -367,6 +395,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		hallRechargeResultDTO.setFee(BigDecimal.valueOf(bussinessBody.getFee()));
 		hallRechargeResultDTO.setHallOrderNo(bussinessBody.getHallOrderNo());
 		hallRechargeResultDTO.setOrderNo(orderNo);
+		hallRechargeResultDTO.setCashierOrderNo(cashierOrderNo);
 		return hallRechargeResultDTO;
 	}
 
@@ -395,23 +424,20 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM20003");
 		}
 
-		//调用收银,更行收银订单状态与账户余额
-/*		InitCashierDTO initCashierDTO = new InitCashierDTO();
-		initCashierDTO.setBusPaytype(PwmConstants.BUS_TYPE_RECHARGE_HALL);
-		initCashierDTO.setBusType(rechargeOrderDO.getBusType());
-		initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
-		initCashierDTO.setPayeeId(dto.getMerchantId());
-		initCashierDTO.setSysChannel(PwmConstants.ORD_SYSCHANNEL_HALL);
-		initCashierDTO.setPayerId(busBody.getPayerId());
-		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
-		initCashierDTO.setOrderAmt(busBody.getAmount());
-		initCashierDTO.setFee(BigDecimal.valueOf(busBody.getFee()));
-		initCashierDTO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
-		initCashierDTO.setOrderCcy(CshConstants.QP_PAY_CCY);
-		initCashierDTO.setPayerName("");
-		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
-		genericDTO.setBody(initCashierDTO);
-		GenericDTO<CashierViewDTO> genericCashierViewDTO = cshOrderClient.initCashier(genericDTO);*/
+		//调用收银台线下收款接口，完成用户线下充值
+		HallRechargePaymentDTO hallRechargePaymentDTO = new HallRechargePaymentDTO();
+		hallRechargePaymentDTO.setOrderNo(busBody.getCashierOrderNo());
+		hallRechargePaymentDTO.setHallOrderNo(oriHallOrder);
+		hallRechargePaymentDTO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
+		hallRechargePaymentDTO.setOrderAmt(busBody.getAmount());
+		GenericDTO genericHallRechargePaymentDTO = GenericRspDTO.newSuccessInstance(hallRechargePaymentDTO);
+
+		GenericRspDTO<NoBody> hallPaymentResult = cshOrderClient.hallRechargePayment(genericHallRechargePaymentDTO);
+
+		//收银台收款失败
+		if(!JudgeUtils.isSuccess(hallPaymentResult.getMsgCd())) {
+
+		}
 
 		//更新充值订单
 		RechargeOrderDO updOrderDO = new RechargeOrderDO();
@@ -442,6 +468,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		//充值原订单校验
 		String oriHallOrder = busBody.getHallOrderNo();
+		busBody.getPayerId();
 		if(JudgeUtils.isNull(oriHallOrder)) {
 			throw new LemonException("PWM10011");
 		}
@@ -469,6 +496,16 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		service.updateOrder(updOrderDO);
 
 		//更新收银订单状态
+		HallRechargeOrderDTO hallRechargeOrderDTO = new HallRechargeOrderDTO();
+		hallRechargeOrderDTO.setCshOrderNo(busBody.getCashierOrderNo());
+		hallRechargeOrderDTO.setOrderStatus(CshConstants.ORD_STS_C);
+		hallRechargeOrderDTO.setPayerId(busBody.getPayerId());
+		GenericDTO genericHallRechargeOrderDTO = GenericRspDTO.newSuccessInstance(hallRechargeOrderDTO);
+
+		GenericRspDTO<NoBody> cashierOrderUpdateResult = cshOrderClient.orderInfoUpdate(genericHallRechargeOrderDTO);
+		if(!JudgeUtils.isSuccess(cashierOrderUpdateResult.getMsgCd())) {
+			throw new LemonException("PWM20012");
+		}
 
 		//返回处理结果
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
@@ -524,6 +561,17 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			return "";
 		}
 
+	}
+
+	/**
+	 * 提取收银台支付url中收银订单号
+	 * @param url
+	 * @return
+	 */
+	public static String extractOrderNo(String url) {
+		int index = url.lastIndexOf("&");
+		String tmpOrderNo = url.substring(index);
+		return tmpOrderNo.substring(4);
 	}
 
 }
