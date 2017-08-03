@@ -28,6 +28,11 @@ public class RechargeResultDTO {
     @Length(max=204)
     private String orderNo;
 
+	@ApiModelProperty(name = "busType", value = "业务类型")
+	@NotEmpty(message="PWM10038")
+	@Length(max =4)
+	private String busType;
+
 	/**
 	 * 币种
 	 */
@@ -93,5 +98,13 @@ public class RechargeResultDTO {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getBusType() {
+		return busType;
+	}
+
+	public void setBusType(String busType) {
+		this.busType = busType;
 	}
 }
