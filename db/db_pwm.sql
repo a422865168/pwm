@@ -115,19 +115,6 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10018','zh','查询关键字不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10019','zh','查询用户类型不能为空!',now(),now());
-
-
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20001','zh','业务类型与交易类型不匹配!',now(),now());
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20002','zh','原充值订单不存在!',now(),now());
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20003','zh','充值金额不一致!',now(),now());
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20004','zh','生成订单不唯一!',now(),now());
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20005','zh','更新订单失败!',now(),now());
-
 --------------ruan
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10021','zh','海币充值订单号不能为空!',now(),now());
@@ -139,24 +126,6 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10024','zh','充值金额不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10025','zh','充海币操作状态非法!',now(),now());
-
-
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20006','zh','生成海币充值订单不唯一!',now(),now());
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20007','zh','更新海币充值订单失败!',now(),now());
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20008','zh','原海币充值订单不存在!',now(),now());
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20009','zh','海币充值金额不一致!',now(),now());
--------------------------
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20010','zh','营业厅充值找不到原订单信息!',now(),now());
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20011','zh','营业厅充值原订单状态异常!',now(),now());
-insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20012','zh','更新收银订单失败!',now(),now());
-
 ---------------------leon
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10026','zh','实际提现金额不小于0!',now(),now());
@@ -178,11 +147,40 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10034','zh','支付密码不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10035','zh','手机号不能为空!',now(),now());
-
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10036','zh','营业厅充值请求参数校验失败!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10037','zh','营业厅充值请求操作状态异常!',now(),now());
+
+
+
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20001','zh','业务类型与交易类型不匹配!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20002','zh','原充值订单不存在!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20003','zh','充值金额不一致!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20004','zh','生成订单不唯一!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20005','zh','更新订单失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20006','zh','生成海币充值订单不唯一!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20007','zh','更新海币充值订单失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20008','zh','原海币充值订单不存在!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20009','zh','海币充值金额不一致!',now(),now());
+-------------------------
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20010','zh','营业厅充值找不到原订单信息!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20011','zh','营业厅充值原订单状态异常!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20012','zh','更新收银订单失败!',now(),now());
+
+
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30001','zh','该用户为黑名单!',now(),now());
