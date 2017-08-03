@@ -12,6 +12,10 @@ import com.hisun.lemon.csh.order.dto.HallRechargeOrderDTO;
 import com.hisun.lemon.csh.order.dto.HallRechargePaymentDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
+import com.hisun.lemon.tfm.client.TfmServerClient;
+import com.hisun.lemon.tfm.dto.TradeFeeReqDTO;
+import com.hisun.lemon.tfm.dto.TradeFeeRspDTO;
+import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
 import com.hisun.lemon.urm.client.UserBasicInfClient;
 import com.hisun.lemon.urm.dto.UserBasicInfDTO;
 import org.slf4j.Logger;
@@ -59,8 +63,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	private AcmComponent acmComponent;
 	@Resource
 	UserBasicInfClient userBasicInfClient;
-	//	@Resource
-	//	TfmServerClient fmServerClient;
+	@Resource
+	TfmServerClient fmServerClient;
 	/**
 	 * 海币充值下单
 	 */
@@ -265,9 +269,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 
 		// 订单已经成功
-		if (StringUtils.equals(rechargeOrderDO.getOrderStatus(), PwmConstants.RECHARGE_ORD_S)) {
-			return;
-		}
+//		if (StringUtils.equals(rechargeOrderDO.getOrderStatus(), PwmConstants.RECHARGE_ORD_S)) {
+//			return;
+//		}
 
 		// 判断返回状态
 		if (!StringUtils.equals(rechargeResultDTO.getStatus(), PwmConstants.RECHARGE_ORD_S)) {
@@ -304,26 +308,22 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	@Override
 	public HallQueryResultDTO queryUserInfo(String userId, BigDecimal amount) {
 		//根据手机号查询平台用户基本信息
-//		GenericDTO<UserBasicInfDTO> genericUserBasicInfDTO=  userBasicInfClient.queryUserByLoginId(userId);
-//		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
-//		TradeFeeReqDTO tradeFeeReqDTO = new TradeFeeReqDTO();
-//		tradeFeeReqDTO.setBusOrderNo("");
-//		tradeFeeReqDTO.setBusOrderTime("");
-//		tradeFeeReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
-//		tradeFeeReqDTO.setTradeAmt(amount);
-//		tradeFeeReqDTO.setUserId(userBasicInfDTO.getUserId());
-//		tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
-//
-//		GenericDTO genericTradeFeeReqDTO = GenericDTO.newSuccessInstance(tradeFeeReqDTO);
-//		GenericDTO<TradeFeeRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeFee(genericTradeFeeReqDTO);
-//		TradeFeeRspDTO tradeFeeRspDTO = genericTradeFeeRspDTO.getBody();
-//
-//		HallQueryResultDTO hallQueryResultDTO = new HallQueryResultDTO();
-//		hallQueryResultDTO.setFee(tradeFeeRspDTO.getTradeFee());
-//		hallQueryResultDTO.setUmId(userBasicInfDTO.getUserId());
-//		hallQueryResultDTO.setUmName(userBasicInfDTO.getUsrNm());
-//		return hallQueryResultDTO;
-		return null;
+		GenericDTO<UserBasicInfDTO> genericUserBasicInfDTO=  userBasicInfClient.queryUserByLoginId(userId);
+		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
+		TradeRateReqDTO tradeFeeReqDTO = new TradeRateReqDTO();
+		tradeFeeReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
+		tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
+
+		GenericDTO genericTradeFeeReqDTO = GenericRspDTO.newSuccessInstance(tradeFeeReqDTO);
+		GenericDTO<TradeFeeRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeRate(genericTradeFeeReqDTO);
+		TradeFeeRspDTO tradeFeeRspDTO = genericTradeFeeRspDTO.getBody();
+
+		BigDecimal tradeFee = tradeFeeRspDTO.getTradeFee();
+		HallQueryResultDTO hallQueryResultDTO = new HallQueryResultDTO();
+		hallQueryResultDTO.setFee(tradeFee.multiply(amount));
+		hallQueryResultDTO.setUmId(userBasicInfDTO.getUserId());
+		hallQueryResultDTO.setUmName(userBasicInfDTO.getUsrNm());
+		return hallQueryResultDTO;
 	}
 
 	@Override

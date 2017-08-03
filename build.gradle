@@ -55,6 +55,7 @@ subprojects{
             dependency 'com.hisun:cpo-interface:1.0.0-SNAPSHOT'
             dependency 'com.hisun:acm-interface:1.0.1-SNAPSHOT'
             dependency 'com.hisun:urm-interface:1.0.0-SNAPSHOT'
+            dependency 'com.hisun:tfm-interface:1.0.0-SNAPSHOT'
 	     }
     }
     
