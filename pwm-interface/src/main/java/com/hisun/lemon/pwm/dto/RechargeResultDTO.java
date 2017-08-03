@@ -24,6 +24,7 @@ public class RechargeResultDTO {
 	/**
 	 * 充提订单号
 	 */
+	@ApiModelProperty(name = "orderNo", value = "充提订单号")
     @NotEmpty(message="PWM10005")
     @Length(max=204)
     private String orderNo;
@@ -32,6 +33,14 @@ public class RechargeResultDTO {
 	@NotEmpty(message="PWM10038")
 	@Length(max =4)
 	private String busType;
+
+	@ApiModelProperty(name = "payerId", value = "收银订单付款用户Id")
+	@Length(max =20)
+	private String payerId;
+
+	@ApiModelProperty(name = "txJrnNo", value = "收银订单流水")
+	@Length(max =26)
+	private String txJrnNo;
 
 	/**
 	 * 币种
@@ -49,13 +58,14 @@ public class RechargeResultDTO {
 	/**
 	 * 收银订单号
 	 */
+	@ApiModelProperty(name = "extOrderNo", value = "收银订单号")
 	@NotEmpty(message="PWM10007")
 	@Length(max=24)
 	private String extOrderNo;
 	/**
 	 * 订单状态
 	 */
-	@ApiModelProperty(name = "status", value = "订单状态")
+	@ApiModelProperty(name = "status", value = "订单状态(S:成功|F:失败)")
 	@NotEmpty(message="PWM10008")
 	@Pattern(regexp="S|F",message="PWM10009")
 	private String status;
@@ -106,5 +116,21 @@ public class RechargeResultDTO {
 
 	public void setBusType(String busType) {
 		this.busType = busType;
+	}
+
+	public String getPayerId() {
+		return payerId;
+	}
+
+	public void setPayerId(String payerId) {
+		this.payerId = payerId;
+	}
+
+	public String getTxJrnNo() {
+		return txJrnNo;
+	}
+
+	public void setTxJrnNo(String txJrnNo) {
+		this.txJrnNo = txJrnNo;
 	}
 }
