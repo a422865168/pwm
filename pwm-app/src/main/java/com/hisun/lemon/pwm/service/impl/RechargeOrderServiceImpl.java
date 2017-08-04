@@ -201,18 +201,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					null, 
 					null);
 				
-		acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);	
+		//acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);	
 		//计算海币数量  1:100multiply
 		BigDecimal hCouponAmt=rechargSeaDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
-		// 账务更新成功  调用海币充值接口
-		RechargeHCouponDO update=new RechargeHCouponDO();
-	    update.setAcTm(rechargeHCouponDTO.getAccDate());
-	    update.sethCouponAmt(hCouponAmt);
-	    update.setOrderAmt(rechargSeaDTO.getOrderAmt());
-		update.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
-		update.setOrderCcy(rechargSeaDTO.getOrderCcy());
-		update.setOrderNo(rechargSeaDTO.getOrderNo());
-		service.updateSeaOrder(update);
+		
 		
 		/////
 		RechargeMkmToolReqDTO mkmReqDTO=new RechargeMkmToolReqDTO();
@@ -232,7 +224,15 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		GenericRspDTO<RechargeMkmToolResDTO> mkmRsp=mkmClient.getSeaCyy(rechangeDTO);
 		if(!JudgeUtils.isNotNull(mkmRsp)){
 			if(StringUtils.equals(mkmRsp.getBody().getResult(), "1")){
-				
+				// 账务更新成功  调用海币充值接口
+				RechargeHCouponDO update=new RechargeHCouponDO();
+			    update.setAcTm(rechargeHCouponDTO.getAccDate());
+			    update.sethCouponAmt(hCouponAmt);
+			    update.setOrderAmt(rechargSeaDTO.getOrderAmt());
+				update.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
+				update.setOrderCcy(rechargSeaDTO.getOrderCcy());
+				update.setOrderNo(rechargSeaDTO.getOrderNo());
+				service.updateSeaOrder(update);
 			}else
 			{
 				throw new LemonException("PWM40001");
