@@ -10,6 +10,7 @@ dependencies {
     compile("com.hisun:cpo-interface")
     compile("com.hisun:acm-interface")
     compile("com.hisun:urm-interface")
+    compile("com.hisun:mkm-interface")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("com.hisun:tfm-interface")
 }

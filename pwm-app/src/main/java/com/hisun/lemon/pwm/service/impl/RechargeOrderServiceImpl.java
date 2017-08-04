@@ -36,6 +36,7 @@ import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.mkm.client.MarketActivityClient;
 import com.hisun.lemon.mkm.req.dto.RechargeMkmToolReqDTO;
+import com.hisun.lemon.mkm.res.dto.RechargeMkmToolResDTO;
 import com.hisun.lemon.pwm.component.AcmComponent;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
@@ -130,7 +131,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	public void handleHCouponResult(GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO) {
 		RechargeHCouponResultDTO rechargSeaDTO = rechargeHCouponDTO.getBody();
 		RechargeHCouponDO rechargeSeaDO = this.service.getHCoupon(rechargSeaDTO.getOrderNo());
-		
 		// 原订单不存在
 		if (JudgeUtils.isNull(rechargeSeaDO)) {
 			throw new LemonException("PWM20008");
@@ -215,19 +215,27 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		String mobile=mblNo;
 		mkmReqDTO.setMobile(mobile);
 		Integer count=hCouponAmt.intValue();
-		//mkmReqDTO.setRechargeTm(rechargeSeaDO.getTxTm());
+		mkmReqDTO.setRechargeTm(rechargeSeaDO.getTxTm());
 		mkmReqDTO.setCount(count);
+		GenericDTO<RechargeMkmToolReqDTO> rechangeDTO=new GenericDTO<RechargeMkmToolReqDTO>();
+		rechangeDTO.setBody(mkmReqDTO);
+		GenericRspDTO<RechargeMkmToolResDTO> mkmRsp=mkmClient.getSeaCyy(rechangeDTO);
+		if(!JudgeUtils.isNotNull(mkmRsp)){
+			if(StringUtils.equals(mkmRsp.getBody().getResult(), "1")){
+				RechargeHCouponDO update=new RechargeHCouponDO();
+			    update.setAcTm(rechargeHCouponDTO.getAccDate());
+			    update.sethCouponAmt(hCouponAmt);
+			    update.setOrderAmt(rechargSeaDTO.getOrderAmt());
+				update.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
+				update.setOrderCcy(rechargSeaDTO.getOrderCcy());
+				update.setOrderNo(rechargSeaDTO.getOrderNo());
+				service.updateSeaOrder(update);
+			}else
+			{
+				throw new LemonException("PWM40001");
+			}
+		}
 		
-		
-		
-		RechargeHCouponDO update=new RechargeHCouponDO();
-	    update.setAcTm(rechargeHCouponDTO.getAccDate());
-	    update.sethCouponAmt(hCouponAmt);
-	    update.setOrderAmt(rechargSeaDTO.getOrderAmt());
-		update.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
-		update.setOrderCcy(rechargSeaDTO.getOrderCcy());
-		update.setOrderNo(rechargSeaDTO.getOrderNo());
-		service.updateSeaOrder(update);
 	}
 
 	@Override

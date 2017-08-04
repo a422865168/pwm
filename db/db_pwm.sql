@@ -197,3 +197,5 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30005','zh','提现订单号不存在!',now(),now());
 
 -------------------------
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM40001','zh','调用营销接口返回接口异常!',now(),now());

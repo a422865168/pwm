@@ -52,7 +52,7 @@ public class AcmComponent {
 		userDTO.setUserId(userId);
 		GenericDTO<UserAccountDTO> user=new GenericDTO<UserAccountDTO>();
 		user.setBody(userDTO);
-		GenericDTO<List<QueryAcBalRspDTO>> genericQueryAcBalRspDTO = accountManagementClient.queryAcBal(user);
+		GenericDTO<List<QueryAcBalRspDTO>> genericQueryAcBalRspDTO = accountManagementClient.queryAcBal(userDTO);
 		List<QueryAcBalRspDTO> acmAcBalInfList = genericQueryAcBalRspDTO.getBody();
 
 		if (JudgeUtils.isNull(acmAcBalInfList) || JudgeUtils.isEmpty(acmAcBalInfList)) {
