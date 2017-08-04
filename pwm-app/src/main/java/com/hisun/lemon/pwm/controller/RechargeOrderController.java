@@ -2,7 +2,6 @@ package com.hisun.lemon.pwm.controller;
 
 import javax.annotation.Resource;
 
-import com.hisun.lemon.framework.data.GenericRspDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -13,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.pwm.dto.HallQueryDTO;
 import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
