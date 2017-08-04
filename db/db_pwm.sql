@@ -181,7 +181,8 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20011','zh','营业厅充值原订单状态异常!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20012','zh','更新收银订单失败!',now(),now());
-
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20013','zh','线下收银台收款失败!',now(),now());
 
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
