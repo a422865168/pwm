@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -397,9 +398,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		String merchantId = dto.getMerchantId();
 		String applySign = dto.getSign();
 		// 签名密钥
-		String key = "";
+		String key = LemonUtils.getProperty("pwm.recharge.HALLKEY");
 		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
 		String md5 = md5Str(bussinessBody, key);
+
 		// 签名校验
 		if (JudgeUtils.isNull(md5) || !JudgeUtils.equals(applySign, md5.toUpperCase())) {
 			throw new LemonException("PWM10036");
@@ -427,7 +429,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setPsnFlag(bussinessBody.getPsnFlag());
 		rechargeOrderDO.setSysChannel(PwmConstants.ORD_SYSCHANNEL_HALL);
 		rechargeOrderDO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
-		rechargeOrderDO.setModifyTime(null);
+		rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setRemark("");
 
 		this.service.initOrder(rechargeOrderDO);
@@ -450,9 +452,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		genericDTO.setBody(initCashierDTO);
 		GenericDTO<CashierViewDTO> genericCashierViewDTO = cshOrderClient.initCashier(genericDTO);
 		CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
-		//收银订单号与支付方式
-		String cashierUrl = cashierViewDTO.getCashierUrl();
-		String cashierOrderNo = extractOrderNo(cashierUrl);
+
 		// 返回
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(bussinessBody.getAmount());
@@ -460,7 +460,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		hallRechargeResultDTO.setFee(BigDecimal.valueOf(bussinessBody.getFee()));
 		hallRechargeResultDTO.setHallOrderNo(bussinessBody.getHallOrderNo());
 		hallRechargeResultDTO.setOrderNo(orderNo);
-		hallRechargeResultDTO.setCashierOrderNo(cashierOrderNo);
+		hallRechargeResultDTO.setCashierOrderNo(cashierViewDTO.getOrderNo());
 		return hallRechargeResultDTO;
 	}
 
@@ -502,8 +502,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		//收银台收款失败
 		if(!JudgeUtils.isSuccess(hallPaymentResult.getMsgCd())) {
-
+			throw new LemonException("PWM20013");
 		}
+
+		//账务处理
 
 		//更新充值订单
 		RechargeOrderDO updOrderDO = new RechargeOrderDO();
@@ -534,7 +536,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		//充值原订单校验
 		String oriHallOrder = busBody.getHallOrderNo();
-		busBody.getPayerId();
 		if(JudgeUtils.isNull(oriHallOrder)) {
 			throw new LemonException("PWM10011");
 		}
@@ -565,11 +566,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		HallRechargeOrderDTO hallRechargeOrderDTO = new HallRechargeOrderDTO();
 		hallRechargeOrderDTO.setCshOrderNo(busBody.getCashierOrderNo());
 		hallRechargeOrderDTO.setOrderStatus(CshConstants.ORD_STS_C);
-		hallRechargeOrderDTO.setPayerId(busBody.getPayerId());
 
 		GenericDTO<HallRechargeOrderDTO> genericHallRechargeOrderDTO = new GenericDTO<>();
 		genericHallRechargeOrderDTO.setBody(hallRechargeOrderDTO);
-		GenericRspDTO<NoBody> cashierOrderUpdateResult = cshOrderClient.orderInfoUpdate(genericHallRechargeOrderDTO);
+		GenericRspDTO<NoBody> cashierOrderUpdateResult = cshOrderClient.hallRevocationOrderUpdate(genericHallRechargeOrderDTO);
 		if(!JudgeUtils.isSuccess(cashierOrderUpdateResult.getMsgCd())) {
 			throw new LemonException("PWM20012");
 		}
@@ -596,49 +596,13 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			oriMap.put("payerId",busBody.getPayerId());
 			oriMap.put("status",busBody.getStatus());
 			retStr = om.writeValueAsString(oriMap);
-			retStr = getMd5(retStr+key);
 
+			Md5PasswordEncoder md5 = new Md5PasswordEncoder();
+			retStr = md5.encodePassword(retStr+key,null);
 		} catch (JsonProcessingException e) {
 
 		}
 		return retStr;
-	}
-
-	private static String getMd5(String plainText) {
-		try {
-			MessageDigest md = null;
-			md = MessageDigest.getInstance("MD5");
-			md.update(plainText.getBytes());
-			byte b[] = md.digest();
-			int i;
-			StringBuffer buf = new StringBuffer("");
-			for (int offset = 0; offset < b.length; offset++) {
-				i = b[offset];
-				if (i < 0)
-					i += 256;
-				if (i < 16)
-					buf.append("0");
-				buf.append(Integer.toHexString(i));
-			}
-			//32位加密
-			return buf.toString();
-			// 16位的加密
-			//return buf.toString().substring(8, 24);
-		} catch (NoSuchAlgorithmException e) {
-			return "";
-		}
-
-	}
-
-	/**
-	 * 提取收银台支付url中收银订单号
-	 * @param url
-	 * @return
-	 */
-	public static String extractOrderNo(String url) {
-		int index = url.lastIndexOf("&");
-		String tmpOrderNo = url.substring(index);
-		return tmpOrderNo.substring(4);
 	}
 
 }

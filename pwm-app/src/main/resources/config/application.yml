@@ -225,3 +225,8 @@ security :
   user :
     name : lemon
     password : lemon123
+
+pwm :
+  recharge :
+    #营业厅充值签名KEY值
+    HALLKEY : PWM123456789002
