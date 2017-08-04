@@ -8,6 +8,17 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.csh.order.dto.HallRechargeOrderDTO;
+import com.hisun.lemon.csh.order.dto.HallRechargePaymentDTO;
+import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.framework.data.NoBody;
+import com.hisun.lemon.tfm.client.TfmServerClient;
+import com.hisun.lemon.tfm.dto.TradeFeeReqDTO;
+import com.hisun.lemon.tfm.dto.TradeFeeRspDTO;
+import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
+import com.hisun.lemon.tfm.dto.TradeRateRspDTO;
+import com.hisun.lemon.urm.client.UserBasicInfClient;
+import com.hisun.lemon.urm.dto.UserBasicInfDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,15 +35,10 @@ import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.csh.client.CshOrderClient;
 import com.hisun.lemon.csh.constants.CshConstants;
 import com.hisun.lemon.csh.order.dto.CashierViewDTO;
-import com.hisun.lemon.csh.order.dto.HallRechargeOrderDTO;
-import com.hisun.lemon.csh.order.dto.HallRechargePaymentDTO;
 import com.hisun.lemon.csh.order.dto.InitCashierDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
-import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
-import com.hisun.lemon.pwm.component.AcmComponent;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
@@ -44,11 +50,7 @@ import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
-import com.hisun.lemon.tfm.client.TfmServerClient;
-import com.hisun.lemon.tfm.dto.TradeFeeRspDTO;
-import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
-import com.hisun.lemon.urm.client.UserBasicInfClient;
-import com.hisun.lemon.urm.dto.UserBasicInfDTO;
+import com.hisun.lemon.pwm.component.AcmComponent;
 
 @Service
 public class RechargeOrderServiceImpl implements IRechargeOrderService {
@@ -147,50 +149,59 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if (rechargeSeaDO.getOrderAmt().compareTo(amount) != 0) {
 			throw new LemonException("PWM20009");
 		}
-        //账务处理
-		AccountingReqDTO userAccountReqDTO = null; // 海币账务对象
-		AccountingReqDTO cshItemReqDTO = null; // 暂收收银台账务对象
-		String payJrnNo=LemonUtils.getRequestId();
-		// 资金类型
-	    String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
-	    //对手方用户id
-	    String balAcNo=acmComponent.getAcmAcNo(rechargeSeaDO.getUserId(), balCapType);
-	  	//借:其他应付款-暂收-收银台         100
-	  	cshItemReqDTO=acmComponent.createAccountingReqDTO(
-	  			    rechargeSeaDO.getOrderNo(),
-	  				payJrnNo, 
-	  				rechargeSeaDO.getTxType(), 
-	  				ACMConstants.ACCOUNTING_NOMARL, 
-	  				rechargeSeaDO.getOrderAmt(),
-	  				balAcNo, 
-	  				ACMConstants.ITM_AC_TYP, 
-	  				balCapType, 
-	  				ACMConstants.AC_D_FLG, 
-	  				PwmConstants.AC_ITEM_CSH_PAY,
-	  				null, 
-	  				null, 
-	  				null, 
-	  				null, 
-	  				null);
-	  	//贷：其他应付款-中转挂账-海币       100
-	  	userAccountReqDTO=acmComponent.createAccountingReqDTO(
-	  			        rechargeSeaDO.getOrderNo(),
-	  					payJrnNo, 
-	  					rechargeSeaDO.getTxType(), 
-	  					ACMConstants.ACCOUNTING_NOMARL, 
-	  					rechargeSeaDO.getOrderAmt(),
-	  					null, 
-	  					ACMConstants.ITM_AC_TYP, 
-	  					balCapType, 
-	  					ACMConstants.AC_C_FLG, 
-	  					PwmConstants.AC_ITEM_PWM_HCOUPONE,
-	  					PwmConstants.AC_ITEM_PWM_HCOUPONE, 
-	  					null, 
-	  					null, 
-	  					null, 
-	  					null);
-	  			
-	  	acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
+
+		// 账务处理
+		// 账务处理
+				AccountingReqDTO userAccountReqDTO = null; // 用户现金账户账务对象
+				AccountingReqDTO cshItemReqDTO = null; // 暂收收银台账务对象
+				AccountingReqDTO couponItemReqDTO = null; // 优惠账务对象
+				AccountingReqDTO crdItemReqDTO = null; // 补款账务对象
+				//流水号
+				String payJrnNo=LemonUtils.getRequestId();
+				// 查询用户帐号
+				String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
+				//先静静
+				String balAcNo = acmComponent.getAcmAcNo(rechargeHCouponDTO.getUserId(), balCapType);
+				//借:  其他应付款-暂收-收银台
+				cshItemReqDTO=acmComponent.createAccountingReqDTO(
+						rechargeSeaDO.getOrderNo(),
+						payJrnNo, 
+						rechargeSeaDO.getTxType(), 
+						ACMConstants.ACCOUNTING_NOMARL, 
+						rechargeSeaDO.getOrderAmt(),
+						null, 
+						ACMConstants.ITM_AC_TYP, 
+						balCapType, 
+						ACMConstants.AC_D_FLG, 
+						CshConstants.AC_ITEM_CSH_PAY,
+						balAcNo, 
+						null, 
+						null, 
+						null, 
+						null);  
+						
+				//其他应付款-支付账户-xx用户海币账户
+				userAccountReqDTO=acmComponent.createAccountingReqDTO(
+						rechargeSeaDO.getOrderNo(),
+						payJrnNo, 
+						rechargeSeaDO.getTxType(), 
+						ACMConstants.ACCOUNTING_NOMARL, 
+						rechargeSeaDO.gethCouponAmt(),
+						balAcNo, 
+						ACMConstants.USER_AC_TYP,
+						balCapType, 
+						ACMConstants.AC_C_FLG, 
+						"", 
+						CshConstants.AC_ITEM_HCOUPON, 
+						null, 
+						null, 
+						null, 
+						null);
+				
+				acmComponent.requestAc(userAccountReqDTO,couponItemReqDTO,crdItemReqDTO,cshItemReqDTO);
+				
+				
+
 		// 更新订单
 		//计算海币数量  1:100multiply
 		BigDecimal hCouponAmt=rechargSeaDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
@@ -363,15 +374,18 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//根据手机号查询平台用户基本信息
 		GenericDTO<UserBasicInfDTO> genericUserBasicInfDTO=  userBasicInfClient.queryUserByLoginId(userId);
 		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
+
 		TradeRateReqDTO tradeFeeReqDTO = new TradeRateReqDTO();
 		tradeFeeReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
 		tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
 
-		GenericDTO genericTradeFeeReqDTO = GenericRspDTO.newSuccessInstance(tradeFeeReqDTO);
-		GenericDTO<TradeFeeRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeRate(genericTradeFeeReqDTO);
-		TradeFeeRspDTO tradeFeeRspDTO = genericTradeFeeRspDTO.getBody();
+		GenericDTO<TradeRateReqDTO> genericTradeRateReqDTO = new GenericDTO<>();
+		genericTradeRateReqDTO.setBody(tradeFeeReqDTO);
+		GenericRspDTO<TradeRateRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeRate(genericTradeRateReqDTO);
+		TradeRateRspDTO tradeRateRspDTO = genericTradeFeeRspDTO.getBody();
 
-		BigDecimal tradeFee = tradeFeeRspDTO.getTradeFee();
+		//费率
+		BigDecimal tradeFee = tradeRateRspDTO.getTradeRate();
 		HallQueryResultDTO hallQueryResultDTO = new HallQueryResultDTO();
 		hallQueryResultDTO.setFee(tradeFee.multiply(amount));
 		hallQueryResultDTO.setUmId(userBasicInfDTO.getUserId());
@@ -483,8 +497,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		hallRechargePaymentDTO.setHallOrderNo(oriHallOrder);
 		hallRechargePaymentDTO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
 		hallRechargePaymentDTO.setOrderAmt(busBody.getAmount());
-		GenericDTO genericHallRechargePaymentDTO = GenericRspDTO.newSuccessInstance(hallRechargePaymentDTO);
 
+		GenericDTO<HallRechargePaymentDTO> genericHallRechargePaymentDTO = new GenericDTO<>();
+		genericHallRechargePaymentDTO.setBody(hallRechargePaymentDTO);
 		GenericRspDTO<NoBody> hallPaymentResult = cshOrderClient.hallRechargePayment(genericHallRechargePaymentDTO);
 
 		//收银台收款失败
@@ -553,8 +568,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		hallRechargeOrderDTO.setCshOrderNo(busBody.getCashierOrderNo());
 		hallRechargeOrderDTO.setOrderStatus(CshConstants.ORD_STS_C);
 		hallRechargeOrderDTO.setPayerId(busBody.getPayerId());
-		GenericDTO genericHallRechargeOrderDTO = GenericRspDTO.newSuccessInstance(hallRechargeOrderDTO);
 
+		GenericDTO<HallRechargeOrderDTO> genericHallRechargeOrderDTO = new GenericDTO<>();
+		genericHallRechargeOrderDTO.setBody(hallRechargeOrderDTO);
 		GenericRspDTO<NoBody> cashierOrderUpdateResult = cshOrderClient.orderInfoUpdate(genericHallRechargeOrderDTO);
 		if(!JudgeUtils.isSuccess(cashierOrderUpdateResult.getMsgCd())) {
 			throw new LemonException("PWM20012");
