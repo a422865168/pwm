@@ -189,7 +189,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					payJrnNo, 
 					rechargeSeaDO.getTxType(), 
 					ACMConstants.ACCOUNTING_NOMARL, 
-					rechargeSeaDO.gethCouponAmt(),
+					rechargeSeaDO.getOrderAmt(),
 					balAcNo, 
 					ACMConstants.USER_AC_TYP,
 					balCapType,

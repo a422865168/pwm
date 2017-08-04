@@ -6,7 +6,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import com.hisun.lemon.framework.data.GenericRspDTO;
 import org.springframework.stereotype.Component;
 
 import com.hisun.lemon.acm.client.AccountManagementClient;
@@ -20,9 +19,8 @@ import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.JudgeUtils;
 import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
-import com.hisun.lemon.urm.client.UserBasicInfClient;
-import com.hisun.lemon.urm.dto.UserBasicInfDTO;
 
 /**
  * 账务组件
@@ -56,7 +54,7 @@ public class AcmComponent {
 		List<QueryAcBalRspDTO> acmAcBalInfList = genericQueryAcBalRspDTO.getBody();
 
 		if (JudgeUtils.isNull(acmAcBalInfList) || JudgeUtils.isEmpty(acmAcBalInfList)) {
-			throw new LemonException("TAM20007");
+			throw new LemonException("PWM40003");
 		}
 
 		for (QueryAcBalRspDTO queryAcBalRspDTO : acmAcBalInfList) {
@@ -143,7 +141,7 @@ public class AcmComponent {
 
 		// 借贷平衡校验
 		if (cAmt.compareTo(dAmt) != 0) {
-			LemonException.throwBusinessException("TAM20008");
+			LemonException.throwBusinessException("PWM40002");
 		}
 
 		GenericDTO<List<AccountingReqDTO>> userAccDto = new GenericDTO<>();
