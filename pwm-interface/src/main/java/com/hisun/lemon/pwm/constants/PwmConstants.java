@@ -145,4 +145,16 @@ public class PwmConstants {
 	 */
 	public static final String HALL_PAY_CCY="USD";
 	
+	/**
+	 * 内部科目
+	 * 其他应付款-暂收-收银台
+	 */
+	public static final String AC_ITEM_CSH_PAY="2241030001";
+	
+	/**
+	 * 内部科目
+	 * 其他应付款-中转挂账-海币
+	 */
+	public static final String AC_ITEM_PWM_HCOUPONE="2241040001";
+	
 }
