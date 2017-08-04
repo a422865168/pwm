@@ -156,7 +156,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM20009");
 		}
 
-		// 账务处理
+		/*// 账务处理
 		AccountingReqDTO userAccountReqDTO = null; // xx用户海币账户
 		AccountingReqDTO cshItemReqDTO = null; // 暂收收银台账务对象
 		//流水号
@@ -202,7 +202,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					null);
 				
 		//acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);	
-		//计算海币数量  1:100multiply
+*/		//计算海币数量  1:100multiply
 		BigDecimal hCouponAmt=rechargSeaDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
 		
 		
