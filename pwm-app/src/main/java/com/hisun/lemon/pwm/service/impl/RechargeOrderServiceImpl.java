@@ -16,6 +16,7 @@ import com.hisun.lemon.tfm.client.TfmServerClient;
 import com.hisun.lemon.tfm.dto.TradeFeeReqDTO;
 import com.hisun.lemon.tfm.dto.TradeFeeRspDTO;
 import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
+import com.hisun.lemon.tfm.dto.TradeRateRspDTO;
 import com.hisun.lemon.urm.client.UserBasicInfClient;
 import com.hisun.lemon.urm.dto.UserBasicInfDTO;
 import org.slf4j.Logger;
@@ -373,15 +374,18 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//根据手机号查询平台用户基本信息
 		GenericDTO<UserBasicInfDTO> genericUserBasicInfDTO=  userBasicInfClient.queryUserByLoginId(userId);
 		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
+
 		TradeRateReqDTO tradeFeeReqDTO = new TradeRateReqDTO();
 		tradeFeeReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
 		tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
 
-		GenericDTO genericTradeFeeReqDTO = GenericRspDTO.newSuccessInstance(tradeFeeReqDTO);
-		GenericDTO<TradeFeeRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeRate(genericTradeFeeReqDTO);
-		TradeFeeRspDTO tradeFeeRspDTO = genericTradeFeeRspDTO.getBody();
+		GenericDTO<TradeRateReqDTO> genericTradeRateReqDTO = new GenericDTO<>();
+		genericTradeRateReqDTO.setBody(tradeFeeReqDTO);
+		GenericRspDTO<TradeRateRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeRate(genericTradeRateReqDTO);
+		TradeRateRspDTO tradeRateRspDTO = genericTradeFeeRspDTO.getBody();
 
-		BigDecimal tradeFee = tradeFeeRspDTO.getTradeFee();
+		//费率
+		BigDecimal tradeFee = tradeRateRspDTO.getTradeRate();
 		HallQueryResultDTO hallQueryResultDTO = new HallQueryResultDTO();
 		hallQueryResultDTO.setFee(tradeFee.multiply(amount));
 		hallQueryResultDTO.setUmId(userBasicInfDTO.getUserId());
@@ -493,8 +497,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		hallRechargePaymentDTO.setHallOrderNo(oriHallOrder);
 		hallRechargePaymentDTO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
 		hallRechargePaymentDTO.setOrderAmt(busBody.getAmount());
-		GenericDTO genericHallRechargePaymentDTO = GenericRspDTO.newSuccessInstance(hallRechargePaymentDTO);
 
+		GenericDTO<HallRechargePaymentDTO> genericHallRechargePaymentDTO = new GenericDTO<>();
+		genericHallRechargePaymentDTO.setBody(hallRechargePaymentDTO);
 		GenericRspDTO<NoBody> hallPaymentResult = cshOrderClient.hallRechargePayment(genericHallRechargePaymentDTO);
 
 		//收银台收款失败
@@ -563,8 +568,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		hallRechargeOrderDTO.setCshOrderNo(busBody.getCashierOrderNo());
 		hallRechargeOrderDTO.setOrderStatus(CshConstants.ORD_STS_C);
 		hallRechargeOrderDTO.setPayerId(busBody.getPayerId());
-		GenericDTO genericHallRechargeOrderDTO = GenericRspDTO.newSuccessInstance(hallRechargeOrderDTO);
 
+		GenericDTO<HallRechargeOrderDTO> genericHallRechargeOrderDTO = new GenericDTO<>();
+		genericHallRechargeOrderDTO.setBody(hallRechargeOrderDTO);
 		GenericRspDTO<NoBody> cashierOrderUpdateResult = cshOrderClient.orderInfoUpdate(genericHallRechargeOrderDTO);
 		if(!JudgeUtils.isSuccess(cashierOrderUpdateResult.getMsgCd())) {
 			throw new LemonException("PWM20012");
