@@ -5,12 +5,7 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
@@ -28,8 +23,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 
+import java.math.BigDecimal;
 
- 
+
 @Api(value = "处理充值")
 @RestController
 @RequestMapping(value = "/pwm/recharge")
@@ -58,9 +54,10 @@ public class RechargeOrderController {
 	@ApiOperation(value = "营业厅查询", notes = "查询用户信息")
 	@ApiResponse(code = 200, message = "查询到的用户信息")
 	@GetMapping(value = "/hall/info")
-	public GenericRspDTO<HallQueryResultDTO> queryUserInfo(@Validated GenericDTO<HallQueryDTO> genericResultDTO) {
-		HallQueryResultDTO resultDTO = service.queryUserInfo(genericResultDTO.getBody().getKey(),
-				genericResultDTO.getBody().getAmount());
+	public GenericRspDTO<HallQueryResultDTO> queryUserInfo(@Validated @RequestParam(value = "userId") String userId,
+														   @Validated @RequestParam(value = "amount") BigDecimal amount,
+														   @Validated @RequestParam(value = "type" , required = false) String type) {
+		HallQueryResultDTO resultDTO = service.queryUserInfo(userId,amount);
 		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 
