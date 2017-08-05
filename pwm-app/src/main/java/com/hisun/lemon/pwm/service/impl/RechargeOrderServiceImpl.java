@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.csh.order.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -23,10 +24,6 @@ import com.hisun.lemon.common.utils.JudgeUtils;
 import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.csh.client.CshOrderClient;
 import com.hisun.lemon.csh.constants.CshConstants;
-import com.hisun.lemon.csh.order.dto.CashierViewDTO;
-import com.hisun.lemon.csh.order.dto.HallRechargeOrderDTO;
-import com.hisun.lemon.csh.order.dto.HallRechargePaymentDTO;
-import com.hisun.lemon.csh.order.dto.InitCashierDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
@@ -318,6 +315,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		AccountingReqDTO couponItemReqDTO=null;      //优惠账务对象
 		AccountingReqDTO crdItemReqDTO=null;         //补款账务对象
 		AccountingReqDTO cnlRechargeBnkReqDTO=null;  //充值渠道银行账务对象
+		AccountingReqDTO depositAccountBnkReqDTO=null; //备付金账户银行账务对象
 
 		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 		String balAcNo=acmComponent.getAcmAcNo(rechargeResultDTO.getPayerId(), balCapType);
@@ -335,7 +333,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 						balAcNo,
 						ACMConstants.USER_AC_TYP,
 						balCapType,
-						ACMConstants.AC_C_FLG,
+						ACMConstants.AC_D_FLG,
 						CshConstants.AC_ITEM_CSH_PAY,
 						null,
 						null,
@@ -363,9 +361,45 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
 				break;
 			case PwmConstants.BUS_TYPE_RECHARGE_OFL:
+				AccountingReqDTO cshItemReqDTO1=null;
+//				借：银行存款-备付金账户-XX银行
+				depositAccountBnkReqDTO=acmComponent.createAccountingReqDTO(
+						rechargeOrderDO.getExtOrderNo(),
+						rechargeResultDTO.getTxJrnNo(),
+						rechargeOrderDO.getTxType(),
+						ACMConstants.ACCOUNTING_NOMARL,
+						rechargeOrderDO.getOrderAmt(),
+						balAcNo,
+						ACMConstants.ITM_AC_TYP,
+						balCapType,
+						ACMConstants.AC_D_FLG,
+						PwmConstants.AC_ITEM_DEP_ACC_BNK,
+						null,
+						null,
+						null,
+						null,
+						null);
+//				贷：其他应付款-暂收-收银台
+				cshItemReqDTO1=acmComponent.createAccountingReqDTO(
+						rechargeOrderDO.getExtOrderNo(),
+						rechargeResultDTO.getTxJrnNo(),
+						rechargeOrderDO.getTxType(),
+						ACMConstants.ACCOUNTING_NOMARL,
+						rechargeOrderDO.getOrderAmt(),
+						balAcNo,
+						ACMConstants.ITM_AC_TYP,
+						balCapType,
+						ACMConstants.AC_D_FLG,
+						CshConstants.AC_ITEM_CSH_PAY,
+						null,
+						null,
+						null,
+						null,
+						null);
+				acmComponent.requestAc(depositAccountBnkReqDTO,cshItemReqDTO);
 				break;
-			case PwmConstants.BUS_TYPE_RECHARGE_HALL:
-				break;
+//			case PwmConstants.BUS_TYPE_RECHARGE_HALL:
+//				break;
 			case PwmConstants.BUS_TYPE_RECHARGE_BNB:
 				break;
 			case PwmConstants.BUS_TYPE_WITHDRAW_P:
@@ -518,15 +552,56 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		GenericDTO<HallRechargePaymentDTO> genericHallRechargePaymentDTO = new GenericDTO<>();
 		genericHallRechargePaymentDTO.setBody(hallRechargePaymentDTO);
-		GenericRspDTO<NoBody> hallPaymentResult = cshOrderClient.hallRechargePayment(genericHallRechargePaymentDTO);
+		GenericRspDTO<HallRechargePaymentResultDTO> GenericRspHallPaymentResult = cshOrderClient.hallRechargePayment(genericHallRechargePaymentDTO);
 
+		HallRechargePaymentResultDTO hallRechargePaymentResult = GenericRspHallPaymentResult.getBody();
 		//收银台收款失败
-		if(!JudgeUtils.isSuccess(hallPaymentResult.getMsgCd())) {
+		if(!JudgeUtils.isSuccess(GenericRspHallPaymentResult.getMsgCd())) {
 			throw new LemonException("PWM20013");
 		}
 
 		//账务处理
+		AccountingReqDTO cshItemReqDTO=null;         //暂收收银台账务对象
+		AccountingReqDTO userAccountReqDTO=null;
 
+		//个人账户
+		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
+		String balAcNo=acmComponent.getAcmAcNo(busBody.getPayerId(), balCapType);
+//		借：其他应付款-暂收-收银台
+		cshItemReqDTO=acmComponent.createAccountingReqDTO(
+				hallRechargePaymentResult.getCashierOrderNo(),
+				hallRechargePaymentResult.getTxJrnNo(),
+				PwmConstants.TX_TYPE_RECHANGE,
+				ACMConstants.ACCOUNTING_NOMARL,
+				hallRechargePaymentResult.getAmount(),
+				balAcNo,
+				ACMConstants.ITM_AC_TYP,
+				balCapType,
+				ACMConstants.AC_D_FLG,
+				CshConstants.AC_ITEM_CSH_PAY,
+				null,
+				null,
+				null,
+				null,
+				null);
+//		贷：其他应付款-支付账户-现金账户
+		userAccountReqDTO=acmComponent.createAccountingReqDTO(
+				hallRechargePaymentResult.getCashierOrderNo(),
+				hallRechargePaymentResult.getTxJrnNo(),
+				PwmConstants.TX_TYPE_RECHANGE,
+				ACMConstants.ACCOUNTING_NOMARL,
+				hallRechargePaymentResult.getAmount(),
+				balAcNo,
+				ACMConstants.ITM_AC_TYP,
+				balCapType,
+				ACMConstants.AC_C_FLG,
+				CshConstants.AC_ITEM_CSH_BAL,
+				null,
+				null,
+				null,
+				null,
+				null);
+		acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
 		//更新充值订单
 		RechargeOrderDO updOrderDO = new RechargeOrderDO();
 		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
