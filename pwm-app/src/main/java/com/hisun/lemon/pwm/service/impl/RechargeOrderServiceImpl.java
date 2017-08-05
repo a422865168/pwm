@@ -88,17 +88,17 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			rechargeDO.setOrderCcy(rechargeDTO.getOrderCcy());
 		}
 		rechargeDO.setOrderCcy("USD");
+		// 会计日期
 		rechargeDO.setAcTm(rechargeHCouponDTO.getAccDate());
 		rechargeDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = IdGenUtils.generateId(PwmConstants.R_SEA_GEN_PRE + ymd, 15);
 		// 1:100的充值比例
-		BigDecimal hCouponAmt = rechargeDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
+		BigDecimal amount=rechargeDTO.getOrderAmt();
+		BigDecimal hCouponAmt = amount.multiply(BigDecimal.valueOf(PwmConstants.H_USD_RATE)).setScale(2, BigDecimal.ROUND_DOWN);
 		rechargeDO.sethCouponAmt(hCouponAmt);
 		rechargeDO.setOrderNo(ymd + orderNo);
 		rechargeDO.setOrderAmt(rechargeDTO.getOrderAmt());
-		// 会计日期
-		rechargeDO.setAcTm(LemonUtils.getAccDate());
 		// 交易时间
 		rechargeDO.setTxTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeDO.setTxType(rechargeDTO.getTxType());
@@ -198,9 +198,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					null, 
 					null, 
 					null);	
-		//acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);	
-		//计算海币数量  1:100multiply
-		BigDecimal hCouponAmt=rechargSeaDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
+		acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);	
 		// 账务更新成功  调用海币充值接口
 		RechargeMkmToolReqDTO mkmReqDTO=new RechargeMkmToolReqDTO();
 		mkmReqDTO.setSeq(rechargeSeaDO.getOrderNo());
@@ -211,6 +209,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		String mblNo=accountManagementClient.queryAcNo(userId).getBody();
 		String mobile=mblNo;
 		mkmReqDTO.setMobile(mobile);
+		BigDecimal hCouponAmt=rechargeSeaDO.gethCouponAmt();
 		Integer count=hCouponAmt.intValue();
 		mkmReqDTO.setRechargeTm(rechargeSeaDO.getTxTm());
 		mkmReqDTO.setCount(count);

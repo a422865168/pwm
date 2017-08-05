@@ -157,4 +157,9 @@ public class PwmConstants {
 	 */
 	public static final String AC_ITEM_PWM_HCOUPONE="2241040001";
 	
+	/**
+	 * 海币换算美元比率
+	 */
+	public static final double H_USD_RATE=100;
+	
 }
