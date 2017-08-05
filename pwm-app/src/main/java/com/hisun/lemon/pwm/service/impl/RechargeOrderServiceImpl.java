@@ -197,14 +197,13 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					null, 
 					null, 
 					null, 
-					null);
-				
+					null);	
 		//acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);	
 		//计算海币数量  1:100multiply
 		BigDecimal hCouponAmt=rechargSeaDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
 		// 账务更新成功  调用海币充值接口
 		RechargeMkmToolReqDTO mkmReqDTO=new RechargeMkmToolReqDTO();
-		mkmReqDTO.setSeq(LemonUtils.getRequestId());
+		mkmReqDTO.setSeq(rechargeSeaDO.getOrderNo());
 		mkmReqDTO.setType("00");
 		mkmReqDTO.setMkTool("02");
 		String userId=rechargeSeaDO.getUserId();
@@ -218,7 +217,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		GenericDTO<RechargeMkmToolReqDTO> rechangeDTO=new GenericDTO<RechargeMkmToolReqDTO>();
 		rechangeDTO.setBody(mkmReqDTO);
 		GenericRspDTO<RechargeMkmToolResDTO> mkmRsp=mkmClient.getSeaCyy(rechangeDTO);
-		if(!JudgeUtils.isNotNull(mkmRsp)){
+		if(JudgeUtils.isNotNull(mkmRsp)){
 			if(StringUtils.equals(mkmRsp.getBody().getResult(), "1")){
 				RechargeHCouponDO update=new RechargeHCouponDO();
 			    update.setAcTm(rechargeHCouponDTO.getAccDate());
