@@ -163,4 +163,9 @@ public class PwmConstants {
 	 */
 	public static final String AC_ITEM_DEP_ACC_BNK="1002010001";
 	
+	/**
+	 * 海币换算美元比率
+	 */
+	public static final double H_USD_RATE=100;
+	
 }
