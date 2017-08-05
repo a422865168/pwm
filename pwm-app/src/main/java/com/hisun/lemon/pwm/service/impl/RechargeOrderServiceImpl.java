@@ -1,8 +1,6 @@
 package com.hisun.lemon.pwm.service.impl;
 
 import java.math.BigDecimal;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -156,7 +154,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM20009");
 		}
 
-		/*// 账务处理
+		// 账务处理
 		AccountingReqDTO userAccountReqDTO = null; // xx用户海币账户
 		AccountingReqDTO cshItemReqDTO = null; // 暂收收银台账务对象
 		//流水号
@@ -202,19 +200,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					null);
 				
 		//acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);	
-*/		//计算海币数量  1:100multiply
+		//计算海币数量  1:100multiply
 		BigDecimal hCouponAmt=rechargSeaDTO.getOrderAmt().multiply(BigDecimal.valueOf(100));
 		// 账务更新成功  调用海币充值接口
-		RechargeHCouponDO update=new RechargeHCouponDO();
-	    update.setAcTm(rechargeHCouponDTO.getAccDate());
-	    update.sethCouponAmt(hCouponAmt);
-	    update.setOrderAmt(rechargSeaDTO.getOrderAmt());
-		update.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
-		update.setOrderCcy(rechargSeaDTO.getOrderCcy());
-		update.setOrderNo(rechargSeaDTO.getOrderNo());
-		service.updateSeaOrder(update);
-		
-		/////
 		RechargeMkmToolReqDTO mkmReqDTO=new RechargeMkmToolReqDTO();
 		mkmReqDTO.setSeq(LemonUtils.getRequestId());
 		mkmReqDTO.setType("00");
@@ -232,13 +220,20 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		GenericRspDTO<RechargeMkmToolResDTO> mkmRsp=mkmClient.getSeaCyy(rechangeDTO);
 		if(!JudgeUtils.isNotNull(mkmRsp)){
 			if(StringUtils.equals(mkmRsp.getBody().getResult(), "1")){
-				
-			}else
-			{
+				RechargeHCouponDO update=new RechargeHCouponDO();
+			    update.setAcTm(rechargeHCouponDTO.getAccDate());
+			    update.sethCouponAmt(hCouponAmt);
+			    update.setOrderAmt(rechargSeaDTO.getOrderAmt());
+				update.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
+				update.setOrderCcy(rechargSeaDTO.getOrderCcy());
+				update.setOrderNo(rechargSeaDTO.getOrderNo());
+				service.updateSeaOrder(update);
+			}else{
 				throw new LemonException("PWM40001");
 			}
+		}else{
+			throw new LemonException("PWM40004");
 		}
-		
 	}
 
 	@Override
