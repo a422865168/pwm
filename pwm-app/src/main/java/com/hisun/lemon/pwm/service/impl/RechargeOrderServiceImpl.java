@@ -449,17 +449,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	@Override
 	public HallRechargeResultDTO hallRecharge(HallRechargeApplyDTO dto) {
 
-		String merchantId = dto.getMerchantId();
-		String applySign = dto.getSign();
-		// 签名密钥
-		String key = LemonUtils.getProperty("pwm.recharge.HALLKEY");
 		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
-		String md5 = md5Str(bussinessBody, key);
-
-		// 签名校验
-		if (JudgeUtils.isNull(md5) || !JudgeUtils.equals(applySign, md5.toUpperCase())) {
-			throw new LemonException("PWM10036");
-		}
+		//签名校验
+		signCheck(dto);
 		// 解析校验,状态
 		if (!JudgeUtils.equals(bussinessBody.getStatus(), PwmConstants.RECHARGE_OPR_A)) {
 			throw new LemonException("PWM10037");
@@ -480,6 +472,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setIpAddress("");
 		rechargeOrderDO.setModifyOpr("");
 		rechargeOrderDO.setOrderSuccTm(null);
+		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		rechargeOrderDO.setPsnFlag(bussinessBody.getPsnFlag());
 		rechargeOrderDO.setSysChannel(PwmConstants.ORD_SYSCHANNEL_HALL);
 		rechargeOrderDO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
@@ -498,7 +491,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setPayerId(bussinessBody.getPayerId());
 		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(bussinessBody.getAmount());
-		initCashierDTO.setAppCnl(PwmConstants.ORD_SYSCHANNEL_WEB);
+		initCashierDTO.setAppCnl("PWM");
 		initCashierDTO.setFee(BigDecimal.valueOf(bussinessBody.getFee()));
 		initCashierDTO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
 		initCashierDTO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
@@ -525,6 +518,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	@Override
 	public HallRechargeResultDTO hallRechargeConfirm(HallRechargeApplyDTO dto) {
 		HallRechargeApplyDTO.BussinessBody busBody= dto.getBody();
+		//签名校验
+		signCheck(dto);
 		//检查原订单
 		String oriHallOrder = busBody.getHallOrderNo();
 		if(JudgeUtils.isNull(oriHallOrder)) {
@@ -534,7 +529,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isNull(rechargeOrderDO)) {
 			throw new LemonException("PWM20010");
 		}
-		if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_W)) {
+		if(!JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_W)) {
 			throw new LemonException("PWM20011");
 		}
 		//状态 金额校验
@@ -632,7 +627,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	@Override
 	public HallRechargeResultDTO hallRechargeRevocation(HallRechargeApplyDTO dto) {
 		HallRechargeApplyDTO.BussinessBody busBody= dto.getBody();
-
+		//签名校验
+		signCheck(dto);
 		//充值原订单校验
 		String oriHallOrder = busBody.getHallOrderNo();
 		if(JudgeUtils.isNull(oriHallOrder)) {
@@ -703,6 +699,18 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		}
 		return retStr;
+	}
+
+	private void signCheck(HallRechargeApplyDTO dto) {
+		String applySign = dto.getSign();
+		// 签名密钥
+		String key = LemonUtils.getProperty("pwm.recharge.HALLKEY");
+		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
+		String md5 = md5Str(bussinessBody, key);
+		// 签名校验
+		if (JudgeUtils.isNull(md5) || !JudgeUtils.equals(applySign, md5.toUpperCase())) {
+			throw new LemonException("PWM10036");
+		}
 	}
 
 }
