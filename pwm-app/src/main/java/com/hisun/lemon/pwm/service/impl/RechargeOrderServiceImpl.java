@@ -438,7 +438,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		TradeRateRspDTO tradeRateRspDTO = genericTradeFeeRspDTO.getBody();
 
 		//费率
-		BigDecimal tradeFee = tradeRateRspDTO.getTradeRate();
+		BigDecimal tradeFee = tradeRateRspDTO.getRate();
 		HallQueryResultDTO hallQueryResultDTO = new HallQueryResultDTO();
 		hallQueryResultDTO.setFee(tradeFee.multiply(amount));
 		hallQueryResultDTO.setUmId(userBasicInfDTO.getUserId());
@@ -461,7 +461,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM10036");
 		}
 		// 解析校验,状态
-		if (!JudgeUtils.equals(bussinessBody.getStatus(), PwmConstants.RECHARGE_OPR_O)) {
+		if (!JudgeUtils.equals(bussinessBody.getStatus(), PwmConstants.RECHARGE_OPR_A)) {
 			throw new LemonException("PWM10037");
 		}
 		String ymd = DateTimeUtils.getCurrentDateStr();
@@ -498,6 +498,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setPayerId(bussinessBody.getPayerId());
 		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(bussinessBody.getAmount());
+		initCashierDTO.setAppCnl(PwmConstants.ORD_SYSCHANNEL_WEB);
 		initCashierDTO.setFee(BigDecimal.valueOf(bussinessBody.getFee()));
 		initCashierDTO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
 		initCashierDTO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
@@ -507,6 +508,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		GenericDTO<CashierViewDTO> genericCashierViewDTO = cshOrderClient.initCashier(genericDTO);
 		CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
 
+		if(JudgeUtils.isNull(cashierViewDTO)) {
+			throw new LemonException("PWM40005");
+		}
 		// 返回
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(bussinessBody.getAmount());
