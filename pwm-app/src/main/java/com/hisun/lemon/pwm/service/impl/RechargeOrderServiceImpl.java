@@ -641,7 +641,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isNull(rechargeOrderDO)) {
 			throw new LemonException("PWM20010");
 		}
-		if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_W)) {
+		if(!JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_W)) {
 			throw new LemonException("PWM20011");
 		}
 
@@ -676,6 +676,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		hallRechargeResultDTO.setFee(BigDecimal.valueOf(busBody.getFee()));
 		hallRechargeResultDTO.setHallOrderNo(busBody.getHallOrderNo());
 		hallRechargeResultDTO.setOrderNo(rechargeOrderDO.getOrderNo());
+		hallRechargeOrderDTO.setCshOrderNo(busBody.getCashierOrderNo());
 		return hallRechargeResultDTO;
 
 	}
