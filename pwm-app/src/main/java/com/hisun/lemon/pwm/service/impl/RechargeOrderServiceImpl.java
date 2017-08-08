@@ -423,26 +423,47 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	}
 
 	@Override
-	public HallQueryResultDTO queryUserInfo(String userId, BigDecimal amount) {
-		//根据手机号查询平台用户基本信息
-		GenericDTO<UserBasicInfDTO> genericUserBasicInfDTO=  userBasicInfClient.queryUserByLoginId(userId);
+	public HallQueryResultDTO queryUserInfo(String userId, String hallOrderNo, BigDecimal amount, String type) {
+		//若是查询类型是用户，则根据手机号查询，反之根据商户id查询
+		GenericDTO<UserBasicInfDTO> genericUserBasicInfDTO = null;
+		if(JudgeUtils.equals(PwmConstants.HALL_QUERY_TYPE_U,type)) {
+			genericUserBasicInfDTO = userBasicInfClient.queryUserByLoginId(userId);
+		} else if (JudgeUtils.equals(PwmConstants.HALL_QUERY_TYPE_M,type)) {
+			genericUserBasicInfDTO = userBasicInfClient.queryUser(userId);
+		}
+		if(JudgeUtils.isNull(genericUserBasicInfDTO)) {
+			throw new LemonException("PWM20014");
+		}
 		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
-
 		TradeRateReqDTO tradeFeeReqDTO = new TradeRateReqDTO();
 		tradeFeeReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
 		tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
-
 		GenericDTO<TradeRateReqDTO> genericTradeRateReqDTO = new GenericDTO<>();
 		genericTradeRateReqDTO.setBody(tradeFeeReqDTO);
+
 		GenericRspDTO<TradeRateRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeRate(genericTradeRateReqDTO);
 		TradeRateRspDTO tradeRateRspDTO = genericTradeFeeRspDTO.getBody();
-
 		//费率
 		BigDecimal tradeFee = tradeRateRspDTO.getRate();
 		HallQueryResultDTO hallQueryResultDTO = new HallQueryResultDTO();
 		hallQueryResultDTO.setFee(tradeFee.multiply(amount));
 		hallQueryResultDTO.setUmId(userBasicInfDTO.getUserId());
-		hallQueryResultDTO.setUmName(userBasicInfDTO.getUsrNm());
+		hallQueryResultDTO.setKey(userId);
+		String psnFlag = userBasicInfDTO.getPsnCrpFlag();
+		//个体用户
+		if(JudgeUtils.equals("0",psnFlag)) {
+			hallQueryResultDTO.setUmName(userBasicInfDTO.getUsrNm());
+			//商户
+		} else if(JudgeUtils.equals("1",psnFlag)) {
+			hallQueryResultDTO.setUmName(userBasicInfDTO.getMercName());
+		}
+		if(JudgeUtils.isNotBlank(hallOrderNo)) {
+			RechargeOrderDO rechargeOrderDO = this.service.getRechangeOrderDao().getRechargeOrderByExtOrderNo(hallOrderNo);
+			if(JudgeUtils.isNotNull(rechargeOrderDO)) {
+				hallQueryResultDTO.setHallOrderNo(rechargeOrderDO.getExtOrderNo());
+				hallQueryResultDTO.setOrderStatus(rechargeOrderDO.getOrderStatus());
+			}
+		}
 		return hallQueryResultDTO;
 	}
 

@@ -167,5 +167,15 @@ public class PwmConstants {
 	 * 海币换算美元比率
 	 */
 	public static final double H_USD_RATE=100;
+
+	/**
+	 * 营业厅查询用户类型： U 用户
+	 */
+	public static final String HALL_QUERY_TYPE_U = "U";
+
+	/**
+	 * 营业厅查询用户类型： M 商户
+	 */
+	public static final String HALL_QUERY_TYPE_M = "M";
 	
 }

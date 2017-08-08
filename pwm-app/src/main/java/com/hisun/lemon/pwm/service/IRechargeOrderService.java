@@ -28,12 +28,14 @@ public interface IRechargeOrderService {
     public void handleResult(GenericDTO resultDto);
 
     /**
-     * 查询用户信息
+     * 查询用户与订单信息
      * @param userId
+     * @param hallOrderNo
      * @param amount
+     * @param type
      * @return
      */
-    public HallQueryResultDTO queryUserInfo(String userId,BigDecimal amount);
+    public HallQueryResultDTO queryUserInfo(String userId,String hallOrderNo,BigDecimal amount,String type);
 
     /**
      * 营业厅充值申请处理

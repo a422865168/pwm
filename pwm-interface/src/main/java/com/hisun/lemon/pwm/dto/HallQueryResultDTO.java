@@ -35,7 +35,20 @@ public class HallQueryResultDTO {
 	/**
 	 * 手续费
 	 */
+	@ApiModelProperty(name = "fee", value = "手续费")
 	private BigDecimal fee;
+
+	/**
+	 * 营业厅充值订单号
+	 */
+	@ApiModelProperty(name = "hallOrderNo", value = "营业厅充值订单号")
+	private  String hallOrderNo;
+
+	/**
+	 * 营业厅充值订单状态
+	 */
+	@ApiModelProperty(name = "orderStatus", value = "营业厅充值订单状态")
+	private  String orderStatus;
 
 	public String getKey() {
 		return key;
@@ -67,5 +80,21 @@ public class HallQueryResultDTO {
 
 	public void setFee(BigDecimal fee) {
 		this.fee = fee;
+	}
+
+	public String getHallOrderNo() {
+		return hallOrderNo;
+	}
+
+	public void setHallOrderNo(String hallOrderNo) {
+		this.hallOrderNo = hallOrderNo;
+	}
+
+	public String getOrderStatus() {
+		return orderStatus;
+	}
+
+	public void setOrderStatus(String orderStatus) {
+		this.orderStatus = orderStatus;
 	}
 }
