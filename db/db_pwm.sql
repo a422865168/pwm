@@ -153,7 +153,8 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10037','zh','营业厅充值请求操作状态异常!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10038','zh','业务类型不能为空!',now(),now());
-
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10039','zh','汇款单图片地址不能为空!',now(),now());
 
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
