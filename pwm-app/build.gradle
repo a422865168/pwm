@@ -13,6 +13,7 @@ dependencies {
     compile("com.hisun:mkm-interface")
     compile("org.springframework.boot:spring-boot-starter-thymeleaf")
     compile("com.hisun:tfm-interface")
+    compile("com.hisun:cpi-interface")
 }
 
 mainClassName = 'com.hisun.lemon.Application'

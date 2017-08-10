@@ -355,44 +355,58 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
 				break;
 			case PwmConstants.BUS_TYPE_RECHARGE_OFL:
-				// 借：其他应付款-暂收-收银台
-				cshItemReqDTO=acmComponent.createAccountingReqDTO(
-						rechargeOrderDO.getExtOrderNo(),
-						rechargeResultDTO.getTxJrnNo(),
-						rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL,
-						rechargeOrderDO.getOrderAmt(),
-						balAcNo,
-						ACMConstants.USER_AC_TYP,
-						balCapType,
-						ACMConstants.AC_D_FLG,
-						CshConstants.AC_ITEM_CSH_PAY,
-						null,
-						null,
-						null,
-						null,
-						null);
+				RechargeOrderDO updOrderDO = new RechargeOrderDO();
+				if(JudgeUtils.equals(rechargeResultDTO.getStatus(),PwmConstants.OFFLINE_RECHARGE_ORD_S)) {
+					// 借：其他应付款-暂收-收银台
+					cshItemReqDTO=acmComponent.createAccountingReqDTO(
+							rechargeOrderDO.getExtOrderNo(),
+							rechargeResultDTO.getTxJrnNo(),
+							rechargeOrderDO.getTxType(),
+							ACMConstants.ACCOUNTING_NOMARL,
+							rechargeOrderDO.getOrderAmt(),
+							balAcNo,
+							ACMConstants.USER_AC_TYP,
+							balCapType,
+							ACMConstants.AC_D_FLG,
+							CshConstants.AC_ITEM_CSH_PAY,
+							null,
+							null,
+							null,
+							null,
+							null);
 
-				// 贷：其他应付款-支付账户-xx用户现金账户
-				userAccountReqDTO=acmComponent.createAccountingReqDTO(
-						rechargeOrderDO.getExtOrderNo(),
-						rechargeResultDTO.getTxJrnNo(),
-						rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL,
-						rechargeOrderDO.getOrderAmt(),
-						null,
-						ACMConstants.USER_AC_TYP,
-						balCapType,
-						ACMConstants.AC_C_FLG,
-						CshConstants.AC_ITEM_CSH_BAL,
-						balAcNo,
-						null,
-						null,
-						null,
-						null);
+					// 贷：其他应付款-支付账户-xx用户现金账户
+					userAccountReqDTO=acmComponent.createAccountingReqDTO(
+							rechargeOrderDO.getExtOrderNo(),
+							rechargeResultDTO.getTxJrnNo(),
+							rechargeOrderDO.getTxType(),
+							ACMConstants.ACCOUNTING_NOMARL,
+							rechargeOrderDO.getOrderAmt(),
+							null,
+							ACMConstants.USER_AC_TYP,
+							balCapType,
+							ACMConstants.AC_C_FLG,
+							CshConstants.AC_ITEM_CSH_BAL,
+							balAcNo,
+							null,
+							null,
+							null,
+							null);
+					acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
+					//设置充值订单状态
+					updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
+				} else if(JudgeUtils.equals(rechargeResultDTO.getStatus(),PwmConstants.OFFLINE_RECHARGE_ORD_F)) {
+					updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
+				}
 
-				acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
-				break;
+				updOrderDO.setAcTm(resultDto.getAccDate());
+				updOrderDO.setExtOrderNo(rechargeResultDTO.getExtOrderNo());
+				updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+				updOrderDO.setOrderCcy(rechargeResultDTO.getOrderCcy());
+				updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+				updOrderDO.setOrderNo(orderNo);
+				service.updateOrder(updOrderDO);
+				return;
 //			case PwmConstants.BUS_TYPE_RECHARGE_HALL:
 //				break;
 			case PwmConstants.BUS_TYPE_RECHARGE_BNB:
@@ -771,13 +785,17 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isNull(rechargeOrderDO)) {
 			throw new LemonException("PWM20015");
 		}
+		//查询汇款充值个人信息
+		GenericRspDTO<UserBasicInfDTO> genericUserBasicInfDTO = userBasicInfClient.queryUser(remittanceUploadDTO.getPayerId());
+		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
+
 		GenericDTO<OfflinePaymentDTO> genericOfflinePaymentDTO = new GenericDTO<>();
 		OfflinePaymentDTO offlinePaymentDTO = new OfflinePaymentDTO();
 		offlinePaymentDTO.setOrderAmt(remittanceUploadDTO.getAmount());
 		offlinePaymentDTO.setOrderNo(remittanceUploadDTO.getCashOrderNo());
 		offlinePaymentDTO.setOrderCcy(remittanceUploadDTO.getCcy());
-		offlinePaymentDTO.setCashRemittUrl(remittanceUploadDTO.getCashRemittUrl());
-		offlinePaymentDTO.setMblNo(remittanceUploadDTO.getMblNo());
+		offlinePaymentDTO.setCashRemittUrl(remittanceUploadDTO.getRemittUrl());
+		offlinePaymentDTO.setMblNo(userBasicInfDTO.getMblNo());
 		offlinePaymentDTO.setPayerId(remittanceUploadDTO.getPayerId());
 		genericOfflinePaymentDTO.setBody(offlinePaymentDTO);
 

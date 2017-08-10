@@ -2,6 +2,9 @@ package com.hisun.lemon.pwm.controller;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.framework.utils.LemonUtils;
+import com.hisun.lemon.pwm.dto.*;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -9,19 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.pwm.dto.HallQueryDTO;
-import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
 
 import java.math.BigDecimal;
 
@@ -102,6 +93,22 @@ public class RechargeOrderController {
 	public GenericRspDTO<HallRechargeResultDTO> hallRechargeRevocation(
 			@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO) {
 		HallRechargeResultDTO resultDTO = service.hallRechargeRevocation(genericResultDTO.getBody());
+		return GenericRspDTO.newSuccessInstance(resultDTO);
+	}
+
+	@ApiOperation(value = "线下汇款充值申请", notes = "接收线下汇款充值申请提交处理")
+	@ApiResponse(code = 200, message = "线下汇款申请结果")
+	@PostMapping(value = "/offline/application")
+	public GenericRspDTO<OfflineRechargeResultDTO> offlineRechargeApplication(@Validated @RequestBody GenericDTO<OfflineRechargeApplyDTO> genericDTO) {
+		OfflineRechargeResultDTO resultDTO = service.offlineRechargeApplication(genericDTO);
+		return GenericRspDTO.newSuccessInstance(resultDTO);
+	}
+
+	@ApiOperation(value = "线下汇款上传汇款凭证进行汇款支付", notes = "接收线下汇款凭证进行汇款支付处理")
+	@ApiResponse(code = 200, message = "线下汇款充值上传汇款凭证结果")
+	@PatchMapping(value = "/offline/pay")
+	public GenericRspDTO<OfflineRechargeResultDTO> offlineRemittanceUpload(@Validated @RequestBody GenericDTO<RemittanceUploadDTO> genericDTO) {
+		OfflineRechargeResultDTO resultDTO = service.offlineRemittanceUpload(genericDTO);
 		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 }

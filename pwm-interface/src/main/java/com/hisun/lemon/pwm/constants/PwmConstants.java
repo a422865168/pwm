@@ -177,5 +177,21 @@ public class PwmConstants {
 	 * 营业厅查询用户类型： M 商户
 	 */
 	public static final String HALL_QUERY_TYPE_M = "M";
+
+	/**
+	 * 线下汇款订单状态：待审核
+	 */
+	public static final String OFFLINE_RECHARGE_ORD_W="W";
+
+	/**
+	 * 线下汇款订单状态：审核拒绝
+	 */
+	public static final String OFFLINE_RECHARGE_ORD_F="F";
+
+	/**
+	 * 线下汇款订单状态：审核通过
+	 */
+	public static final String OFFLINE_RECHARGE_ORD_S="S";
+
 	
 }
