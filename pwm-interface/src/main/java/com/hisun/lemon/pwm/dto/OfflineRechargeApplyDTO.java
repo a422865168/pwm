@@ -58,6 +58,9 @@ public class OfflineRechargeApplyDTO {
 	@Length(max = 1)
 	private String psnFlag;
 
+	@ApiModelProperty(name = "crdCorpOrg", value = "资金机构", dataType = "String")
+	private String crdCorpOrg;
+
 
 	public BigDecimal getAmount() {
 		return amount;
@@ -97,5 +100,13 @@ public class OfflineRechargeApplyDTO {
 
 	public void setOrderNo(String orderNo) {
 		this.orderNo = orderNo;
+	}
+
+	public String getCrdCorpOrg() {
+		return crdCorpOrg;
+	}
+
+	public void setCrdCorpOrg(String crdCorpOrg) {
+		this.crdCorpOrg = crdCorpOrg;
 	}
 }

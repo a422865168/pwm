@@ -2,10 +2,15 @@ package com.hisun.lemon.pwm.service.impl;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.cpi.client.RouteClient;
+import com.hisun.lemon.cpi.dto.RouteDTO;
+import com.hisun.lemon.cpi.enums.CorpBusSubTyp;
+import com.hisun.lemon.cpi.enums.CorpBusTyp;
 import com.hisun.lemon.csh.order.dto.*;
 import com.hisun.lemon.pwm.dto.*;
 import org.slf4j.Logger;
@@ -62,6 +67,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	MarketActivityClient mkmClient;
 	@Resource
 	private AccountManagementClient accountManagementClient;
+	@Resource
+	private RouteClient routeClient;
 	/**
 	 * 海币充值下单
 	 */
@@ -732,6 +739,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setIpAddress("");
 		rechargeOrderDO.setModifyOpr("");
 		rechargeOrderDO.setOrderSuccTm(null);
+		//设置汇款订单状态
 		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		rechargeOrderDO.setPsnFlag(offlineRechargeApplyDTO.getPsnFlag());
 		rechargeOrderDO.setSysChannel(PwmConstants.ORD_SYSCHANNEL_APP);
@@ -765,6 +773,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 		CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
 
+
+		GenericRspDTO<List<RouteDTO>> GenericRounteList = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
+		List<RouteDTO> rounteList = GenericRounteList.getBody();
+		if(JudgeUtils.isNull(rounteList) || JudgeUtils.isEmpty(rounteList)) {
+			throw new LemonException("PWM20016");
+		}
 		OfflineRechargeResultDTO offlineRechargeResultDTO = new OfflineRechargeResultDTO();
 		offlineRechargeResultDTO.setAmount(rechargeOrderDO.getOrderAmt());
 		offlineRechargeResultDTO.setCcy(rechargeOrderDO.getOrderCcy());
@@ -773,6 +787,15 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		offlineRechargeResultDTO.setOrderNo(rechargeOrderDO.getOrderNo());
 		offlineRechargeResultDTO.setOrderTm(DateTimeUtils.getCurrentLocalTime());
 		offlineRechargeResultDTO.setCashierOrderNo(cashierViewDTO.getOrderNo());
+		String crdCorpOrg = offlineRechargeApplyDTO.getCrdCorpOrg();
+		for(RouteDTO rd : rounteList) {
+			if(JudgeUtils.equals(crdCorpOrg,rd.getCrdCorpOrg())) {
+				//汇款银行账号
+				offlineRechargeResultDTO.setCrdNo("");
+				//汇款银行账户
+				offlineRechargeResultDTO.setCrdUsrNm("");
+			}
+		}
 		return offlineRechargeResultDTO;
 	}
 

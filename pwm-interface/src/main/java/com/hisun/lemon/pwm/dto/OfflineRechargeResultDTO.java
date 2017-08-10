@@ -71,6 +71,18 @@ public class OfflineRechargeResultDTO {
 	@ApiModelProperty(name = "orderTm", value = "运营审核结果信息", dataType = "String")
 	private String remark;
 
+	/**
+	 * 卡号
+	 */
+	@ApiModelProperty(name = "crdNo", value = "银行卡号", required = true, dataType = "String")
+	private String crdNo;
+
+	/**
+	 * 户名
+	 */
+	@ApiModelProperty(name = "crdUsrNm", value = "银行卡户名", required = true, dataType = "String")
+	private String crdUsrNm;
+
 
 	public BigDecimal getAmount() {
 		return amount;
@@ -134,5 +146,21 @@ public class OfflineRechargeResultDTO {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public String getCrdNo() {
+		return crdNo;
+	}
+
+	public void setCrdNo(String crdNo) {
+		this.crdNo = crdNo;
+	}
+
+	public String getCrdUsrNm() {
+		return crdUsrNm;
+	}
+
+	public void setCrdUsrNm(String crdUsrNm) {
+		this.crdUsrNm = crdUsrNm;
 	}
 }
