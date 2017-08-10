@@ -167,11 +167,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					rechargeSeaDO.getTxType(), 
 					ACMConstants.ACCOUNTING_NOMARL, 
 					rechargeSeaDO.getOrderAmt(),
-					null, 
+					balAcNo, 
 					ACMConstants.ITM_AC_TYP, 
 					balCapType, 
 					ACMConstants.AC_D_FLG, 
-					CshConstants.AC_ITEM_CSH_PAY,
+					PwmConstants.AC_ITEM_CSH_PAY,
 					null, 
 					null, 
 					null, 
@@ -185,12 +185,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					rechargeSeaDO.getTxType(), 
 					ACMConstants.ACCOUNTING_NOMARL, 
 					rechargeSeaDO.getOrderAmt(),
-					balAcNo, 
+					null, 
 					ACMConstants.USER_AC_TYP,
 					balCapType,
 					ACMConstants.AC_C_FLG, 
-					"", 
-					CshConstants.AC_ITEM_HCOUPON, 
+					PwmConstants.AC_ITEM_HCOUPONE, 
+					balAcNo, 
 					null, 
 					null, 
 					null, 
@@ -227,7 +227,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				throw new LemonException("PWM40001");
 			}
 		}else{
-			throw new LemonException("PWM40004");
+			throw new LemonException(mkmRsp.getMsgCd());
 		}
 	}
 

@@ -155,7 +155,7 @@ public class PwmConstants {
 	 * 内部科目
 	 * 其他应付款-中转挂账-海币
 	 */
-	public static final String AC_ITEM_PWM_HCOUPONE="2241040001";
+	public static final String AC_ITEM_HCOUPONE="2241040001";
 
 	/**
 	 * 内部科目
