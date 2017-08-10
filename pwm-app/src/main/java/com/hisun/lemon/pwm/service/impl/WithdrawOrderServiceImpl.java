@@ -6,12 +6,17 @@ import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.cpo.dto.WithdrawReqDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
+import com.hisun.lemon.pwm.dto.WithdrawRateDTO;
+import com.hisun.lemon.pwm.dto.WithdrawRateResultDTO;
 import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
 import com.hisun.lemon.pwm.dto.WithdrawDTO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
+import com.hisun.lemon.tfm.client.TfmServerClient;
+import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +35,12 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 	//@Resource
 	//private WithdrawClient withdrawClient;
 
+    @Resource
+    private TfmServerClient tfmServerClient;
+    /**
+     * 生成提现订单
+     * @param genericWithdrawDTO
+     */
 	@Override
 	public void createOrder(GenericDTO<WithdrawDTO> genericWithdrawDTO) {
 
@@ -68,7 +79,10 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		String ymd= DateTimeUtils.getCurrentDateStr();
 		String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE+ymd,15);
 		withdrawOrderDO.setOrderNo(ymd+orderNo);
+		//交易类型 04提现
 		withdrawOrderDO.setTxType(PwmConstants.TX_TYPE_WITHDRAW);
+		//业务类型 0401个人提现
+		withdrawOrderDO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_P);
 		withdrawOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		withdrawOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
 		//不确定用户名是查还是传
@@ -85,6 +99,10 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
 	}
 
+    /**
+     * 处理提现订单结果
+     * @param genericWithdrawResultDTO
+     */
 	public void completeOrder(GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO) {
 
         WithdrawResultDTO withdrawResultDTO = genericWithdrawResultDTO.getBody();
@@ -104,4 +122,17 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		//withdrawOrderTransactionalService.applyAmountBack();
 	}
 
+    @Override
+    public GenericRspDTO<WithdrawResultDTO> queryRate(WithdrawRateDTO withdrawRateDTO) {
+
+        TradeRateReqDTO tradeRateReqDTO = new TradeRateReqDTO();
+        BeanUtils.copyProperties(tradeRateReqDTO, withdrawRateDTO);
+        GenericDTO genericDTO = new GenericDTO();
+        genericDTO.setBody(tradeRateReqDTO);
+        GenericRspDTO genericRspDTO = tfmServerClient.tradeRate(genericDTO);
+        WithdrawRateResultDTO withdrawRateResultDTO = new WithdrawRateResultDTO();
+        BeanUtils.copyProperties(withdrawRateResultDTO, genericRspDTO.getBody());
+        genericRspDTO.setBody(withdrawRateResultDTO);
+        return genericRspDTO;
+    }
 }

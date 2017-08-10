@@ -1,8 +1,11 @@
 package com.hisun.lemon.pwm.service;
 
 import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.pwm.dto.WithdrawRateDTO;
 import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
 import com.hisun.lemon.pwm.dto.WithdrawDTO;
+import com.hisun.lemon.tfm.dto.TradeRateRspDTO;
 
 /**
  * @author tone
@@ -23,4 +26,10 @@ public interface IWithdrawOrderService {
      * @param genericWithdrawResultDTO
      */
     public void completeOrder(GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO);
+
+    /**
+     * 查询交易费率
+     * @param withdrawRateDTO
+     */
+    public GenericRspDTO<WithdrawResultDTO> queryRate(WithdrawRateDTO withdrawRateDTO);
 }
