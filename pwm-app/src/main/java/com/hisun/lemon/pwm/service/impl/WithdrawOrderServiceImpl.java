@@ -68,6 +68,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		String ymd= DateTimeUtils.getCurrentDateStr();
 		String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE+ymd,15);
 		withdrawOrderDO.setOrderNo(ymd+orderNo);
+		withdrawOrderDO.setTxType(PwmConstants.TX_TYPE_WITHDRAW);
 		withdrawOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		withdrawOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
 		//不确定用户名是查还是传
