@@ -817,7 +817,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM20015");
 		}
 		//判断充值订单是否已提交审核
-		if(JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_SUBMIT,rechargeOrderDO.getOrderStatus())) {
+		if(JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_W1,rechargeOrderDO.getOrderStatus())) {
 			throw new LemonException("PWM20017");
 		}
 		//查询汇款充值个人信息
@@ -845,7 +845,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//更新充值订单状态为已提交审核
 		RechargeOrderDO updateRechargeOrderDo = new RechargeOrderDO();
 		BeanUtils.copyProperties(updateRechargeOrderDo,rechargeOrderDO);
-		updateRechargeOrderDo.setOrderStatus(PwmConstants.OFFLINE_RECHARGE_ORD_SUBMIT);
+		updateRechargeOrderDo.setOrderStatus(PwmConstants.OFFLINE_RECHARGE_ORD_W1);
 		updateRechargeOrderDo.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 		this.service.getRechangeOrderDao().update(updateRechargeOrderDo);
 
