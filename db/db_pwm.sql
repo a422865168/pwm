@@ -153,7 +153,8 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10037','zh','营业厅充值请求操作状态异常!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10038','zh','业务类型不能为空!',now(),now());
-
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10039','zh','汇款单图片地址不能为空!',now(),now());
 
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
@@ -183,7 +184,12 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20012','zh','更新收银订单失败!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20013','zh','线下收银台收款失败!',now(),now());
-
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20014','zh','未查找到任何用户或者商户信息!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20015','zh','未找到任何汇款充值订单信息!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20016','zh','未找到任何汇款银行账号信息!',now(),now());
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30001','zh','该用户为黑名单!',now(),now());
@@ -199,3 +205,11 @@ values ('PWM30005','zh','提现订单号不存在!',now(),now());
 -------------------------
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM40001','zh','调用营销接口返回接口异常!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM40002','zh','借贷不平衡!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM40003','zh','账户信息不存在!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM40004','zh','调用营销接口未返回数据!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM40005','zh','调用创建收银台接口未返回数据!',now(),now());

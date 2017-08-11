@@ -4,12 +4,7 @@ import java.math.BigDecimal;
 
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
+import com.hisun.lemon.pwm.dto.*;
 
 
 /**
@@ -28,12 +23,14 @@ public interface IRechargeOrderService {
     public void handleResult(GenericDTO resultDto);
 
     /**
-     * 查询用户信息
+     * 查询用户与订单信息
      * @param userId
+     * @param hallOrderNo
      * @param amount
+     * @param type
      * @return
      */
-    public HallQueryResultDTO queryUserInfo(String userId,BigDecimal amount);
+    public HallQueryResultDTO queryUserInfo(String userId,String hallOrderNo,BigDecimal amount,String type);
 
     /**
      * 营业厅充值申请处理
@@ -68,4 +65,18 @@ public interface IRechargeOrderService {
      * @return
      */
     public HallRechargeResultDTO hallRechargeRevocation(HallRechargeApplyDTO dto);
+
+    /**
+     * 线下汇款充值申请
+     * @param genericDTO
+     * @return
+     */
+    public OfflineRechargeResultDTO offlineRechargeApplication(GenericDTO<OfflineRechargeApplyDTO> genericDTO);
+
+    /**
+     * 线下汇款上传汇款凭证
+     * @param genericDTO
+     * @return
+     */
+    public OfflineRechargeResultDTO offlineRemittanceUpload(GenericDTO<RemittanceUploadDTO> genericDTO);
 }

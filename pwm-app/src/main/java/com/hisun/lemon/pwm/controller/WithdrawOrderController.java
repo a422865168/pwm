@@ -3,14 +3,12 @@ package com.hisun.lemon.pwm.controller;
 import javax.annotation.Resource;
 
 import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.pwm.dto.WithdrawRateDTO;
+import com.hisun.lemon.pwm.dto.WithdrawRateResultDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.utils.LemonUtils;
@@ -64,4 +62,15 @@ public class WithdrawOrderController {
 		return genericDTO;
 	}
 
+	/**
+	 *	查询交易费率
+	 */
+    @ApiOperation(value = "查询交易费率", notes = "根据业务类型币种查询交易费率")
+    @ApiResponse(code = 200, message = "查询交易费率")
+    @GetMapping(value = "/rate")
+	public GenericRspDTO<WithdrawRateResultDTO> queryWithdrawRate(@Validated WithdrawRateDTO withdrawRateDTO){
+		GenericRspDTO genericDTO = withdrawOrderService.queryRate(withdrawRateDTO);
+		genericDTO.setMsgCd(LemonUtils.getSuccessMsgCd());
+		return genericDTO;
+	}
 }

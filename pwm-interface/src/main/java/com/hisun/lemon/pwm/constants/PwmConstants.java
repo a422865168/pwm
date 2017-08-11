@@ -155,6 +155,43 @@ public class PwmConstants {
 	 * 内部科目
 	 * 其他应付款-中转挂账-海币
 	 */
-	public static final String AC_ITEM_PWM_HCOUPONE="2241040001";
+	public static final String AC_ITEM_HCOUPONE="2241040001";
+
+	/**
+	 * 内部科目
+	 * 银行存款-备付金账户-XX银行
+	 */
+	public static final String AC_ITEM_DEP_ACC_BNK="1002010001";
+	
+	/**
+	 * 海币换算美元比率
+	 */
+	public static final double H_USD_RATE=100;
+
+	/**
+	 * 营业厅查询用户类型： U 用户
+	 */
+	public static final String HALL_QUERY_TYPE_U = "U";
+
+	/**
+	 * 营业厅查询用户类型： M 商户
+	 */
+	public static final String HALL_QUERY_TYPE_M = "M";
+
+	/**
+	 * 线下汇款订单状态：待审核
+	 */
+	public static final String OFFLINE_RECHARGE_ORD_W="W";
+
+	/**
+	 * 线下汇款订单状态：审核拒绝
+	 */
+	public static final String OFFLINE_RECHARGE_ORD_F="F";
+
+	/**
+	 * 线下汇款订单状态：审核通过
+	 */
+	public static final String OFFLINE_RECHARGE_ORD_S="S";
+
 	
 }
