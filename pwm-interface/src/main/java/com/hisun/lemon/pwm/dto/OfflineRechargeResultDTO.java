@@ -83,6 +83,12 @@ public class OfflineRechargeResultDTO {
 	@ApiModelProperty(name = "crdUsrNm", value = "银行卡户名", required = true, dataType = "String")
 	private String crdUsrNm;
 
+	/**
+	 * mblNo 手机号
+	 */
+	@ApiModelProperty(name = "mblNo", value = "用户手机号")
+	private String mblNo;
+
 
 	public BigDecimal getAmount() {
 		return amount;
@@ -162,5 +168,13 @@ public class OfflineRechargeResultDTO {
 
 	public void setCrdUsrNm(String crdUsrNm) {
 		this.crdUsrNm = crdUsrNm;
+	}
+
+	public String getMblNo() {
+		return mblNo;
+	}
+
+	public void setMblNo(String mblNo) {
+		this.mblNo = mblNo;
 	}
 }

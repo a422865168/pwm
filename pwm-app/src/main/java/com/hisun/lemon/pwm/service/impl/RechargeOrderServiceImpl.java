@@ -835,6 +835,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		offlineRechargeResultDTO.setCcy(offlinePaymentResultDTO.getOrderCcy());
 		offlineRechargeResultDTO.setOrderNo(offlinePaymentResultDTO.getRemittOrderNo());
 		offlineRechargeResultDTO.setStatus(offlinePaymentResultDTO.getOrderStatus());
+		offlineRechargeResultDTO.setMblNo(userBasicInfDTO.getMblNo());
 		offlineRechargeResultDTO.setRemark(offlinePaymentResultDTO.getRemark());
 		return offlineRechargeResultDTO;
 	}
