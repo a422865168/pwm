@@ -1,12 +1,14 @@
 package com.hisun.lemon.pwm.service.impl;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.cpi.client.RouteClient;
 import com.hisun.lemon.cpi.dto.RouteDTO;
 import com.hisun.lemon.cpi.enums.CorpBusSubTyp;
@@ -810,8 +812,13 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//原订单校验
 		String orderNo = remittanceUploadDTO.getOrderNo();
 		RechargeOrderDO rechargeOrderDO = this.service.getRechangeOrderDao().get(orderNo);
+
 		if(JudgeUtils.isNull(rechargeOrderDO)) {
 			throw new LemonException("PWM20015");
+		}
+		//判断充值订单是否已提交审核
+		if(JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_SUBMIT,rechargeOrderDO.getOrderStatus())) {
+			throw new LemonException("PWM20017");
 		}
 		//查询汇款充值个人信息
 		GenericRspDTO<UserBasicInfDTO> genericUserBasicInfDTO = userBasicInfClient.queryUser(remittanceUploadDTO.getPayerId());
@@ -835,6 +842,13 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if (JudgeUtils.isNull(offlinePaymentResultDTO)) {
 			throw new LemonException("PWM20013");
 		}
+		//更新充值订单状态为已提交审核
+		RechargeOrderDO updateRechargeOrderDo = new RechargeOrderDO();
+		BeanUtils.copyProperties(updateRechargeOrderDo,rechargeOrderDO);
+		updateRechargeOrderDo.setOrderStatus(PwmConstants.OFFLINE_RECHARGE_ORD_SUBMIT);
+		updateRechargeOrderDo.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+		this.service.getRechangeOrderDao().update(updateRechargeOrderDo);
+
 		OfflineRechargeResultDTO offlineRechargeResultDTO = new OfflineRechargeResultDTO();
 		offlineRechargeResultDTO.setCashierOrderNo(offlinePaymentResultDTO.getCashierOrderNo());
 		offlineRechargeResultDTO.setOrderTm(DateTimeUtils.getCurrentLocalTime());
