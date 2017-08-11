@@ -768,17 +768,18 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		GenericDTO<InitCashierDTO> genericCashierDTO = new GenericDTO<>();
 		genericCashierDTO.setBody(initCashierDTO);
 		GenericDTO<CashierViewDTO> genericCashierViewDTO = cshOrderClient.initCashier(genericCashierDTO);
-		if(JudgeUtils.isNull(genericCashierViewDTO)) {
+		CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
+		if(JudgeUtils.isNull(cashierViewDTO)) {
 			throw new LemonException("PWM40005");
 		}
-		CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
-
 
 		GenericRspDTO<List<RouteDTO>> GenericRounteList = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
 		List<RouteDTO> rounteList = GenericRounteList.getBody();
-		if(JudgeUtils.isNull(rounteList) || JudgeUtils.isEmpty(rounteList)) {
+		if(JudgeUtils.isNull(rounteList)) {
 			throw new LemonException("PWM20016");
 		}
+		GenericRspDTO<UserBasicInfDTO> genericUserBasicInfDTO = userBasicInfClient.queryUser(offlineRechargeApplyDTO.getPayerId());
+		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
 		OfflineRechargeResultDTO offlineRechargeResultDTO = new OfflineRechargeResultDTO();
 		offlineRechargeResultDTO.setAmount(rechargeOrderDO.getOrderAmt());
 		offlineRechargeResultDTO.setCcy(rechargeOrderDO.getOrderCcy());
@@ -787,13 +788,17 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		offlineRechargeResultDTO.setOrderNo(rechargeOrderDO.getOrderNo());
 		offlineRechargeResultDTO.setOrderTm(DateTimeUtils.getCurrentLocalTime());
 		offlineRechargeResultDTO.setCashierOrderNo(cashierViewDTO.getOrderNo());
+		if(JudgeUtils.isNotNull(userBasicInfDTO)){
+			offlineRechargeResultDTO.setMblNo(userBasicInfDTO.getMblNo());
+		}
 		String crdCorpOrg = offlineRechargeApplyDTO.getCrdCorpOrg();
 		for(RouteDTO rd : rounteList) {
 			if(JudgeUtils.equals(crdCorpOrg,rd.getCrdCorpOrg())) {
 				//汇款银行账号
-				offlineRechargeResultDTO.setCrdNo("");
+				offlineRechargeResultDTO.setCrdNo(rd.getCorpAccNo());
 				//汇款银行账户
 				offlineRechargeResultDTO.setCrdUsrNm("");
+				break;
 			}
 		}
 		return offlineRechargeResultDTO;
@@ -819,6 +824,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		offlinePaymentDTO.setOrderCcy(remittanceUploadDTO.getCcy());
 		offlinePaymentDTO.setCashRemittUrl(remittanceUploadDTO.getRemittUrl());
 		offlinePaymentDTO.setPayerId(remittanceUploadDTO.getPayerId());
+		offlinePaymentDTO.setRemark(remittanceUploadDTO.getRemark());
+		offlinePaymentDTO.setCrdCorpOrg(remittanceUploadDTO.getCrdCorpOrg());
+		offlinePaymentDTO.setCrdAcTyp(remittanceUploadDTO.getCrdAcTyp());
 		genericOfflinePaymentDTO.setBody(offlinePaymentDTO);
 
 		//收银台线下汇款处理

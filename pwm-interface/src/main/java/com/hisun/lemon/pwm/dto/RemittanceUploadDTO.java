@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 
 /**
@@ -25,27 +26,27 @@ public class RemittanceUploadDTO {
     /**
      * 收银订单号
      */
-    @ApiModelProperty(name = "cshOrderNo", value = "收银订单号")
+    @ApiModelProperty(name = "cshOrderNo", value = "收银订单号",required = true, dataType = "String")
     @Length(max =24)
     private String cashOrderNo;
 
     /**
      * 充值币种
      */
-    @ApiModelProperty(name = "ccy", value = "币种")
+    @ApiModelProperty(name = "ccy", value = "币种",required = true, dataType = "String")
     private String ccy;
 
     /**
      * 充值金额
      */
-    @ApiModelProperty(name = "amount", value = "充值金额")
+    @ApiModelProperty(name = "amount", value = "充值金额",required = true, dataType = "String")
     @Min(value=0, message="PWM10012")
     private BigDecimal amount;
 
     /**
      * 充值用户或商户id
      */
-    @ApiModelProperty(name = "payerId", value = "充值用户或商户id")
+    @ApiModelProperty(name = "payerId", value = "充值用户或商户id",required = true, dataType = "String")
     @NotEmpty(message="PWM10013")
     @Length(max = 16)
     private String payerId;
@@ -60,6 +61,21 @@ public class RemittanceUploadDTO {
     @ApiModelProperty(name = "remark", value = "附言摘要")
     @NotEmpty(message="PWM10003")
     private String remark;
+
+    /**
+     * 资金机构
+     */
+    @ApiModelProperty(name = "crdCorpOrg", value = "资金机构",required = true, dataType = "String")
+    @NotEmpty(message="PWM10042")
+    private String crdCorpOrg;
+
+    /**
+     * 卡种
+     */
+    @ApiModelProperty(name = "crdAcTyp", value = "卡种，D借记卡，C贷记卡，U未知", required = true, dataType = "String")
+    @NotEmpty(message="PWM10040")
+    @Pattern(regexp="D|C|U",message="PWM10041")
+    private String crdAcTyp;
 
 
     public String getOrderNo() {
@@ -118,4 +134,21 @@ public class RemittanceUploadDTO {
     public void setRemittUrl(String remittUrl) {
         this.remittUrl = remittUrl;
     }
+
+    public String getCrdCorpOrg() {
+        return crdCorpOrg;
+    }
+
+    public void setCrdCorpOrg(String crdCorpOrg) {
+        this.crdCorpOrg = crdCorpOrg;
+    }
+
+    public String getCrdAcTyp() {
+        return crdAcTyp;
+    }
+
+    public void setCrdAcTyp(String crdAcTyp) {
+        this.crdAcTyp = crdAcTyp;
+    }
+
 }
