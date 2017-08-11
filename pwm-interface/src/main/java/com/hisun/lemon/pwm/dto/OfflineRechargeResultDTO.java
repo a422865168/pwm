@@ -50,7 +50,7 @@ public class OfflineRechargeResultDTO {
 	 * 状态:<br/>
 	 * 订单状态
 	 */
-	@ApiModelProperty(name = "status", value = "汇款充值订单状态(W:待审核处理|F:交易失败|S:交易成功|S1:审核已提交)")
+	@ApiModelProperty(name = "status", value = "汇款充值订单状态(W:待审核处理|F:交易失败|S:交易成功|W1:审核已提交)")
 	@Length(max = 1)
 	private String status;
 
