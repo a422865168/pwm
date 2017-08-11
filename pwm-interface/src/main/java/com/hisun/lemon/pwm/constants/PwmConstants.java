@@ -186,7 +186,7 @@ public class PwmConstants {
 	/**
 	 * 线下汇款订单状态：审核已提交
 	 */
-	public static final String OFFLINE_RECHARGE_ORD_SUBMIT="S1";
+	public static final String OFFLINE_RECHARGE_ORD_W1="W1";
 
 	/**
 	 * 线下汇款订单状态：审核拒绝
