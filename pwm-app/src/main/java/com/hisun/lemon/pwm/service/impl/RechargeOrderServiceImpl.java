@@ -818,7 +818,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		offlinePaymentDTO.setOrderNo(remittanceUploadDTO.getCashOrderNo());
 		offlinePaymentDTO.setOrderCcy(remittanceUploadDTO.getCcy());
 		offlinePaymentDTO.setCashRemittUrl(remittanceUploadDTO.getRemittUrl());
-		offlinePaymentDTO.setMblNo(userBasicInfDTO.getMblNo());
 		offlinePaymentDTO.setPayerId(remittanceUploadDTO.getPayerId());
 		genericOfflinePaymentDTO.setBody(offlinePaymentDTO);
 
