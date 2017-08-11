@@ -467,7 +467,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		hallQueryResultDTO.setFee(tradeFee.multiply(amount));
 		hallQueryResultDTO.setUmId(userBasicInfDTO.getUserId());
 		hallQueryResultDTO.setKey(userId);
-		//根据商户名称判断是否是
+		//根据商户名称判断是否是商户还是个体
 		String psnFlag = userBasicInfDTO.getMercName();
 
 		//个体用户
@@ -819,6 +819,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//判断充值订单是否已提交审核
 		if(JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_W1,rechargeOrderDO.getOrderStatus())) {
 			throw new LemonException("PWM20017");
+		}
+
+		//金额校验
+		if(!JudgeUtils.equals(remittanceUploadDTO.getAmount(),rechargeOrderDO.getOrderAmt())){
+			throw new LemonException("PWM20018");
 		}
 		//查询汇款充值个人信息
 		GenericRspDTO<UserBasicInfDTO> genericUserBasicInfDTO = userBasicInfClient.queryUser(remittanceUploadDTO.getPayerId());
