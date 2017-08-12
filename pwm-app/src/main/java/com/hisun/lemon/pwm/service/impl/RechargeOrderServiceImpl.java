@@ -320,94 +320,39 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		AccountingReqDTO cnlRechargeBnkReqDTO=null;  //充值渠道银行账务对象
 		AccountingReqDTO depositAccountBnkReqDTO=null; //备付金账户银行账务对象
 
+		//账号资金属性：1 现金 8 待结算
 		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
+		//现金账户
 		String balAcNo=acmComponent.getAcmAcNo(rechargeResultDTO.getPayerId(), balCapType);
 
 		switch (busType) {
 			//个人快捷支付账户充值
 			case PwmConstants.BUS_TYPE_RECHARGE_QP:
 				// 借：其他应付款-暂收-收银台
-				cshItemReqDTO=acmComponent.createAccountingReqDTO(
-						rechargeOrderDO.getExtOrderNo(),
-						rechargeResultDTO.getTxJrnNo(),
-						rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL,
-						rechargeOrderDO.getOrderAmt(),
-						balAcNo,
-						ACMConstants.USER_AC_TYP,
-						balCapType,
-						ACMConstants.AC_D_FLG,
-						CshConstants.AC_ITEM_CSH_PAY,
-						null,
-						null,
-						null,
-						null,
-						null);
+				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getExtOrderNo(), rechargeResultDTO.getTxJrnNo(), rechargeOrderDO.getTxType(),
+						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
+						CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
 
 				// 贷：其他应付款-支付账户-xx用户现金账户
-				userAccountReqDTO=acmComponent.createAccountingReqDTO(
-						rechargeOrderDO.getExtOrderNo(),
-						rechargeResultDTO.getTxJrnNo(),
-						rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL,
-						rechargeOrderDO.getOrderAmt(),
-						null,
-						ACMConstants.USER_AC_TYP,
-						balCapType,
-						ACMConstants.AC_C_FLG,
-						CshConstants.AC_ITEM_CSH_BAL,
-						balAcNo,
-						null,
-						null,
-						null,
-						null);
+				userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getExtOrderNo(), rechargeResultDTO.getTxJrnNo(), rechargeOrderDO.getTxType(),
+						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), null, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+						CshConstants.AC_ITEM_CSH_BAL, balAcNo, null, null, null, null);
 				acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
 				break;
 			case PwmConstants.BUS_TYPE_RECHARGE_OFL:
 				RechargeOrderDO updOrderDO = new RechargeOrderDO();
-				if(JudgeUtils.equals(rechargeResultDTO.getStatus(),PwmConstants.OFFLINE_RECHARGE_ORD_S)) {
-					// 借：其他应付款-暂收-收银台
-					cshItemReqDTO=acmComponent.createAccountingReqDTO(
-							rechargeOrderDO.getExtOrderNo(),
-							rechargeResultDTO.getTxJrnNo(),
-							rechargeOrderDO.getTxType(),
-							ACMConstants.ACCOUNTING_NOMARL,
-							rechargeOrderDO.getOrderAmt(),
-							balAcNo,
-							ACMConstants.USER_AC_TYP,
-							balCapType,
-							ACMConstants.AC_D_FLG,
-							CshConstants.AC_ITEM_CSH_PAY,
-							null,
-							null,
-							null,
-							null,
-							null);
+				// 借：其他应付款-暂收-收银台
+				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getExtOrderNo(), rechargeResultDTO.getTxJrnNo(), rechargeOrderDO.getTxType(),
+						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
+						CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
 
-					// 贷：其他应付款-支付账户-xx用户现金账户
-					userAccountReqDTO=acmComponent.createAccountingReqDTO(
-							rechargeOrderDO.getExtOrderNo(),
-							rechargeResultDTO.getTxJrnNo(),
-							rechargeOrderDO.getTxType(),
-							ACMConstants.ACCOUNTING_NOMARL,
-							rechargeOrderDO.getOrderAmt(),
-							null,
-							ACMConstants.USER_AC_TYP,
-							balCapType,
-							ACMConstants.AC_C_FLG,
-							CshConstants.AC_ITEM_CSH_BAL,
-							balAcNo,
-							null,
-							null,
-							null,
-							null);
-					acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
-					//设置充值订单状态
-					updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
-				} else if(JudgeUtils.equals(rechargeResultDTO.getStatus(),PwmConstants.OFFLINE_RECHARGE_ORD_F)) {
-					updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
-				}
-
+				// 贷：其他应付款-支付账户-xx用户现金账户
+				userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getExtOrderNo(), rechargeResultDTO.getTxJrnNo(), rechargeOrderDO.getTxType(),
+						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+						CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, null);
+				acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
+				//更新充值订单状态
+				updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
 				updOrderDO.setAcTm(resultDto.getAccDate());
 				updOrderDO.setExtOrderNo(rechargeResultDTO.getExtOrderNo());
 				updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
