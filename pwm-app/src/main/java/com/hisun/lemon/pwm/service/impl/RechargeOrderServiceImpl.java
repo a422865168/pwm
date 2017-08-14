@@ -490,6 +490,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
 
 		if(JudgeUtils.isNull(cashierViewDTO)) {
+			//更新充值订单状态
+			RechargeOrderDO updatOrderDO = new RechargeOrderDO();
+			updatOrderDO.setOrderNo(orderNo);
+			updatOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+			updatOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
+			this.service.updateOrder(updatOrderDO);
 			throw new LemonException("PWM40005");
 		}
 		// 返回
@@ -684,12 +690,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
 		rechargeOrderDO.setOrderNo(orderNo);
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
-		rechargeOrderDO.setOrderStatus(PwmConstants.OFFLINE_RECHARGE_ORD_W);
 		rechargeOrderDO.setIpAddress("");
 		rechargeOrderDO.setModifyOpr("");
 		rechargeOrderDO.setOrderSuccTm(null);
 		//设置汇款订单状态
-		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
+		rechargeOrderDO.setOrderStatus(PwmConstants.OFFLINE_RECHARGE_ORD_W);
 		rechargeOrderDO.setPsnFlag(offlineRechargeApplyDTO.getPsnFlag());
 		rechargeOrderDO.setSysChannel(PwmConstants.ORD_SYSCHANNEL_APP);
 		rechargeOrderDO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
@@ -719,6 +724,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		GenericDTO<CashierViewDTO> genericCashierViewDTO = cshOrderClient.initCashier(genericCashierDTO);
 		CashierViewDTO cashierViewDTO = genericCashierViewDTO.getBody();
 		if(JudgeUtils.isNull(cashierViewDTO)) {
+			//更新充值订单状态
+			RechargeOrderDO updatOrderDO = new RechargeOrderDO();
+			updatOrderDO.setOrderNo(orderNo);
+			updatOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+			updatOrderDO.setOrderStatus(PwmConstants.OFFLINE_RECHARGE_ORD_F);
+			this.service.updateOrder(updatOrderDO);
 			throw new LemonException("PWM40005");
 		}
 
