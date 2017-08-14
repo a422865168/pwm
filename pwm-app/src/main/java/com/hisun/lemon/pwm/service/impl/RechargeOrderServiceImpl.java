@@ -780,7 +780,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 
 		//金额校验
-		if(!JudgeUtils.equals(remittanceUploadDTO.getAmount(),rechargeOrderDO.getOrderAmt())){
+		if(!JudgeUtils.equals(remittanceUploadDTO.getAmount().setScale(2),rechargeOrderDO.getOrderAmt().setScale(2))){
 			throw new LemonException("PWM20018");
 		}
 		//查询汇款充值个人信息
@@ -797,6 +797,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		offlinePaymentDTO.setRemark(remittanceUploadDTO.getRemark());
 		offlinePaymentDTO.setCrdCorpOrg(remittanceUploadDTO.getCrdCorpOrg());
 		offlinePaymentDTO.setCrdAcTyp(remittanceUploadDTO.getCrdAcTyp());
+		offlinePaymentDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_OFL);
 		genericOfflinePaymentDTO.setBody(offlinePaymentDTO);
 
 		//收银台线下汇款处理
