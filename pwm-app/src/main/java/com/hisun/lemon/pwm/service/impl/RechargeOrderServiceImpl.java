@@ -1,7 +1,6 @@
 package com.hisun.lemon.pwm.service.impl;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -718,6 +717,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
 		initCashierDTO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
 		initCashierDTO.setPayerName("");
+		initCashierDTO.setGoodsDesc("");
 
 		GenericDTO<InitCashierDTO> genericCashierDTO = new GenericDTO<>();
 		genericCashierDTO.setBody(initCashierDTO);
