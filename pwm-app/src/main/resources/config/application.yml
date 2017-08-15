@@ -258,7 +258,7 @@ pagehelper :
   defaultPageSize : 8
   
 swagger :
-  profiles : DEV,SIT,CI
+  profiles : dev,sit,ci
   show : true
   version : 1.0
   globleRequestParams :
