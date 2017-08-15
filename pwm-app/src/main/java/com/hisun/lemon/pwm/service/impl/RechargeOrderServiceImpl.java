@@ -692,6 +692,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setIpAddress("");
 		rechargeOrderDO.setModifyOpr("");
 		rechargeOrderDO.setOrderSuccTm(null);
+		rechargeOrderDO.setCrdCorpOrg(offlineRechargeApplyDTO.getCrdCorpOrg());
 		//设置汇款订单状态
 		rechargeOrderDO.setOrderStatus(PwmConstants.OFFLINE_RECHARGE_ORD_W);
 		rechargeOrderDO.setPsnFlag(offlineRechargeApplyDTO.getPsnFlag());
@@ -779,25 +780,26 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM20017");
 		}
 
-		//金额校验
-		if(!JudgeUtils.equals(remittanceUploadDTO.getAmount().setScale(2),rechargeOrderDO.getOrderAmt().setScale(2))){
-			throw new LemonException("PWM20018");
-		}
 		//查询汇款充值个人信息
 		GenericRspDTO<UserBasicInfDTO> genericUserBasicInfDTO = userBasicInfClient.queryUser(remittanceUploadDTO.getPayerId());
 		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
 
+		//根据资金机构查询汇款账户
+		GenericRspDTO<List<RouteDTO>> GenericRounteList = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
+		List<RouteDTO> rounteList = GenericRounteList.getBody();
+		if(JudgeUtils.isNull(rounteList)) {
+			throw new LemonException("PWM20016");
+		}
+		RouteDTO routeDTO = rounteList.get(0);
 		GenericDTO<OfflinePaymentDTO> genericOfflinePaymentDTO = new GenericDTO<>();
 		OfflinePaymentDTO offlinePaymentDTO = new OfflinePaymentDTO();
-		offlinePaymentDTO.setOrderAmt(remittanceUploadDTO.getAmount());
-		offlinePaymentDTO.setOrderNo(remittanceUploadDTO.getCashOrderNo());
-		offlinePaymentDTO.setOrderCcy(remittanceUploadDTO.getCcy());
 		offlinePaymentDTO.setCashRemittUrl(remittanceUploadDTO.getRemittUrl());
 		offlinePaymentDTO.setPayerId(remittanceUploadDTO.getPayerId());
 		offlinePaymentDTO.setRemark(remittanceUploadDTO.getRemark());
-		offlinePaymentDTO.setCrdCorpOrg(remittanceUploadDTO.getCrdCorpOrg());
-		offlinePaymentDTO.setCrdAcTyp(remittanceUploadDTO.getCrdAcTyp());
+		offlinePaymentDTO.setCrdCorpOrg(routeDTO.getCrdCorpOrg());
+		offlinePaymentDTO.setCrdAcTyp(routeDTO.getCrdAcTyp());
 		offlinePaymentDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_OFL);
+		offlinePaymentDTO.setOrderNo(rechargeOrderDO.getOrderNo());
 		genericOfflinePaymentDTO.setBody(offlinePaymentDTO);
 
 		//收银台线下汇款处理
