@@ -3,6 +3,7 @@ package com.hisun.lemon.pwm.dto;
 import java.math.BigDecimal;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -23,9 +24,7 @@ import io.swagger.annotations.ApiModelProperty;
 public class WithdrawDTO {
 
 	//用户编号
-	@ApiModelProperty(name = "userId", value = "用户编号")
-    @NotEmpty(message="PWM10027")
-	@Length(max =24)
+	@ApiModelProperty(hidden = true)
     private String userId;
 	//提现银行卡号
 	@ApiModelProperty(name = "capCardNo", value = "提现银行卡号")
@@ -34,6 +33,7 @@ public class WithdrawDTO {
     private String capCardNo;
 	//申请提现金额
 	@ApiModelProperty(name = "wcApplyAmt", value = "申请提现金额")
+    @NotNull(message = "PWM10041")
 	@Min(value=0, message="PWM10029")
 	private BigDecimal wcApplyAmt;
 	//提现手续费

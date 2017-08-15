@@ -198,5 +198,23 @@ public class PwmConstants {
 	 */
 	public static final String OFFLINE_RECHARGE_ORD_S="S";
 
-	
+    /**
+     * 内部科目
+     * 其他应付款-支付账户-现金账户
+     */
+    public static final String AC_ITEM_PAY_CASH_ACNO="2241010001";
+
+    /**
+     * 内部科目
+     * 应付账款-待结算款-批量付款
+     */
+    public static final String AC_ITEM_FOR_PAY="2202010001";
+
+    /**
+     * 内部科目
+     * 手续费收入-支付账户-提现
+     */
+    public static final String AC_ITEM_FEE_PAY_WIDR="6021010002";
+
+
 }

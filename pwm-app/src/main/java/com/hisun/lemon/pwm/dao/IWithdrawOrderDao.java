@@ -3,6 +3,7 @@ package com.hisun.lemon.pwm.dao;
 import com.hisun.lemon.framework.dao.BaseDao;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
 
 /**
  * @author tone
@@ -11,6 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
  *
  */
 @Mapper
+@Component
 public interface IWithdrawOrderDao extends BaseDao<WithdrawOrderDO>{
 
     /**

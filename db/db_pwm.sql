@@ -136,7 +136,7 @@ values ('PWM10028','zh','银行卡号不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10029','zh','申请提现金额不小于0!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM10030','zh','申请手续费不小于0!',now(),now());
+values ('PWM10030','zh','申请提现手续费不小于0!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10031','zh','提现类型不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
@@ -159,6 +159,8 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10040','zh','卡种不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10041','zh','卡种非法!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10042','zh','申请提现金额不能为空!',now(),now());
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20001','zh','业务类型与交易类型不匹配!',now(),now());
@@ -208,6 +210,18 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30004','zh','支付密码错误!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30005','zh','提现订单号不存在!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30006','zh','传入手续费与算出手续费不一致!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30007','zh','调用rsm风控接口失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30008','zh','调用tfm计费接口失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30009','zh','调用acm账户接口失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30010','zh','调用urm用户接口失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30011','zh','调用tfm计费接口失败!',now(),now());
 
 -------------------------
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)

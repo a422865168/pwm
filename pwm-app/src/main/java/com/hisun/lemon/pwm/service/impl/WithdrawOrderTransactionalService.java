@@ -4,9 +4,10 @@ import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.JudgeUtils;
 import com.hisun.lemon.pwm.dao.IWithdrawOrderDao;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 
 
 /**
@@ -18,22 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class WithdrawOrderTransactionalService {
 
-    @Autowired
+    @Resource
     private IWithdrawOrderDao withdrawOrderDao;
-
-    /**
-     *  将提现金额由账户转到提现银行卡
-     */
-    public void applyAmountTransfer(){
-
-    }
-
-    /**
-     *  将提现金额由银行卡退回到账户
-     */
-    public void applyAmountBack(){
-
-    }
 
     /**
      * 提现申请，生成订单
@@ -61,11 +48,12 @@ public class WithdrawOrderTransactionalService {
     /**
      * 校验订单是否存在
      */
-    public void query(String orderNo){
+    public WithdrawOrderDO query(String orderNo){
 
         WithdrawOrderDO withdrawOrderDO = withdrawOrderDao.get(orderNo);
         if(JudgeUtils.isNotNull(withdrawOrderDO)){
             LemonException.throwBusinessException("PWM30005");
         }
+        return withdrawOrderDO;
     }
 }

@@ -14,6 +14,7 @@
         <result column="bus_type" property="busType" jdbcType="VARCHAR" />
         <result column="wc_apply_amt" property="wcApplyAmt" jdbcType="DECIMAL" />
         <result column="wc_act_amt" property="wcActAmt" jdbcType="DECIMAL" />
+        <result column="wc_total_amt" property="wcTotalAmt" jdbcType="DECIMAL" />
         <result column="fee_amt" property="feeAmt" jdbcType="DECIMAL" />
         <result column="pay_urge_flg" property="payUrgeFlg" jdbcType="CHAR" />
         <result column="user_id" property="userId" jdbcType="VARCHAR" />
@@ -37,7 +38,7 @@
         order_no, order_tm, order_exp_tm, ac_tm, order_ccy, order_succ_tm, wc_type, tx_type, 
         bus_type, wc_apply_amt, wc_act_amt, fee_amt, pay_urge_flg, user_id, user_name, agr_no, 
         cap_corg_no, cap_card_no, cap_card_type, cap_card_name, wc_remark, ntf_mbl, order_status, 
-        rsp_order_no, rsp_succ_tm, bus_cnl, modify_time,
+        rsp_order_no, rsp_succ_tm, bus_cnl, modify_time, wc_total_amt,
         create_time
     </sql>
 
@@ -88,6 +89,9 @@
             </if>
             <if test="wcActAmt != null" >
                 wc_act_amt,
+            </if>
+            <if test="wcTotalAmt != null" >
+                wc_total_amt,
             </if>
             <if test="feeAmt != null" >
                 fee_amt,
@@ -175,6 +179,9 @@
             <if test="wcActAmt != null" >
                 #{wcActAmt,jdbcType=DECIMAL},
             </if>
+            <if test="wcTotalAmt != null" >
+                #{wcTotalAmt,jdbcType=DECIMAL},
+            </if>
             <if test="feeAmt != null" >
                 #{feeAmt,jdbcType=DECIMAL},
             </if>
@@ -261,6 +268,9 @@
             </if>
             <if test="wcActAmt != null" >
                 wc_act_amt = #{wcActAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="wcTotalAmt != null" >
+                wc_total_amt = #{wcTotalAmt,jdbcType=DECIMAL},
             </if>
             <if test="feeAmt != null" >
                 fee_amt = #{feeAmt,jdbcType=DECIMAL},

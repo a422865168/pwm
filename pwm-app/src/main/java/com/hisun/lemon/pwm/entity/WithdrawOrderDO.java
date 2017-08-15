@@ -57,6 +57,10 @@ public class WithdrawOrderDO extends BaseDO {
      */
     private BigDecimal wcActAmt;
     /**
+     * @Fields wcActAmt 提现总金额
+     */
+    private BigDecimal wcTotalAmt;
+    /**
      * @Fields feeAmt 手续费金额
      */
     private BigDecimal feeAmt;
@@ -325,4 +329,11 @@ public class WithdrawOrderDO extends BaseDO {
         this.busCnl = busCnl;
     }
 
+    public BigDecimal getWcTotalAmt() {
+        return wcTotalAmt;
+    }
+
+    public void setWcTotalAmt(BigDecimal wcTotalAmt) {
+        this.wcTotalAmt = wcTotalAmt;
+    }
 }
