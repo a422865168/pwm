@@ -74,7 +74,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         String ymd= DateTimeUtils.getCurrentDateStr();
         String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE+ymd,15);
 		WithdrawDTO withdrawDTO = genericWithdrawDTO.getBody();
-		withdrawDTO.setUserId(genericWithdrawDTO.getUserId());
+		withdrawDTO.setUserId(LemonUtils.getUserId());
         GenericRspDTO genericRspDTO = null;
         GenericDTO genericDTO = new GenericDTO();
 
