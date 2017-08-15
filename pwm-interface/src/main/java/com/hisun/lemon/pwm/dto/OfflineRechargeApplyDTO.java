@@ -23,13 +23,6 @@ import java.math.BigDecimal;
 public class OfflineRechargeApplyDTO {
 
 	/**
-	 * 充值订单号
-	 */
-	@ApiModelProperty(name = "orderNo", value = "充值订单号")
-	@Length(max =24)
-	private String orderNo;
-
-	/**
 	 * 充值金额
 	 */
 	@ApiModelProperty(name = "amount", value = "充值金额")
@@ -92,14 +85,6 @@ public class OfflineRechargeApplyDTO {
 
 	public void setPsnFlag(String psnFlag) {
 		this.psnFlag = psnFlag;
-	}
-
-	public String getOrderNo() {
-		return orderNo;
-	}
-
-	public void setOrderNo(String orderNo) {
-		this.orderNo = orderNo;
 	}
 
 	public String getCrdCorpOrg() {
