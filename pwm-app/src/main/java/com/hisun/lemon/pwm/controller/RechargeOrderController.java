@@ -45,11 +45,11 @@ public class RechargeOrderController {
 	@ApiOperation(value = "营业厅查询", notes = "查询用户与充值订单信息")
 	@ApiResponse(code = 200, message = "查询到的用户与订单信息")
 	@GetMapping(value = "/hall/info")
-	public GenericRspDTO<HallQueryResultDTO> queryUserInfo(@Validated @RequestParam(value = "userId") String userId,
+	public GenericRspDTO<HallQueryResultDTO> queryUserOrOrderInfo(@Validated @RequestParam(value = "key",required = false) String key,
 														   @Validated @RequestParam(value = "hallOrderNo") String hallOrderNo,
 														   @Validated @RequestParam(value = "amount",required = false) BigDecimal amount,
-														   @Validated @RequestParam(value = "type") String type) {
-		HallQueryResultDTO resultDTO = service.queryUserInfo(userId,hallOrderNo,amount,type);
+														   @Validated @RequestParam(value = "type",required = false) String type) {
+		HallQueryResultDTO resultDTO = service.queryUserOrOrderInfo(key,hallOrderNo,amount,type);
 		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 

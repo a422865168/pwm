@@ -216,5 +216,11 @@ public class PwmConstants {
      */
     public static final String AC_ITEM_FEE_PAY_WIDR="6021010002";
 
+	/**
+	 * 手机号国家编码
+	 * 柬埔寨：
+	 */
+	public static final String COUNTRY_CODE_KHM="855";
+
 
 }

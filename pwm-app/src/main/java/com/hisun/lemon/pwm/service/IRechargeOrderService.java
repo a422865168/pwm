@@ -24,13 +24,13 @@ public interface IRechargeOrderService {
 
     /**
      * 查询用户与订单信息
-     * @param userId
+     * @param key
      * @param hallOrderNo
      * @param amount
      * @param type
      * @return
      */
-    public HallQueryResultDTO queryUserInfo(String userId,String hallOrderNo,BigDecimal amount,String type);
+    public HallQueryResultDTO queryUserOrOrderInfo(String key,String hallOrderNo,BigDecimal amount,String type);
 
     /**
      * 营业厅充值处理
