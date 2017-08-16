@@ -406,18 +406,22 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			}
 
 			UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
-			TradeRateReqDTO tradeFeeReqDTO = new TradeRateReqDTO();
-			tradeFeeReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
-			tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
-			GenericDTO<TradeRateReqDTO> genericTradeRateReqDTO = new GenericDTO<>();
-			genericTradeRateReqDTO.setBody(tradeFeeReqDTO);
 
-			GenericRspDTO<TradeRateRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeRate(genericTradeRateReqDTO);
-			TradeRateRspDTO tradeRateRspDTO = genericTradeFeeRspDTO.getBody();
-			//费率
-			BigDecimal tradeFee = tradeRateRspDTO.getRate();
+			if(JudgeUtils.isNotNull(amount)){
+				TradeRateReqDTO tradeFeeReqDTO = new TradeRateReqDTO();
+				tradeFeeReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
+				tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
+				GenericDTO<TradeRateReqDTO> genericTradeRateReqDTO = new GenericDTO<>();
+				genericTradeRateReqDTO.setBody(tradeFeeReqDTO);
 
-			hallQueryResultDTO.setFee(tradeFee.multiply(amount));
+				GenericRspDTO<TradeRateRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeRate(genericTradeRateReqDTO);
+				TradeRateRspDTO tradeRateRspDTO = genericTradeFeeRspDTO.getBody();
+				//费率
+				BigDecimal tradeFee = tradeRateRspDTO.getRate();
+
+				hallQueryResultDTO.setFee(amount.multiply(tradeFee));
+			}
+
 			hallQueryResultDTO.setUmId(userBasicInfDTO.getUserId());
 			hallQueryResultDTO.setKey(key);
 
@@ -434,6 +438,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			if(JudgeUtils.isNotNull(rechargeOrderDO)) {
 				hallQueryResultDTO.setHallOrderNo(rechargeOrderDO.getExtOrderNo());
 				hallQueryResultDTO.setOrderStatus(rechargeOrderDO.getOrderStatus());
+				hallQueryResultDTO.setOrderNo(rechargeOrderDO.getOrderNo());
+				hallQueryResultDTO.setOrderAmt(rechargeOrderDO.getOrderAmt());
+				hallQueryResultDTO.setOrderTm(rechargeOrderDO.getOrderTm());
+				hallQueryResultDTO.setOrderSuccTm(rechargeOrderDO.getOrderSuccTm());
 			}
 		}
 		return hallQueryResultDTO;
