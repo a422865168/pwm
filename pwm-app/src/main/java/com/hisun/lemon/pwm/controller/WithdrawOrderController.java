@@ -37,6 +37,7 @@ public class WithdrawOrderController {
 	@PostMapping(value = "/order")
 	public GenericRspDTO createOrder(@Validated @RequestBody GenericDTO<WithdrawDTO> genericWithdrawDTO) {
 
+		genericWithdrawDTO.getBody().setUserId(LemonUtils.getUserId());
 		WithdrawRspDTO withdrawRspDTO = withdrawOrderService.createOrder(genericWithdrawDTO);
 		return GenericRspDTO.newSuccessInstance(withdrawRspDTO);
 	}
@@ -66,4 +67,37 @@ public class WithdrawOrderController {
 		genericDTO.setMsgCd(LemonUtils.getSuccessMsgCd());
 		return genericDTO;
 	}
+
+	/**
+	 * 查询可提现银行
+	 */
+	@ApiOperation(value = "查询可提现银行", notes = "查询可提现银行列表")
+	@ApiResponse(code = 200, message = "查询可提现银行结果")
+	@GetMapping(value = "/bank")
+	public GenericRspDTO<WithdrawBankRspDTO> queryWithdrawBank(){
+		WithdrawBankRspDTO withdrawBankRspDTO = withdrawOrderService.queryBank();
+		return GenericRspDTO.newSuccessInstance(withdrawBankRspDTO);
+	}
+
+	/**
+	 * 添加提现银行卡
+	 */
+	@ApiOperation(value = "添加提现银行卡", notes = "添加提现银行卡")
+	@ApiResponse(code = 200, message = "添加提现银行卡")
+	@PostMapping(value = "/add")
+	public GenericRspDTO addWithdrawCard(@Validated @RequestBody GenericDTO<WithdrawCardBindDTO> genericWithdrawCardBindDTO){
+		withdrawOrderService.addCard(genericWithdrawCardBindDTO);
+		return GenericRspDTO.newSuccessInstance();
+	}
+
+    /**
+     * 查询已添加的银行卡
+     */
+    @ApiOperation(value = "查询可提现银行", notes = "查询可提现银行列表")
+    @ApiResponse(code = 200, message = "查询可提现银行结果")
+    @GetMapping(value = "/bank")
+    public GenericRspDTO queryWithdrawCard(){
+        //WithdrawBankRspDTO withdrawBankRspDTO = withdrawOrderService.queryCard();
+        return GenericRspDTO.newSuccessInstance();
+    }
 }

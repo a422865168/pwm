@@ -12,11 +12,16 @@ public class PwmConstants {
 	public static final String R_ORD_GEN_PRE="pwmRechangeOrdNo"; 
 	
 	/**
-	 * 生成充值订单号的前缀
+	 * 生成提现订单号的前缀
 	 */
-	public static final String W_ORD_GEN_PRE="pwmWithdrawOrdNo"; 
-	
-	/**
+	public static final String W_ORD_GEN_PRE="pwmWithdrawOrdNo";
+
+    /**
+     * 生成提现银行卡主键的前缀
+     */
+    public static final String W_CRD_GEN_PRE="pwmWithdrawCardNo";
+
+    /**
 	 * 交易类型：充值
 	 */
 	public static final String TX_TYPE_RECHANGE="01";

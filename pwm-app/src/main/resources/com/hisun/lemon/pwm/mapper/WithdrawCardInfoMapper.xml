@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisun.lemon.pwm.dao.IWithdrawCardInfoDao" >
+
+    <resultMap id="BaseResultMap" type="com.hisun.lemon.pwm.entity.WithdrawCardInfoDO" >
+        <id column="bin_id" property="binId" jdbcType="VARCHAR" />
+        <result column="card_bin" property="cardBin" jdbcType="VARCHAR" />
+        <result column="cap_corg" property="capCorg" jdbcType="VARCHAR" />
+        <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
+        <result column="card_ac_type" property="cardAcType" jdbcType="CHAR" />
+        <result column="card_length" property="cardLength" jdbcType="INTEGER" />
+        <result column="opr_id" property="oprId" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        card_bin, cap_corg, bank_name, card_ac_type, card_length, opr_id
+    </sql>
+
+    <select id="get" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="Base_Column_List" />
+        from pwm_withdraw_bank
+        where bin_id = #{binId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="query" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from pwm_withdraw_bank
+    </select>
+
+    <delete id="delete" parameterType="java.lang.String" >
+        delete from pwm_withdraw_bank
+        where bin_id = #{binId,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.hisun.lemon.pwm.entity.WithdrawCardInfoDO" >
+        insert into pwm_withdraw_bank
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="binId != null" >
+                bin_id,
+            </if>
+            <if test="cardBin != null" >
+                card_bin,
+            </if>
+            <if test="capCorg != null" >
+                cap_corg,
+            </if>
+            <if test="bankName != null" >
+                bank_name,
+            </if>
+            <if test="cardAcType != null" >
+                card_ac_type,
+            </if>
+            <if test="cardLength != null" >
+                card_length,
+            </if>
+            <if test="oprId != null" >
+                opr_id,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="modifyTime != null" >
+                modify_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="binId != null" >
+                #{binId,jdbcType=VARCHAR},
+            </if>
+            <if test="cardBin != null" >
+                #{cardBin,jdbcType=VARCHAR},
+            </if>
+            <if test="capCorg != null" >
+                #{capCorg,jdbcType=VARCHAR},
+            </if>
+            <if test="bankName != null" >
+                #{bankName,jdbcType=VARCHAR},
+            </if>
+            <if test="cardAcType != null" >
+                #{cardAcType,jdbcType=CHAR},
+            </if>
+            <if test="cardLength != null" >
+                #{cardLength,jdbcType=INTEGER},
+            </if>
+            <if test="oprId != null" >
+                #{oprId,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null" >
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.hisun.lemon.pwm.entity.WithdrawCardInfoDO" >
+        update pwm_withdraw_bank
+        <set >
+            <if test="cardBin != null" >
+                card_bin = #{cardBin,jdbcType=VARCHAR},
+            </if>
+            <if test="capCorg != null" >
+                cap_corg = #{capCorg,jdbcType=VARCHAR},
+            </if>
+            <if test="bankName != null" >
+                bank_name = #{bankName,jdbcType=VARCHAR},
+            </if>
+            <if test="cardAcType != null" >
+                card_ac_type = #{cardAcType,jdbcType=CHAR},
+            </if>
+            <if test="cardLength != null" >
+                card_length = #{cardLength,jdbcType=INTEGER},
+            </if>
+            <if test="oprId != null" >
+                opr_id = #{oprId,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null" >
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where bin_id = #{binId,jdbcType=VARCHAR}
+    </update>
+</mapper>

@@ -2,10 +2,7 @@ package com.hisun.lemon.pwm.service;
 
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.pwm.dto.WithdrawRateDTO;
-import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
-import com.hisun.lemon.pwm.dto.WithdrawDTO;
-import com.hisun.lemon.pwm.dto.WithdrawRspDTO;
+import com.hisun.lemon.pwm.dto.*;
 import com.hisun.lemon.tfm.dto.TradeRateRspDTO;
 
 /**
@@ -33,4 +30,16 @@ public interface IWithdrawOrderService {
      * @param withdrawRateDTO
      */
     public GenericRspDTO<WithdrawResultDTO> queryRate(WithdrawRateDTO withdrawRateDTO);
+
+    /**
+     * 查询提现银行
+     * @return
+     */
+    public WithdrawBankRspDTO queryBank();
+
+    /**
+     * 添加提现银行卡
+     * @param genericWithdrawCardBindDTO
+     */
+    public GenericRspDTO addCard(GenericDTO<WithdrawCardBindDTO> genericWithdrawCardBindDTO);
 }
