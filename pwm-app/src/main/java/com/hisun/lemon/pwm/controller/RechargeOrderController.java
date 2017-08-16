@@ -53,21 +53,12 @@ public class RechargeOrderController {
 		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 
-	@ApiOperation(value = "营业厅充值申请", notes = "接收营业厅的充值申请请求")
-	@ApiResponse(code = 200, message = "营业厅充值申请结果")
-	@PostMapping(value = "/hall/application")
+	@ApiOperation(value = "营业厅充值", notes = "接收营业厅的充值请求")
+	@ApiResponse(code = 200, message = "营业厅充值结果")
+	@PostMapping(value = "/hall")
 	public GenericRspDTO<HallRechargeResultDTO> hallRecharge(
 			@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO) {
-		HallRechargeResultDTO resultDTO = service.hallRecharge(genericResultDTO.getBody());
-		return GenericRspDTO.newSuccessInstance(resultDTO);
-	}
-
-	@ApiOperation(value = "营业厅充值确认", notes = "接收营业厅的充值确认请求")
-	@ApiResponse(code = 200, message = "营业厅充值确认结果")
-	@PatchMapping(value = "/hall/acknowledgement")
-	public GenericRspDTO<HallRechargeResultDTO> hallRechargeConfirm(
-			@Validated @RequestBody GenericDTO<HallRechargeApplyDTO> genericResultDTO) {
-		HallRechargeResultDTO resultDTO = service.hallRechargeConfirm(genericResultDTO.getBody());
+		HallRechargeResultDTO resultDTO = service.hallRechargePay(genericResultDTO.getBody());
 		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 

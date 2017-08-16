@@ -33,18 +33,12 @@ public interface IRechargeOrderService {
     public HallQueryResultDTO queryUserInfo(String userId,String hallOrderNo,BigDecimal amount,String type);
 
     /**
-     * 营业厅充值申请处理
+     * 营业厅充值处理
      * @param dto
      * @return
      */
-    public HallRechargeResultDTO hallRecharge(HallRechargeApplyDTO dto);
+    public HallRechargeResultDTO hallRechargePay(HallRechargeApplyDTO dto);
 
-    /**
-     * 营业厅充值确认处理
-     * @param dto
-     * @return
-     */
-    public HallRechargeResultDTO hallRechargeConfirm(HallRechargeApplyDTO dto);
     
     /**
      * 海币充值下单

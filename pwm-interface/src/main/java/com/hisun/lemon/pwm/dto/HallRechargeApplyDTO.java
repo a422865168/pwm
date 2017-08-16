@@ -73,13 +73,12 @@ public class HallRechargeApplyDTO {
 
 		/**
 		 * 状态:<br/>
-		 * A:申请<br/>
-		 * O:确认<br/>
-		 * C:取消<br/>
+		 * A:充值<br/>
+		 * C:撤销<br/>
 		 */
-		@ApiModelProperty(name = "status", value = "营业厅充值操作状态(A:申请|O:确认|C:取消)",required = true)
+		@ApiModelProperty(name = "status", value = "营业厅充值操作状态(A:充值|C:撤销)",required = true)
 		@NotEmpty(message="PWM10014")
-		@Pattern(regexp="A|O|C",message="PWM10015")
+		@Pattern(regexp="A|C",message="PWM10015")
 		@Length(max = 1)
 		private String status;
 
