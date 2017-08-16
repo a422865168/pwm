@@ -1,7 +1,7 @@
 spring :
   redis :
     database : 0
-    host : 120.76.22.56
+    host : 192.168.1.39
     port : 6379
     password : Hisunpay2017
     pool : 
@@ -258,7 +258,7 @@ pagehelper :
   defaultPageSize : 8
   
 swagger :
-  profiles : DEV,SIT,CI
+  profiles : dev,sit,ci
   show : true
   version : 1.0
   globleRequestParams :

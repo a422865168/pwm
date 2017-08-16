@@ -1,6 +1,8 @@
 package com.hisun.lemon.pwm.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,6 +17,9 @@ import io.swagger.annotations.ApiModelProperty;
  */
 @ApiModel("营业厅充值查询结果传输对象")
 public class HallQueryResultDTO {
+
+	@ApiModelProperty(name = "orderNo", value = "平台充值订单号")
+	private  String orderNo;
 	/**
 	 * 查询关键字
 	 */
@@ -49,6 +54,21 @@ public class HallQueryResultDTO {
 	 */
 	@ApiModelProperty(name = "orderStatus", value = "营业厅充值订单状态")
 	private  String orderStatus;
+
+	@ApiModelProperty(name = "orderAmt", value = "订单金额")
+	private  BigDecimal orderAmt;
+
+	/**
+	 * 下单时间
+	 */
+	@ApiModelProperty(name = "orderTm", value = "下单时间")
+	private LocalDateTime orderTm;
+
+	/**
+	 * 订单交易成功时间
+	 */
+	@ApiModelProperty(name = "orderTm", value = "交易完成时间")
+	private LocalDateTime orderSuccTm;
 
 	public String getKey() {
 		return key;
@@ -96,5 +116,37 @@ public class HallQueryResultDTO {
 
 	public void setOrderStatus(String orderStatus) {
 		this.orderStatus = orderStatus;
+	}
+
+	public String getOrderNo() {
+		return orderNo;
+	}
+
+	public void setOrderNo(String orderNo) {
+		this.orderNo = orderNo;
+	}
+
+	public BigDecimal getOrderAmt() {
+		return orderAmt;
+	}
+
+	public void setOrderAmt(BigDecimal orderAmt) {
+		this.orderAmt = orderAmt;
+	}
+
+	public LocalDateTime getOrderTm() {
+		return orderTm;
+	}
+
+	public void setOrderTm(LocalDateTime orderTm) {
+		this.orderTm = orderTm;
+	}
+
+	public LocalDateTime getOrderSuccTm() {
+		return orderSuccTm;
+	}
+
+	public void setOrderSuccTm(LocalDateTime orderSuccTm) {
+		this.orderSuccTm = orderSuccTm;
 	}
 }

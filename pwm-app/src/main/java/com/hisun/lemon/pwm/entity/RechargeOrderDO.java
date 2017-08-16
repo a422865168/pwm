@@ -71,6 +71,11 @@ public class RechargeOrderDO extends BaseDO {
      * @Fields extOrderNo  外部订单号
      */
     private String extOrderNo;
+
+    /**
+     * @Fields crdCorpOrg  资金机构
+     */
+    private String crdCorpOrg;
   
 
     public String getOrderNo() {
@@ -199,5 +204,13 @@ public class RechargeOrderDO extends BaseDO {
 
     public String getExtOrderNo() {
         return extOrderNo;
+    }
+
+    public String getCrdCorpOrg() {
+        return crdCorpOrg;
+    }
+
+    public void setCrdCorpOrg(String crdCorpOrg) {
+        this.crdCorpOrg = crdCorpOrg;
     }
 }

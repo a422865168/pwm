@@ -21,12 +21,13 @@
         <result column="modify_opr" property="modifyOpr" jdbcType="VARCHAR" />
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+        <result column="corp_org" property="crdCorpOrg" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="Base_Column_List" >
         order_no, order_tm, ac_tm, tx_type, bus_type, order_ccy, order_amt, order_status, 
         order_succ_tm, psn_flag, order_exp_tm, sys_channel, ip_address, remark,ext_order_no, modify_opr,
-        create_time, modify_time
+        create_time, modify_time,corp_org
     </sql>
 
     <select id="get" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -98,6 +99,9 @@
             <if test="extOrderNo != null" >
                 ext_order_no,
             </if>
+            <if test="crdCorpOrg != null" >
+                corp_org,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null" >
@@ -154,6 +158,9 @@
             <if test="extOrderNo != null" >
                 #{extOrderNo,jdbcType=VARCHAR},
             </if>
+            <if test="crdCorpOrg != null" >
+                #{crdCorpOrg,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
 
@@ -207,7 +214,10 @@
             </if>
             <if test="modifyTime != null" >
                 modify_time = #{modifyTime,jdbcType=TIMESTAMP},
-            </if> 
+            </if>
+            <if test="crdCorpOrg != null" >
+                corp_org = #{crdCorpOrg,jdbcType=VARCHAR},
+            </if>
         </set>
         where order_no = #{orderNo,jdbcType=VARCHAR}
     </update>
@@ -217,5 +227,25 @@
         <include refid="Base_Column_List" />
         from pwm_rechange_order
         where ext_order_no = #{extOrderNo,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryList" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        from csh_order
+        <where>
+            <if test="acTm != null">
+                <![CDATA[and ac_tm = #{acTm}]]>
+            </if>
+
+
+            <if test="statusList != null">
+                and order_status in
+                <foreach item="item" index="index" collection="statusList"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
     </select>
 </mapper>

@@ -149,4 +149,24 @@
         </set>
         where order_no = #{orderNo,jdbcType=VARCHAR}
     </update>
+
+    <select id="queryList" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        from csh_order
+        <where>
+            <if test="acTm != null">
+                <![CDATA[and ac_tm = #{acTm}]]>
+            </if>
+
+
+            <if test="statusList != null">
+                and order_status in
+                <foreach item="item" index="index" collection="statusList"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

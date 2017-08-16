@@ -3,12 +3,9 @@ package com.hisun.lemon.pwm.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 
 
@@ -21,13 +18,6 @@ import java.math.BigDecimal;
  */
 @ApiModel("线下汇款充值申请传输对象")
 public class OfflineRechargeApplyDTO {
-
-	/**
-	 * 充值订单号
-	 */
-	@ApiModelProperty(name = "orderNo", value = "充值订单号")
-	@Length(max =24)
-	private String orderNo;
 
 	/**
 	 * 充值金额
@@ -92,14 +82,6 @@ public class OfflineRechargeApplyDTO {
 
 	public void setPsnFlag(String psnFlag) {
 		this.psnFlag = psnFlag;
-	}
-
-	public String getOrderNo() {
-		return orderNo;
-	}
-
-	public void setOrderNo(String orderNo) {
-		this.orderNo = orderNo;
 	}
 
 	public String getCrdCorpOrg() {

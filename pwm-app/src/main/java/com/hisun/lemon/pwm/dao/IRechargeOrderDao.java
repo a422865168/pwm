@@ -11,8 +11,13 @@ import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+import java.util.Map;
+
 @Mapper
 public interface IRechargeOrderDao extends BaseDao<RechargeOrderDO> {
 
 	public RechargeOrderDO getRechargeOrderByExtOrderNo(@Param("extOrderNo")String extOrderNo);
+
+	public List<RechargeOrderDO> queryList(Map o);
 }

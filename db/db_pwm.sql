@@ -25,6 +25,7 @@ CREATE TABLE `pwm_rechange_order` (
   `modify_opr` varchar(20) DEFAULT NULL,
   `create_time` datetime NOT NULL,
   `modify_time` datetime NOT NULL,
+  `corp_org` varchar(16) DEFAULT '',
   `tm_smp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`order_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
