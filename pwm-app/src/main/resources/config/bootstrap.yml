@@ -8,6 +8,6 @@ server :
 eureka :
   client :
     serviceUrl :
-      defaultZone : http://120.76.22.56:9002/eureka/
+      defaultZone : http://192.168.1.38:9002/eureka/
   instance :
     preferIpAddress : true
