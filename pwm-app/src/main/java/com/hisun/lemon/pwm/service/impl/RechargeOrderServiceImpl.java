@@ -519,8 +519,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		String balAcNo=acmComponent.getAcmAcNo(bussinessBody.getPayerId(), balCapType);
 //		借：其他应付款-暂收-收银台
 		cshItemReqDTO=acmComponent.createAccountingReqDTO(
-				hallPayResult.getCashierOrderNo(),
-				hallPayResult.getTxJrnNo(),
+				rechargeOrderDO.getOrderNo(),
+				genericRspHallPaymentResult.getRequestId(),
 				PwmConstants.TX_TYPE_RECHANGE,
 				ACMConstants.ACCOUNTING_NOMARL,
 				hallPayResult.getAmount(),
@@ -536,8 +536,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				null);
 //		贷：其他应付款-支付账户-现金账户
 		userAccountReqDTO=acmComponent.createAccountingReqDTO(
-				hallPayResult.getCashierOrderNo(),
-				hallPayResult.getTxJrnNo(),
+				rechargeOrderDO.getOrderNo(),
+				genericRspHallPaymentResult.getRequestId(),
 				PwmConstants.TX_TYPE_RECHANGE,
 				ACMConstants.ACCOUNTING_NOMARL,
 				hallPayResult.getAmount(),
