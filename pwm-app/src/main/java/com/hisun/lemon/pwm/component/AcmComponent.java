@@ -149,7 +149,7 @@ public class AcmComponent {
 		GenericRspDTO<NoBody> accountingTreatment = accountingTreatmentClient.accountingTreatment(userAccDto);
 
 		if (JudgeUtils.isNotSuccess(accountingTreatment.getMsgCd())) {
-			throw new LemonException(accountingTreatment.getMsgCd());
+			LemonException.throwBusinessException(accountingTreatment.getMsgCd());
 		}
 		return accountingTreatment;
 	}
