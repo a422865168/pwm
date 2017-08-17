@@ -49,7 +49,7 @@ public class RechargeHCouponResultDTO {
 	 */
 	@ApiModelProperty(name = "orderNo", value = "海币充值订单编号")
 	@NotEmpty(message = "PWM10021")
-	@Length(max=24)
+	@Length(max=25)
 	private String orderNo;
 	public String getOrderNo() {
 		return orderNo;
