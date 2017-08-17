@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -310,11 +311,15 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
      * @return
      */
     @Override
-    public WithdrawBankRspDTO queryBank() {
+    public List<WithdrawBankRspDTO> queryBank(GenericDTO genericDTO) {
 
-        WithdrawCardInfoDO withdrawCardInfoDO = withdrawCardInfoDao.query();
-        WithdrawBankRspDTO withdrawBankRspDTO = new WithdrawBankRspDTO();
-        BeanUtils.copyProperties(withdrawBankRspDTO, withdrawCardInfoDO);
+        List<WithdrawCardInfoDO> withdrawCardInfoDO = withdrawCardInfoDao.query();
+        List<WithdrawBankRspDTO> withdrawBankRspDTO = new ArrayList();
+        for(WithdrawCardInfoDO withdrawCardInfoDO1 : withdrawCardInfoDO) {
+            WithdrawBankRspDTO withdrawBankRspDTO1 = new WithdrawBankRspDTO();
+            BeanUtils.copyProperties(withdrawBankRspDTO1, withdrawCardInfoDO1);
+            withdrawBankRspDTO.add(withdrawBankRspDTO1);
+        }
         return withdrawBankRspDTO;
     }
 
@@ -340,29 +345,68 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         //判断提现银行卡是否存在
         if(JudgeUtils.isNotNull(withdrawCardBindDO1)){
             //判断提现银行卡状态是否失效
-            if(JudgeUtils.equals("1",withdrawCardBindDO1.getCardStatus())){
+            if(JudgeUtils.equals(PwmConstants.WITHDRAW_CARD_STAT_EFF,withdrawCardBindDO1.getCardStatus())){
                 LemonException.throwBusinessException("PWM30012");
             }
-            if(JudgeUtils.equals("0",withdrawCardBindDO1.getCardStatus())){
+            if(JudgeUtils.equals(PwmConstants.WITHDRAW_CARD_STAT_FAIL,withdrawCardBindDO1.getCardStatus())){
                 //失效则更新状态
                 WithdrawCardBindDO withdrawCardBindDO2 = new WithdrawCardBindDO();
                 withdrawCardBindDO2.setCardNo(cardNoEnc);
-                withdrawCardBindDO2.setCardStatus("1");
+                withdrawCardBindDO2.setCardStatus(PwmConstants.WITHDRAW_CARD_STAT_EFF);
                 withdrawCardBindDO2.setEftTm(DateTimeUtils.getCurrentLocalDateTime());
                 withdrawCardBindDO2.setFailTm("");
                 withdrawCardBindDO2.setCardId(withdrawCardBindDO1.getCardId());
                 withdrawOrderTransactionalService.updateCard(withdrawCardBindDO2);
             }
         }else{
-            //提现银行卡不存在，则添加入库
+            //提现银行卡不存在，则填充数据，添加入库
             String ymd= DateTimeUtils.getCurrentDateStr();
             String orderNo= IdGenUtils.generateId(PwmConstants.W_CRD_GEN_PRE+ymd,15);
             withdrawCardBindDO.setCardId(ymd+orderNo);
             withdrawCardBindDO.setEftTm(DateTimeUtils.getCurrentLocalDateTime());
-            withdrawCardBindDO.setUserId(LemonUtils.getUserId());
             withdrawCardBindDO.setCardNoLast(cardNo.substring(cardNo.length()-4));
             withdrawOrderTransactionalService.addCard(withdrawCardBindDO);
         }
         return GenericRspDTO.newSuccessInstance();
+    }
+
+    /**
+     * 查询已添加提现银行卡
+     * @param genericDTO
+     * @return
+     */
+    @Override
+    public List<WithdrawCardQueryDTO> queryCard(GenericDTO genericDTO) {
+        List<WithdrawCardBindDO> withdrawCardBindDO = withdrawCardBindDao.queryCardList(LemonUtils.getUserId());
+        List<WithdrawCardQueryDTO> withdrawCardQueryDTO = new ArrayList();
+        for(WithdrawCardBindDO withdrawCardBindDO1 : withdrawCardBindDO) {
+            WithdrawCardQueryDTO withdrawCardQueryDTO1 = new WithdrawCardQueryDTO();
+            BeanUtils.copyProperties(withdrawCardQueryDTO1, withdrawCardBindDO1);
+            withdrawCardQueryDTO.add(withdrawCardQueryDTO1);
+        }
+        return withdrawCardQueryDTO;
+    }
+
+    /**
+     * 删除提现银行卡
+     * @param genericWithdrawCardDelDTO
+     * @return
+     */
+    @Override
+    public GenericRspDTO delCard(GenericDTO<WithdrawCardDelDTO> genericWithdrawCardDelDTO) {
+        WithdrawCardDelDTO withdrawCardDelDTO = genericWithdrawCardDelDTO.getBody();
+        WithdrawCardBindDO withdrawCardBindDO = withdrawCardBindDao.get(withdrawCardDelDTO.getCardId());
+        if(JudgeUtils.isNull(withdrawCardBindDO)){
+            LemonException.throwBusinessException("PWM30013");
+        }
+        if(JudgeUtils.isNotNull(withdrawCardBindDO) && JudgeUtils.equals(PwmConstants.WITHDRAW_CARD_STAT_FAIL, withdrawCardBindDO.getCardStatus())){
+            LemonException.throwBusinessException("PWM30014");
+        }
+        WithdrawCardBindDO withdrawCardBindDO1 = new WithdrawCardBindDO();
+        withdrawCardBindDO1.setCardId(withdrawCardBindDO.getCardId());
+        withdrawCardBindDO1.setCardStatus(PwmConstants.WITHDRAW_CARD_STAT_FAIL);
+        withdrawCardBindDO1.setFailTm(DateTimeUtils.getCurrentDateTimeStr("yyyy-MM-dd HH:mm:ss"));
+        withdrawOrderTransactionalService.updateCard(withdrawCardBindDO1);
+        return null;
     }
 }

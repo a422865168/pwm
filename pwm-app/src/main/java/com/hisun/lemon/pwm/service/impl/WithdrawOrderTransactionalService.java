@@ -63,12 +63,12 @@ public class WithdrawOrderTransactionalService {
 
     /**
      * 更新银行卡状态
-     * @param withdrawCardBindDO2
+     * @param withdrawCardBindDO
      */
-    public void updateCard(WithdrawCardBindDO withdrawCardBindDO2) {
-        int num = withdrawCardBindDao.update(withdrawCardBindDO2);
+    public void updateCard(WithdrawCardBindDO withdrawCardBindDO) {
+        int num = withdrawCardBindDao.update(withdrawCardBindDO);
         if(num != 1){
-            LemonException.throwBusinessException("PWM20005");
+            LemonException.throwBusinessException("PWM20019");
         }
     }
 

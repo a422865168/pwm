@@ -227,5 +227,13 @@ public class PwmConstants {
 	 */
 	public static final String COUNTRY_CODE_KHM="855";
 
+	/**
+	 * 提现银行卡状态"1"：生效
+	 */
+	public static final String WITHDRAW_CARD_STAT_EFF="1";
 
+	/**
+	 * 提现银行卡状态"0"：失效
+	 */
+	public static final String WITHDRAW_CARD_STAT_FAIL="0";
 }

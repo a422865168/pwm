@@ -11,9 +11,13 @@ import com.hisun.lemon.pwm.entity.WithdrawCardBindDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Mapper
 @Component
 public interface IWithdrawCardBindDao extends BaseDao<WithdrawCardBindDO> {
     //查询提现银行卡号是否存在
-    public WithdrawCardBindDO query(String card_no);
+    public WithdrawCardBindDO query(String cardNo);
+    //查询已添加提现银行卡
+    public List<WithdrawCardBindDO> queryCardList(String userid);
 }

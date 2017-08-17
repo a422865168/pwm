@@ -11,8 +11,10 @@ import com.hisun.lemon.pwm.entity.WithdrawCardInfoDO;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Mapper
 @Component
 public interface IWithdrawCardInfoDao extends BaseDao<WithdrawCardInfoDO> {
-    public WithdrawCardInfoDO query();
+    public List<WithdrawCardInfoDO> query();
 }

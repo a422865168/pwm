@@ -17,6 +17,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 
+import java.util.List;
+
 
 @Api(value = "处理提现")
 @RestController
@@ -74,8 +76,8 @@ public class WithdrawOrderController {
 	@ApiOperation(value = "查询可提现银行", notes = "查询可提现银行列表")
 	@ApiResponse(code = 200, message = "查询可提现银行结果")
 	@GetMapping(value = "/bank")
-	public GenericRspDTO<WithdrawBankRspDTO> queryWithdrawBank(){
-		WithdrawBankRspDTO withdrawBankRspDTO = withdrawOrderService.queryBank();
+	public GenericRspDTO<List<WithdrawBankRspDTO>> queryWithdrawBank(GenericDTO genericDTO){
+		List<WithdrawBankRspDTO> withdrawBankRspDTO = withdrawOrderService.queryBank(genericDTO);
 		return GenericRspDTO.newSuccessInstance(withdrawBankRspDTO);
 	}
 
@@ -86,8 +88,8 @@ public class WithdrawOrderController {
 	@ApiResponse(code = 200, message = "添加提现银行卡")
 	@PostMapping(value = "/add")
 	public GenericRspDTO addWithdrawCard(@Validated @RequestBody GenericDTO<WithdrawCardBindDTO> genericWithdrawCardBindDTO){
-		withdrawOrderService.addCard(genericWithdrawCardBindDTO);
-		return GenericRspDTO.newSuccessInstance();
+		genericWithdrawCardBindDTO.getBody().setUserId(LemonUtils.getUserId());
+		return withdrawOrderService.addCard(genericWithdrawCardBindDTO);
 	}
 
     /**
@@ -95,9 +97,19 @@ public class WithdrawOrderController {
      */
     @ApiOperation(value = "查询可提现银行", notes = "查询可提现银行列表")
     @ApiResponse(code = 200, message = "查询可提现银行结果")
-    @GetMapping(value = "/bank")
-    public GenericRspDTO queryWithdrawCard(){
-        //WithdrawBankRspDTO withdrawBankRspDTO = withdrawOrderService.queryCard();
-        return GenericRspDTO.newSuccessInstance();
+    @GetMapping(value = "/card")
+    public GenericRspDTO<List<WithdrawCardQueryDTO>> queryWithdrawCard(GenericDTO genericDTO){
+        List<WithdrawCardQueryDTO> withdrawCardQueryDTO = withdrawOrderService.queryCard(genericDTO);
+        return GenericRspDTO.newSuccessInstance(withdrawCardQueryDTO);
     }
+
+	/**
+	 * 删除提现银行卡
+	 */
+	@ApiOperation(value = "删除提现银行卡", notes = "删除提现银行卡")
+	@ApiResponse(code = 200, message = "删除提现银行卡")
+	@PutMapping(value = "/del")
+	public GenericRspDTO delWithdrawCard(@Validated @RequestBody GenericDTO<WithdrawCardDelDTO> genericWithdrawCardDelDTO){
+		return withdrawOrderService.delCard(genericWithdrawCardDelDTO);
+	}
 }

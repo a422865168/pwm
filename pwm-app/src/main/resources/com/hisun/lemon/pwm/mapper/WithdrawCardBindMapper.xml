@@ -8,7 +8,7 @@
         <result column="card_no_last" property="cardNoLast" jdbcType="VARCHAR" />
         <result column="branch_name" property="branchName" jdbcType="VARCHAR" />
         <result column="user_id" property="userId" jdbcType="VARCHAR" />
-        <result column="card_bin" property="cardBin" jdbcType="VARCHAR" />
+        <result column="cap_corg" property="capCorg" jdbcType="VARCHAR" />
         <result column="card_status" property="cardStatus" jdbcType="CHAR" />
         <result column="eft_tm" property="eftTm" jdbcType="TIMESTAMP" />
         <result column="fail_tm" property="failTm" jdbcType="VARCHAR" />
@@ -18,7 +18,7 @@
     </resultMap>
 
     <sql id="Base_Column_List" >
-        card_id, card_no, card_no_last, branch_name, user_id, card_bin, card_status, eft_tm, 
+        card_id, card_no, card_no_last, branch_name, user_id, cap_corg, card_status, eft_tm, 
         fail_tm, remark
     </sql>
 
@@ -34,6 +34,13 @@
         <include refid="Base_Column_List" />
         from pwm_withdraw_card
         where card_no = #{cardNo,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryCardList" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_withdraw_card
+        where card_status="1" and user_id = #{userId,jdbcType=VARCHAR}
     </select>
 
     <delete id="delete" parameterType="java.lang.String" >
@@ -59,8 +66,8 @@
             <if test="userId != null" >
                 user_id,
             </if>
-            <if test="cardBin != null" >
-                card_bin,
+            <if test="capCorg != null" >
+                cap_corg,
             </if>
             <if test="cardStatus != null" >
                 card_status,
@@ -97,8 +104,8 @@
             <if test="userId != null" >
                 #{userId,jdbcType=VARCHAR},
             </if>
-            <if test="cardBin != null" >
-                #{cardBin,jdbcType=VARCHAR},
+            <if test="capCorg != null" >
+                #{capCorg,jdbcType=VARCHAR},
             </if>
             <if test="cardStatus != null" >
                 #{cardStatus,jdbcType=CHAR},
@@ -136,8 +143,8 @@
             <if test="userId != null" >
                 user_id = #{userId,jdbcType=VARCHAR},
             </if>
-            <if test="cardBin != null" >
-                card_bin = #{cardBin,jdbcType=VARCHAR},
+            <if test="capCorg != null" >
+                cap_corg = #{capCorg,jdbcType=VARCHAR},
             </if>
             <if test="cardStatus != null" >
                 card_status = #{cardStatus,jdbcType=CHAR},

@@ -31,9 +31,9 @@ public class WithdrawCardBindDO extends BaseDO {
      */
     private String userId;
     /**
-     * @Fields cardBin 卡bin
+     * @Fields capCorg 资金机构
      */
-    private String cardBin;
+    private String capCorg;
     /**
      * @Fields cardStatus 卡状态 1生效 0失效
      */
@@ -91,12 +91,12 @@ public class WithdrawCardBindDO extends BaseDO {
         this.userId = userId;
     }
 
-    public String getCardBin() {
-        return cardBin;
+    public String getCapCorg() {
+        return capCorg;
     }
 
-    public void setCardBin(String cardBin) {
-        this.cardBin = cardBin;
+    public void setCapCorg(String capCorg) {
+        this.capCorg = capCorg;
     }
 
     public String getCardStatus() {
