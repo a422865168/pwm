@@ -22,12 +22,6 @@ import java.math.BigDecimal;
 @ApiModel("海币充值结果")
 public class RechargeHCouponResultDTO {
 	/**
-	 * @Fields userId 内部用户号
-	 */
-	@ApiModelProperty(name = "userId", value = "内部用户号")
-	@Length(max=24)
-	private String userId;
-	/**
 	 * 充值金额
 	 */
 	@ApiModelProperty(name = "orderAmt", value = "充值金额")
@@ -63,16 +57,6 @@ public class RechargeHCouponResultDTO {
 
 	public void setOrderNo(String orderNo) {
 		this.orderNo = orderNo;
-	}
-
-
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public BigDecimal getOrderAmt() {
