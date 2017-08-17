@@ -2,11 +2,10 @@ package com.hisun.lemon.pwm.service;
 
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.pwm.dto.WithdrawRateDTO;
-import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
-import com.hisun.lemon.pwm.dto.WithdrawDTO;
-import com.hisun.lemon.pwm.dto.WithdrawRspDTO;
+import com.hisun.lemon.pwm.dto.*;
 import com.hisun.lemon.tfm.dto.TradeRateRspDTO;
+
+import java.util.List;
 
 /**
  * @author tone
@@ -33,4 +32,30 @@ public interface IWithdrawOrderService {
      * @param withdrawRateDTO
      */
     public GenericRspDTO<WithdrawResultDTO> queryRate(WithdrawRateDTO withdrawRateDTO);
+
+    /**
+     * 查询提现银行
+     * @return
+     */
+    public List<WithdrawBankRspDTO> queryBank(GenericDTO genericDTO);
+
+    /**
+     * 添加提现银行卡
+     * @param genericWithdrawCardBindDTO
+     */
+    public GenericRspDTO addCard(GenericDTO<WithdrawCardBindDTO> genericWithdrawCardBindDTO);
+
+    /**
+     * 查询已添加的提现银行卡
+     * @param genericDTO
+     * @return
+     */
+    public List<WithdrawCardQueryDTO> queryCard(GenericDTO genericDTO);
+
+    /**
+     * 删除提现应行卡
+     * @param genericWithdrawCardDelDTO
+     * @return
+     */
+    public GenericRspDTO delCard(GenericDTO<WithdrawCardDelDTO> genericWithdrawCardDelDTO);
 }

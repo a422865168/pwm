@@ -2,9 +2,18 @@ package com.hisun.lemon.pwm.service;
 
 import java.math.BigDecimal;
 
+import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.pwm.dto.*;
+import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
+import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
+import com.hisun.lemon.pwm.dto.RechargeDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
+import com.hisun.lemon.pwm.dto.RemittanceUploadDTO;
 
 
 /**
@@ -24,34 +33,28 @@ public interface IRechargeOrderService {
 
     /**
      * 查询用户与订单信息
-     * @param userId
+     * @param key
      * @param hallOrderNo
      * @param amount
      * @param type
      * @return
      */
-    public HallQueryResultDTO queryUserInfo(String userId,String hallOrderNo,BigDecimal amount,String type);
+    public HallQueryResultDTO queryUserOrOrderInfo(String key,String hallOrderNo,BigDecimal amount,String type);
 
     /**
-     * 营业厅充值申请处理
+     * 营业厅充值处理
      * @param dto
      * @return
      */
-    public HallRechargeResultDTO hallRecharge(HallRechargeApplyDTO dto);
+    public HallRechargeResultDTO hallRechargePay(HallRechargeApplyDTO dto);
 
-    /**
-     * 营业厅充值确认处理
-     * @param dto
-     * @return
-     */
-    public HallRechargeResultDTO hallRechargeConfirm(HallRechargeApplyDTO dto);
     
     /**
      * 海币充值下单
      * @param rechargeHCouponDTO
      * @return
      */
-    public GenericRspDTO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
+    public GenericRspDTO<CashierViewDTO> createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
     
     /**
      * 海币充值结果处理

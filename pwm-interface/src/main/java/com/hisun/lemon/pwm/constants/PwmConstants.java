@@ -12,11 +12,16 @@ public class PwmConstants {
 	public static final String R_ORD_GEN_PRE="pwmRechangeOrdNo"; 
 	
 	/**
-	 * 生成充值订单号的前缀
+	 * 生成提现订单号的前缀
 	 */
-	public static final String W_ORD_GEN_PRE="pwmWithdrawOrdNo"; 
-	
-	/**
+	public static final String W_ORD_GEN_PRE="pwmWithdrawOrdNo";
+
+    /**
+     * 生成提现银行卡主键的前缀
+     */
+    public static final String W_CRD_GEN_PRE="pwmWithdrawCardNo";
+
+    /**
 	 * 交易类型：充值
 	 */
 	public static final String TX_TYPE_RECHANGE="01";
@@ -216,5 +221,19 @@ public class PwmConstants {
      */
     public static final String AC_ITEM_FEE_PAY_WIDR="6021010002";
 
+	/**
+	 * 手机号国家编码
+	 * 柬埔寨：
+	 */
+	public static final String COUNTRY_CODE_KHM="855";
 
+	/**
+	 * 提现银行卡状态"1"：生效
+	 */
+	public static final String WITHDRAW_CARD_STAT_EFF="1";
+
+	/**
+	 * 提现银行卡状态"0"：失效
+	 */
+	public static final String WITHDRAW_CARD_STAT_FAIL="0";
 }
