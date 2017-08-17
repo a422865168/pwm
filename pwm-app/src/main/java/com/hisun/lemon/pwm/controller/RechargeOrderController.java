@@ -99,7 +99,7 @@ public class RechargeOrderController {
 		return GenericRspDTO.newSuccessInstance();
 	}
 
-	@ApiOperation(value = "营业厅充值撤销", notes = "接收营业厅的充值撤销请求")
+	@ApiOperation(value = "营业厅充值撤销冲正", notes = "接收营业厅的充值撤销请求")
 	@ApiResponse(code = 200, message = "营业厅充值撤销结果")
 	@PostMapping(value = "/hall/revocation")
 	public GenericRspDTO<HallRechargeResultDTO> hallRechargeRevocation(
