@@ -27,13 +27,6 @@ public class RechargeHCouponDTO {
 	@ApiModelProperty(name = "orderCcy", value = "币种(USD:美元)")
 	@Length(max =4)
 	private String orderCcy;
-
-	/**
-	 * @Fields userId 内部用户号
-	 */
-	@NotEmpty(message="PWM10023")
-	@Length(max =24)
-	private String userId;
 	/**
 	 * 充值金额
 	 */
@@ -79,14 +72,6 @@ public class RechargeHCouponDTO {
 
 	public void setOrderCcy(String orderCcy) {
 		this.orderCcy = orderCcy;
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public BigDecimal getOrderAmt() {

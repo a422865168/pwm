@@ -1,20 +1,40 @@
 package com.hisun.lemon.pwm.controller;
 
+import java.math.BigDecimal;
+
 import javax.annotation.Resource;
 
-import com.hisun.lemon.framework.utils.LemonUtils;
-import com.hisun.lemon.pwm.dto.*;
-import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
+import com.hisun.lemon.csh.dto.cashier.InitCashierDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
+import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
+import com.hisun.lemon.pwm.dto.RechargeDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
+import com.hisun.lemon.pwm.dto.RechargeResultDTO;
+import com.hisun.lemon.pwm.dto.RemittanceUploadDTO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
 
-import java.math.BigDecimal;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 
 
 @Api(value = "处理充值")
@@ -65,7 +85,8 @@ public class RechargeOrderController {
 	@ApiOperation(value = "海币充值下单", notes = "生成充值订单，调用收银台")
 	@ApiResponse(code = 200, message = "充值下单")
 	@PostMapping(value = "/order/sea")
-	public GenericRspDTO createHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
+	@ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
+	public GenericRspDTO<CashierViewDTO> createHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
 		return this.service.createHCouponOrder(rechargeHCouponDTO);
 	}
 
