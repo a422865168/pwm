@@ -66,8 +66,6 @@ public class RechargeResultDTO {
 	 * 订单状态
 	 */
 	@ApiModelProperty(name = "status", value = "订单状态(S:成功|F:失败)")
-	@NotEmpty(message="PWM10008")
-	@Pattern(regexp="S|F",message="PWM10009")
 	private String status;
 
 	public String getOrderNo() {
