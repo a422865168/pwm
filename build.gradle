@@ -61,6 +61,7 @@ subprojects{
             dependency 'com.hisun:cpi-interface:1.0.0-SNAPSHOT'
             dependency 'com.hisun:rsm-interface:1.0.0-SNAPSHOT'
             dependency 'com.hisun:urm-interface:1.0.0-SNAPSHOT'
+            dependency 'com.hisun:bil-interface:1.0.0-SNAPSHOT'
             dependency 'com.hisun:jcommon:1.0.1-SNAPSHOT'
 	     }
     }
