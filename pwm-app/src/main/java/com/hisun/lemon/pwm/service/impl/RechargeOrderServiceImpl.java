@@ -77,7 +77,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	 * 海币充值下单
 	 */
 	@Override
-	public GenericRspDTO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
+	public GenericRspDTO<CashierViewDTO> createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
 		RechargeHCouponDTO rechargeDTO = rechargeHCouponDTO.getBody();
 		if (!rechargeDTO.getBusType().startsWith(PwmConstants.TX_TYPE_HCOUPON)) {
 			throw new LemonException("PWM20001");
@@ -89,7 +89,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 			rechargeDO.setOrderCcy(rechargeDTO.getOrderCcy());
 		}
-		rechargeDO.setOrderCcy("USD");
+		rechargeDO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
 		// 会计日期
 		rechargeDO.setAcTm(rechargeHCouponDTO.getAccDate());
 		rechargeDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
@@ -105,23 +105,29 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeDO.setTxTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeDO.setTxType(rechargeDTO.getTxType());
 		rechargeDO.setBusType(rechargeDTO.getBusType());
-		rechargeDO.setUserId(rechargeDTO.getUserId());
+		rechargeDO.setUserId(LemonUtils.getUserId());
 		// 生成海币充值订单
 		this.service.initSeaOrder(rechargeDO);
 		// 调用收银
+		logger.info("订单：" + rechargeDO.getOrderNo() + " 请求收银台");
 		InitCashierDTO initCashierDTO = new InitCashierDTO();
 		initCashierDTO.setBusPaytype(null);
 		initCashierDTO.setBusType(rechargeDO.getBusType());
 		initCashierDTO.setExtOrderNo(rechargeDO.getOrderNo());
 		initCashierDTO.setSysChannel("APP");
-		initCashierDTO.setPayerId("");
+		initCashierDTO.setPayerId(LemonUtils.getUserId());
+		initCashierDTO.setPayeeId(LemonUtils.getUserId());
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 		initCashierDTO.setTxType(rechargeDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDO.getOrderAmt());
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
-		logger.info("订单：" + rechargeDO.getOrderNo() + " 请求收银台");
-		return cshOrderClient.initCashier(genericDTO);
+		GenericRspDTO<CashierViewDTO> rspDTO = new GenericRspDTO<CashierViewDTO>();
+		rspDTO = cshOrderClient.initCashier(genericDTO);
+		if (!JudgeUtils.isSuccess(rspDTO.getMsgCd())) {
+			throw new LemonException(rspDTO.getMsgCd());
+		}
+		return rspDTO;
 	}
 
 	/**
@@ -164,7 +170,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		// 查询用户帐号
 		String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
 		//先静静
-		String balAcNo = acmComponent.getAcmAcNo(rechargeHCouponDTO.getUserId(), balCapType);
+		String balAcNo = acmComponent.getAcmAcNo(LemonUtils.getUserId(), balCapType);
 		//借：其他应付款-暂收-收银台         100
 		cshItemReqDTO=acmComponent.createAccountingReqDTO(
 					rechargeSeaDO.getOrderNo(),

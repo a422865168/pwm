@@ -124,18 +124,18 @@ public class ChkFileComponent {
 		String localPath=getLocalPath(appCnl);
 		String[] uploadFileNames=new String[]{localPath+chkFileName,localPath+flagName};
 
-		String remoteIp=LemonUtils.getProperty("csh.sftp.ip");
-		int remotePort=Integer.valueOf(LemonUtils.getProperty("csh.sftp.port"));
-		String timeoutStr=LemonUtils.getProperty("csh.sftp.connectTimeout");
+		String remoteIp=LemonUtils.getProperty("pwm.sftp.ip");
+		int remotePort=Integer.valueOf(LemonUtils.getProperty("pwm.sftp.port"));
+		String timeoutStr=LemonUtils.getProperty("pwm.sftp.connectTimeout");
 		int connectTimeout=defaultSftpTimeout;
 		if(StringUtils.isNotEmpty(timeoutStr)){
 			connectTimeout=Integer.valueOf(timeoutStr);
 		}
 
-		String remotePath=LemonUtils.getProperty("csh.chk.remotePath");
+		String remotePath=LemonUtils.getProperty("pwm.chk.remotePath");
 
-		String name=LemonUtils.getProperty("csh.sftp.name");
-		String pwd=LemonUtils.getProperty("csh.sftp.password");
+		String name=LemonUtils.getProperty("pwm.sftp.name");
+		String pwd=LemonUtils.getProperty("pwm.sftp.password");
 
 		try {
 			FileSftpUtils.upload(uploadFileNames,remoteIp,remotePort,connectTimeout,remotePath,name,pwd);
@@ -165,7 +165,7 @@ public class ChkFileComponent {
 	 * @return
 	 */
 	private String getLocalPath(String appCnl){
-		String localPath=LemonUtils.getProperty("csh.chk.localPath")+appCnl+"/";
+		String localPath=LemonUtils.getProperty("pwm.chk.localPath")+appCnl+"/";
 		File localPathFile=new File(localPath);
 		if(localPathFile.exists()){
 			if(localPathFile.isDirectory()){

@@ -2,9 +2,18 @@ package com.hisun.lemon.pwm.service;
 
 import java.math.BigDecimal;
 
+import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.pwm.dto.*;
+import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
+import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
+import com.hisun.lemon.pwm.dto.RechargeDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
+import com.hisun.lemon.pwm.dto.RemittanceUploadDTO;
 
 
 /**
@@ -45,7 +54,7 @@ public interface IRechargeOrderService {
      * @param rechargeHCouponDTO
      * @return
      */
-    public GenericRspDTO createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
+    public GenericRspDTO<CashierViewDTO> createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
     
     /**
      * 海币充值结果处理

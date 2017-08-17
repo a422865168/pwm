@@ -295,3 +295,12 @@ pwm :
   recharge :
     #营业厅充值签名KEY值
     HALLKEY : PWM123456789002
+  sftp :
+    ip : 192.168.1.38
+    port : 22
+    name : payment
+    password : Hisunpay2017
+    connectTimeout : 2000
+  chk :
+    remotePath : /home/payment/data/pwm/
+    localPath : /home/payment/data/localchk/pwm/
