@@ -369,8 +369,42 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				updOrderDO.setOrderNo(orderNo);
 				service.updateOrder(updOrderDO);
 				return;
-//			case PwmConstants.BUS_TYPE_RECHARGE_HALL:
-//				break;
+			case PwmConstants.BUS_TYPE_RECHARGE_HALL:
+				cshItemReqDTO=acmComponent.createAccountingReqDTO(
+						rechargeOrderDO.getOrderNo(),
+						rechargeResultDTO.getTxJrnNo(),
+						PwmConstants.TX_TYPE_RECHANGE,
+						ACMConstants.ACCOUNTING_NOMARL,
+						rechargeResultDTO.getAmount(),
+						balAcNo,
+						ACMConstants.ITM_AC_TYP,
+						balCapType,
+						ACMConstants.AC_D_FLG,
+						CshConstants.AC_ITEM_CSH_PAY,
+						null,
+						null,
+						null,
+						null,
+						null);
+//		贷：其他应付款-支付账户-现金账户
+				userAccountReqDTO=acmComponent.createAccountingReqDTO(
+						rechargeOrderDO.getOrderNo(),
+						rechargeResultDTO.getTxJrnNo(),
+						PwmConstants.TX_TYPE_RECHANGE,
+						ACMConstants.ACCOUNTING_NOMARL,
+						rechargeResultDTO.getAmount(),
+						balAcNo,
+						ACMConstants.USER_AC_TYP,
+						balCapType,
+						ACMConstants.AC_C_FLG,
+						CshConstants.AC_ITEM_CSH_BAL,
+						null,
+						null,
+						null,
+						null,
+						null);
+				acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
+				break;
 			case PwmConstants.BUS_TYPE_RECHARGE_BNB:
 				break;
 			case PwmConstants.BUS_TYPE_WITHDRAW_P:
@@ -511,47 +545,47 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			LemonException.throwBusinessException(genericRspHallPaymentResult.getMsgCd());
 		}
 		//账务处理
-		AccountingReqDTO cshItemReqDTO=null;         //暂收收银台账务对象
-		AccountingReqDTO userAccountReqDTO=null;
-
-		//个人账户
-		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
-		String balAcNo=acmComponent.getAcmAcNo(bussinessBody.getPayerId(), balCapType);
-//		借：其他应付款-暂收-收银台
-		cshItemReqDTO=acmComponent.createAccountingReqDTO(
-				"5555555555555555555",
-				"222222223333333333333",
-				PwmConstants.TX_TYPE_RECHANGE,
-				ACMConstants.ACCOUNTING_NOMARL,
-				hallPayResult.getAmount(),
-				balAcNo,
-				ACMConstants.ITM_AC_TYP,
-				balCapType,
-				ACMConstants.AC_D_FLG,
-				CshConstants.AC_ITEM_CSH_PAY,
-				null,
-				null,
-				null,
-				null,
-				null);
-//		贷：其他应付款-支付账户-现金账户
-		userAccountReqDTO=acmComponent.createAccountingReqDTO(
-				"5555555555555555555",
-				"222222223333333333333",
-				PwmConstants.TX_TYPE_RECHANGE,
-				ACMConstants.ACCOUNTING_NOMARL,
-				hallPayResult.getAmount(),
-				balAcNo,
-				ACMConstants.USER_AC_TYP,
-				balCapType,
-				ACMConstants.AC_C_FLG,
-				CshConstants.AC_ITEM_CSH_BAL,
-				null,
-				null,
-				null,
-				null,
-				null);
-		acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
+//		AccountingReqDTO cshItemReqDTO=null;         //暂收收银台账务对象
+//		AccountingReqDTO userAccountReqDTO=null;
+//
+//		//个人账户
+//		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
+//		String balAcNo=acmComponent.getAcmAcNo(bussinessBody.getPayerId(), balCapType);
+////		借：其他应付款-暂收-收银台
+//		cshItemReqDTO=acmComponent.createAccountingReqDTO(
+//				rechargeOrderDO.getOrderNo(),
+//				genericRspHallPaymentResult.getRequestId(),
+//				PwmConstants.TX_TYPE_RECHANGE,
+//				ACMConstants.ACCOUNTING_NOMARL,
+//				hallPayResult.getAmount(),
+//				balAcNo,
+//				ACMConstants.ITM_AC_TYP,
+//				balCapType,
+//				ACMConstants.AC_D_FLG,
+//				CshConstants.AC_ITEM_CSH_PAY,
+//				null,
+//				null,
+//				null,
+//				null,
+//				null);
+////		贷：其他应付款-支付账户-现金账户
+//		userAccountReqDTO=acmComponent.createAccountingReqDTO(
+//				rechargeOrderDO.getOrderNo(),
+//				genericRspHallPaymentResult.getRequestId(),
+//				PwmConstants.TX_TYPE_RECHANGE,
+//				ACMConstants.ACCOUNTING_NOMARL,
+//				hallPayResult.getAmount(),
+//				balAcNo,
+//				ACMConstants.USER_AC_TYP,
+//				balCapType,
+//				ACMConstants.AC_C_FLG,
+//				CshConstants.AC_ITEM_CSH_BAL,
+//				null,
+//				null,
+//				null,
+//				null,
+//				null);
+//		acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
 
 		//更新充值订单
 		RechargeOrderDO updOrderDO = new RechargeOrderDO();
