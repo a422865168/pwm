@@ -15,7 +15,7 @@ public class CshRechargeChkFileServiceImpl extends AbstractChkFileService {
         this.chkOrderStatus=new String[]{
                 PwmConstants.RECHARGE_ORD_S
         };
-        appCnl="PWM";
+        appCnl="CSH";
         this.lockName="PWM_CSH_CHK_FILE_LOCK";
     }
 }

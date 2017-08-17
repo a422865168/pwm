@@ -302,5 +302,5 @@ pwm :
     password : Hisunpay2017
     connectTimeout : 2000
   chk :
-    remotePath : /home/payment/data/
-    localPath : /home/payment/data/localchk/
+    remotePath : /home/payment/data/pwm/
+    localPath : /home/payment/data/localchk/pwm/
