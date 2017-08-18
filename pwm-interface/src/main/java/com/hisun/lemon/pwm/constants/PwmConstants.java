@@ -77,7 +77,7 @@ public class PwmConstants {
 	public static final String RECHARGE_ORD_F ="F";
 
 	/**
-	 * 充值订单状态：冲正
+	 * 充值订单状态：冲正撤销
 	 */
 	public static final String RECHARGE_ORD_C ="C";
 
