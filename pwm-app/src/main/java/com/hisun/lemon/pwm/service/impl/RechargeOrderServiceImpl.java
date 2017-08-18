@@ -251,6 +251,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
+		orderNo=rechargeDTO.getBusType()+ymd + orderNo;
+
 		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
 		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		rechargeOrderDO.setBusType(rechargeDTO.getBusType());
@@ -258,7 +260,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setOrderAmt(rechargeDTO.getAmount());
 		rechargeOrderDO.setOrderCcy("USD");
 		rechargeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
-		rechargeOrderDO.setOrderNo(ymd + orderNo);
+		rechargeOrderDO.setOrderNo(orderNo);
 		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setPsnFlag(rechargeDTO.getPsnFlag());
@@ -275,9 +277,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	  	initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
 	  	initCashierDTO.setSysChannel(rechargeDTO.getSysChannel());
 	  	initCashierDTO.setPayerId("");
+		initCashierDTO.setPayeeId(LemonUtils.getUserId());
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 	  	initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
+		initCashierDTO.setGoodsDesc("在线充值$"+rechargeDTO.getAmount());
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		logger.info("订单："+rechargeOrderDO.getOrderNo()+" 请求收银台");
