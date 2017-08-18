@@ -30,10 +30,10 @@ public class RechargeHCouponDTO {
 	/**
 	 * 充值金额
 	 */
-	@ApiModelProperty(name = "orderAmt", value = "充值金额")
+	@ApiModelProperty(name = "hCouponAmt", value = "海币充值数量")
 	@NotNull(message = "PWM10024")
 	@Min(value = 0, message = "PWM10024")
-	private BigDecimal orderAmt;
+	private BigDecimal hCouponAmt;
 
 	/**
 	 * @Fields txType 交易类型
@@ -74,12 +74,13 @@ public class RechargeHCouponDTO {
 		this.orderCcy = orderCcy;
 	}
 
-	public BigDecimal getOrderAmt() {
-		return orderAmt;
+	public BigDecimal gethCouponAmt() {
+		return hCouponAmt;
 	}
 
-	public void setOrderAmt(BigDecimal orderAmt) {
-		this.orderAmt = orderAmt;
+	public void sethCouponAmt(BigDecimal hCouponAmt) {
+		this.hCouponAmt = hCouponAmt;
 	}
-
+	
+	
 }

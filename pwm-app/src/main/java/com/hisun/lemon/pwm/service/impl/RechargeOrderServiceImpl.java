@@ -96,11 +96,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = IdGenUtils.generateId(PwmConstants.R_SEA_GEN_PRE + ymd, 15);
 		// 1:100的充值比例
-		BigDecimal amount=rechargeDTO.getOrderAmt();
-		BigDecimal hCouponAmt = amount.multiply(BigDecimal.valueOf(PwmConstants.H_USD_RATE)).setScale(2, BigDecimal.ROUND_DOWN);
+		BigDecimal hCouponAmt=rechargeDTO.gethCouponAmt();
+		BigDecimal amount = hCouponAmt.multiply(BigDecimal.valueOf(PwmConstants.H_USD_RATE)).setScale(2, BigDecimal.ROUND_DOWN);
 		rechargeDO.sethCouponAmt(hCouponAmt);
 		rechargeDO.setOrderNo(ymd + orderNo);
-		rechargeDO.setOrderAmt(rechargeDTO.getOrderAmt());
+		rechargeDO.setOrderAmt(amount);
 		// 交易时间
 		rechargeDO.setTxTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeDO.setTxType(rechargeDTO.getTxType());
@@ -112,7 +112,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		logger.info("订单：" + rechargeDO.getOrderNo() + " 请求收银台");
 		InitCashierDTO initCashierDTO = new InitCashierDTO();
 		initCashierDTO.setBusPaytype(null);
-		initCashierDTO.setBusType(rechargeDO.getBusType());
+		initCashierDTO.setBusType(PwmConstants.BUS_TYPE_HCOUPON);
 		initCashierDTO.setExtOrderNo(rechargeDO.getOrderNo());
 		initCashierDTO.setSysChannel("APP");
 		initCashierDTO.setPayerId(LemonUtils.getUserId());
@@ -120,6 +120,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 		initCashierDTO.setTxType(rechargeDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDO.getOrderAmt());
+		initCashierDTO.setGoodsDesc("海币充值");
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		GenericRspDTO<CashierViewDTO> rspDTO = new GenericRspDTO<CashierViewDTO>();
@@ -295,12 +296,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if (rechargeOrderDO == null) {
 			throw new LemonException("PWM20002");
 		}
-
-		// 订单已经成功
-//		if (StringUtils.equals(rechargeOrderDO.getOrderStatus(), PwmConstants.RECHARGE_ORD_S)) {
-//			return;
-//		}
-
 		// 判断返回状态
 		if (!StringUtils.equals(rechargeResultDTO.getStatus(), PwmConstants.RECHARGE_ORD_S)) {
 			RechargeOrderDO updOrderDO = new RechargeOrderDO();

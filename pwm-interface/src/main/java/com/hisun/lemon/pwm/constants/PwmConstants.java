@@ -171,7 +171,7 @@ public class PwmConstants {
 	/**
 	 * 海币换算美元比率
 	 */
-	public static final double H_USD_RATE=100;
+	public static final double H_USD_RATE=0.01;
 
 	/**
 	 * 营业厅查询用户类型： U 用户
