@@ -516,7 +516,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//借：其他应付款-暂收-收银台
 		cshItemReqDTO=acmComponent.createAccountingReqDTO(
 				rechargeOrderDO.getOrderNo(),
-				genericRspHallPaymentResult.getRequestId(),
+                rechargeOrderDO.getExtOrderNo(),
 				PwmConstants.TX_TYPE_RECHANGE,
 				ACMConstants.ACCOUNTING_NOMARL,
 				hallPayResult.getAmount(),
@@ -533,7 +533,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//贷：其他应付款-支付账户-现金账户
 		userAccountReqDTO=acmComponent.createAccountingReqDTO(
 				rechargeOrderDO.getOrderNo(),
-				genericRspHallPaymentResult.getRequestId(),
+                rechargeOrderDO.getExtOrderNo(),
 				PwmConstants.TX_TYPE_RECHANGE,
 				ACMConstants.ACCOUNTING_NOMARL,
 				hallPayResult.getAmount(),
