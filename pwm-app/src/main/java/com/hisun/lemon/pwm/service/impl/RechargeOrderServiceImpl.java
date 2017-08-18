@@ -275,9 +275,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	  	initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
 	  	initCashierDTO.setSysChannel(rechargeDTO.getSysChannel());
 	  	initCashierDTO.setPayerId("");
+		initCashierDTO.setPayeeId(LemonUtils.getUserId());
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 	  	initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
+		initCashierDTO.setGoodsDesc("在线充值$"+rechargeDTO.getAmount());
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		logger.info("订单："+rechargeOrderDO.getOrderNo()+" 请求收银台");
