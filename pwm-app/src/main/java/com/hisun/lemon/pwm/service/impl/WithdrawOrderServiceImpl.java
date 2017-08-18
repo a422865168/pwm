@@ -126,7 +126,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
         //调用tfm接口查询手续费
         GenericRspDTO<TradeFeeRspDTO> tradeGenericRspDTO = tfmServerClient.tradeFee(genericDTO);
-        if(JudgeUtils.isNull(tradeGenericRspDTO)){
+        if(JudgeUtils.isNull(tradeGenericRspDTO.getBody())){
             LemonException.throwBusinessException("PWM30008");
         }
         //手续费
@@ -260,7 +260,9 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         if(JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_S1, withdrawOrderDO.getOrderStatus())){
             withdrawOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
             withdrawOrderDO.setRspSuccTm(DateTimeUtils.getCurrentLocalDateTime());
-        }else{//若订单失败，则做账，并把手续费退了
+        }
+        //若订单状态为'F1'失败，则做账，并把手续费退了
+        if(JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_F1, withdrawOrderDO.getOrderStatus())){
             /**
              * 账务处理
              */
@@ -319,7 +321,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         GenericDTO genericDTO = new GenericDTO();
         genericDTO.setBody(tradeRateReqDTO);
         GenericRspDTO genericRspDTO = tfmServerClient.tradeRate(genericDTO);
-        if(JudgeUtils.isNull(genericRspDTO)){
+        if(JudgeUtils.isNull(genericRspDTO.getBody())){
             LemonException.throwBusinessException("PWM30011");
         }
         WithdrawRateResultDTO withdrawRateResultDTO = new WithdrawRateResultDTO();
