@@ -638,6 +638,44 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			LemonException.throwBusinessException(cashierOrderUpdateResult.getMsgCd());
 		}
 
+		//营业厅冲正账务处理
+		//借：其他应付款-支付账户-现金账户
+		AccountingReqDTO cshItemReqDTO=acmComponent.createAccountingReqDTO(
+				rechargeOrderDO.getOrderNo(),
+				cashierOrderUpdateResult.getRequestId(),
+				rechargeOrderDO.getTxType(),
+				ACMConstants.ACCOUNTING_CANCEL,
+				rechargeOrderDO.getOrderAmt(),
+				null,
+				ACMConstants.ITM_AC_TYP,
+				null,
+				ACMConstants.AC_D_FLG,
+				CshConstants.AC_ITEM_CSH_BAL,
+				null,
+				null,
+				null,
+				null,
+				null);
+
+		//贷：应收账款-渠道充值-营业厅
+		AccountingReqDTO cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
+				rechargeOrderDO.getOrderNo(),
+				cashierOrderUpdateResult.getRequestId(),
+				rechargeOrderDO.getTxType(),
+				ACMConstants.ACCOUNTING_CANCEL,
+				rechargeOrderDO.getOrderAmt(),
+				null,
+				ACMConstants.ITM_AC_TYP,
+				null,
+				ACMConstants.AC_C_FLG,
+				CshConstants.AC_ITEM_CNL_RECHARGE_HALL,
+				null,
+				null,
+				null,
+				null,
+				null);
+
+		acmComponent.requestAc(cshItemReqDTO,cnlRechargeHallReqDTO);
 		//更新订单状态
 		RechargeOrderDO updOrderDO = new RechargeOrderDO();
 		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
