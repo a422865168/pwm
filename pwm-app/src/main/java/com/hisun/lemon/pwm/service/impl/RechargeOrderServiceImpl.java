@@ -460,6 +460,13 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if (!JudgeUtils.equals(bussinessBody.getStatus(), PwmConstants.RECHARGE_OPR_A)) {
 			throw new LemonException("PWM10037");
 		}
+
+		//重复下单校验
+		RechargeOrderDO oriRechargeOrderDO = this.service.getRechangeOrderDao().getRechargeOrderByExtOrderNo(bussinessBody.getHallOrderNo());
+		if(JudgeUtils.isNotNull(oriRechargeOrderDO)){
+			throw new LemonException("PWM20021");
+		}
+
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = ymd + IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
 		// 生成充值订单
