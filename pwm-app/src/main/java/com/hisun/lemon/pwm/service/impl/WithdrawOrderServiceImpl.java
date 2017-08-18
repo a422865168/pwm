@@ -7,6 +7,8 @@ import com.hisun.lemon.acm.constants.CapTypEnum;
 import com.hisun.lemon.acm.dto.AccountingReqDTO;
 import com.hisun.lemon.acm.dto.QueryAcBalRspDTO;
 import com.hisun.lemon.acm.dto.UserAccountDTO;
+import com.hisun.lemon.bil.dto.CreateUserBillDTO;
+import com.hisun.lemon.bil.dto.UpdateUserBillDTO;
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
@@ -27,6 +29,7 @@ import com.hisun.lemon.pwm.dto.*;
 import com.hisun.lemon.pwm.entity.WithdrawCardBindDO;
 import com.hisun.lemon.pwm.entity.WithdrawCardInfoDO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
+import com.hisun.lemon.pwm.mq.BillSyncHandler;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
 import com.hisun.lemon.rsm.client.RiskCheckClient;
 import com.hisun.lemon.rsm.dto.req.riskJrn.JrnReqDTO;
@@ -76,6 +79,9 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
     @Resource
     private IWithdrawCardBindDao withdrawCardBindDao;
+
+    @Resource
+    BillSyncHandler billSyncHandler;
     /**
      * 生成提现订单
      * @param genericWithdrawDTO
@@ -104,7 +110,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		    LemonException.throwBusinessException("PWM30007");
         }
         //校验用户如为黑名单，则抛出异常信息
-		if(JudgeUtils.equals("在黑名单中", genericRspDTO.getMsgCd())){
+		if(JudgeUtils.equals("RSM30002", genericRspDTO.getMsgCd())){
 			LemonException.throwBusinessException("PWM30001");
 		}
 
@@ -167,7 +173,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         if(JudgeUtils.isNull(genericRspDTO)){
             LemonException.throwBusinessException("PWM30010");
         }
-		if(!JudgeUtils.equals("用户账户支付密码", genericRspDTO.getMsgCd())){
+		if(!JudgeUtils.equals("URM30005", genericRspDTO.getMsgCd())){
 			LemonException.throwBusinessException("PWM30004");
 		}
 
@@ -178,7 +184,8 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		//交易类型 04提现
 		withdrawOrderDO.setTxType(PwmConstants.TX_TYPE_WITHDRAW);
 		//提现总金额=实际提现金额+手续费
-        withdrawOrderDO.setWcTotalAmt(withdrawOrderDO.getWcActAmt().add(withdrawOrderDO.getFeeAmt()));
+        withdrawOrderDO.setWcTotalAmt(totalAmt);
+        withdrawOrderDO.setWcActAmt(totalAmt.divide(fee));
 		//业务类型 0401个人提现
 		withdrawOrderDO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_P);
 		withdrawOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
@@ -215,6 +222,15 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
 		//生成提现单据
 		withdrawOrderTransactionalService.createOrder(withdrawOrderDO);
+
+		//同步账单数据
+        CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
+        BeanUtils.copyProperties(createUserBillDTO, withdrawOrderDO);
+        createUserBillDTO.setTxTm(withdrawOrderDO.getOrderTm());
+        createUserBillDTO.setPayerId(withdrawOrderDO.getUserId());
+        createUserBillDTO.setOrderAmt(totalAmt);
+        createUserBillDTO.setFee(fee);
+        billSyncHandler.createBill(createUserBillDTO);
 
 		//调用资金能力的提现申请接口，等待结果通知
 		WithdrawReqDTO withdrawReqDTO = new WithdrawReqDTO();
@@ -278,6 +294,12 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         withdrawOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
         //若更新提现单据状态及相关信息
 		withdrawOrderTransactionalService.updateOrder(withdrawOrderDO);
+
+		//同步账单数据
+        UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
+        BeanUtils.copyProperties(updateUserBillDTO, withdrawOrderDO);
+        billSyncHandler.updateBill(updateUserBillDTO);
+
         WithdrawRspDTO withdrawRspDTO = new WithdrawRspDTO();
         withdrawRspDTO.setOrderNo(withdrawOrderDO.getOrderNo());
         withdrawRspDTO.setOrderStatus(withdrawOrderDO.getOrderStatus());
@@ -342,6 +364,8 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
             return GenericRspDTO.newInstance(e.getMsgCd(), withdrawCardBindDTO);
         }
         WithdrawCardBindDO withdrawCardBindDO1 = withdrawCardBindDao.query(cardNoEnc);
+        //初始化需要返回的卡信息
+        WithdrawCardQueryDTO withdrawCardQueryDTO = new WithdrawCardQueryDTO();
         //判断提现银行卡是否存在
         if(JudgeUtils.isNotNull(withdrawCardBindDO1)){
             //判断提现银行卡状态是否失效
@@ -357,6 +381,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
                 withdrawCardBindDO2.setFailTm("");
                 withdrawCardBindDO2.setCardId(withdrawCardBindDO1.getCardId());
                 withdrawOrderTransactionalService.updateCard(withdrawCardBindDO2);
+                BeanUtils.copyProperties(withdrawCardQueryDTO, withdrawCardBindDO1);
             }
         }else{
             //提现银行卡不存在，则填充数据，添加入库
@@ -365,9 +390,12 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
             withdrawCardBindDO.setCardId(ymd+orderNo);
             withdrawCardBindDO.setEftTm(DateTimeUtils.getCurrentLocalDateTime());
             withdrawCardBindDO.setCardNoLast(cardNo.substring(cardNo.length()-4));
+            withdrawCardBindDO.setCardNo(cardNoEnc);
             withdrawOrderTransactionalService.addCard(withdrawCardBindDO);
+            BeanUtils.copyProperties(withdrawCardQueryDTO, withdrawCardBindDO);
         }
-        return GenericRspDTO.newSuccessInstance();
+        //更新成功则返回改卡信息
+        return GenericRspDTO.newSuccessInstance(withdrawCardQueryDTO);
     }
 
     /**
@@ -393,7 +421,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
      * @return
      */
     @Override
-    public GenericRspDTO delCard(GenericDTO<WithdrawCardDelDTO> genericWithdrawCardDelDTO) {
+    public GenericRspDTO<WithdrawCardDelRspDTO> delCard(GenericDTO<WithdrawCardDelDTO> genericWithdrawCardDelDTO) {
         WithdrawCardDelDTO withdrawCardDelDTO = genericWithdrawCardDelDTO.getBody();
         WithdrawCardBindDO withdrawCardBindDO = withdrawCardBindDao.get(withdrawCardDelDTO.getCardId());
         if(JudgeUtils.isNull(withdrawCardBindDO)){
@@ -407,6 +435,9 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         withdrawCardBindDO1.setCardStatus(PwmConstants.WITHDRAW_CARD_STAT_FAIL);
         withdrawCardBindDO1.setFailTm(DateTimeUtils.getCurrentDateTimeStr("yyyy-MM-dd HH:mm:ss"));
         withdrawOrderTransactionalService.updateCard(withdrawCardBindDO1);
-        return null;
+        withdrawCardBindDO1.setCardNoLast(withdrawCardBindDO.getCardNoLast());
+        WithdrawCardDelRspDTO withdrawCardDelRspDTO = new WithdrawCardDelRspDTO();
+        BeanUtils.copyProperties(withdrawCardDelRspDTO, withdrawCardBindDO1);
+        return GenericRspDTO.newSuccessInstance(withdrawCardDelRspDTO);
     }
 }

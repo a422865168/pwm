@@ -109,7 +109,7 @@ public class WithdrawOrderController {
 	@ApiOperation(value = "删除提现银行卡", notes = "删除提现银行卡")
 	@ApiResponse(code = 200, message = "删除提现银行卡")
 	@PutMapping(value = "/del")
-	public GenericRspDTO delWithdrawCard(@Validated @RequestBody GenericDTO<WithdrawCardDelDTO> genericWithdrawCardDelDTO){
+	public GenericRspDTO<WithdrawCardDelRspDTO> delWithdrawCard(@Validated @RequestBody GenericDTO<WithdrawCardDelDTO> genericWithdrawCardDelDTO){
 		return withdrawOrderService.delCard(genericWithdrawCardDelDTO);
 	}
 }

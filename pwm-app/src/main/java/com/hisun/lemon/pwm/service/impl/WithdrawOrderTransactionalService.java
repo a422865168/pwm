@@ -55,7 +55,8 @@ public class WithdrawOrderTransactionalService {
     public WithdrawOrderDO query(String orderNo){
 
         WithdrawOrderDO withdrawOrderDO = withdrawOrderDao.get(orderNo);
-        if(JudgeUtils.isNotNull(withdrawOrderDO)){
+        //订单号不存在，则抛异常
+        if(JudgeUtils.isNull(withdrawOrderDO)){
             LemonException.throwBusinessException("PWM30005");
         }
         return withdrawOrderDO;
