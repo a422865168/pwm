@@ -94,12 +94,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeDO.setAcTm(rechargeHCouponDTO.getAccDate());
 		rechargeDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		String ymd = DateTimeUtils.getCurrentDateStr();
-		String orderNo = IdGenUtils.generateId(PwmConstants.R_SEA_GEN_PRE + ymd, 15);
+		String orderNo = PwmConstants.BUS_TYPE_RECHARGE_HALL + ymd + IdGenUtils.generateId(PwmConstants.BUS_TYPE_HCOUPON + ymd, 15);
 		// 1:100的充值比例
 		BigDecimal hCouponAmt=rechargeDTO.gethCouponAmt();
 		BigDecimal amount = hCouponAmt.multiply(BigDecimal.valueOf(PwmConstants.H_USD_RATE)).setScale(2, BigDecimal.ROUND_DOWN);
 		rechargeDO.sethCouponAmt(hCouponAmt);
-		rechargeDO.setOrderNo(ymd + orderNo);
+		rechargeDO.setOrderNo(orderNo);
 		rechargeDO.setOrderAmt(amount);
 		// 交易时间
 		rechargeDO.setTxTm(DateTimeUtils.getCurrentLocalDateTime());
