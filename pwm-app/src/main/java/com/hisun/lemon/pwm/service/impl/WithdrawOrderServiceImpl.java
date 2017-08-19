@@ -173,7 +173,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         if(JudgeUtils.isNull(genericRspDTO)){
             LemonException.throwBusinessException("PWM30010");
         }
-		if(!JudgeUtils.equals("URM30005", genericRspDTO.getMsgCd())){
+		if(JudgeUtils.equals("URM30005", genericRspDTO.getMsgCd())){
 			LemonException.throwBusinessException("PWM30004");
 		}
 
