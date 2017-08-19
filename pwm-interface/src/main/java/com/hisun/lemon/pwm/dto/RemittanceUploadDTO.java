@@ -20,7 +20,7 @@ public class RemittanceUploadDTO {
      */
     @ApiModelProperty(name = "orderNo", value = "充值订单号")
     @NotEmpty(message="PWM10007")
-    @Length(max =24)
+    @Length(max =28)
     private String orderNo;
 
     /**
@@ -33,6 +33,7 @@ public class RemittanceUploadDTO {
 
     @ApiModelProperty(name = "cashRemittUrl", value = "汇款单图片url", required = true, dataType = "String")
     @NotEmpty(message="PWM10039")
+    @Length(max = 256)
     private String remittUrl;
 
     /**
@@ -40,6 +41,7 @@ public class RemittanceUploadDTO {
      */
     @ApiModelProperty(name = "remark", value = "附言摘要")
     @NotEmpty(message="PWM10003")
+    @Length(max = 256)
     private String remark;
 
     public String getOrderNo() {
