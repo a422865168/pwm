@@ -470,7 +470,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 
 		String ymd = DateTimeUtils.getCurrentDateStr();
-		String orderNo = ymd + IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
+		String orderNo = PwmConstants.BUS_TYPE_RECHARGE_HALL + ymd + IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
 		// 生成充值订单
 		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
 		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
@@ -684,7 +684,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	public OfflineRechargeResultDTO offlineRechargeApplication(GenericDTO<OfflineRechargeApplyDTO> genericDTO) {
 		OfflineRechargeApplyDTO offlineRechargeApplyDTO = genericDTO.getBody();
 		String ymd = DateTimeUtils.getCurrentDateStr();
-		String orderNo = ymd + IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
+		String orderNo = PwmConstants.BUS_TYPE_RECHARGE_OFL + ymd + IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
 		// 生成充值订单
 		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
 		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
