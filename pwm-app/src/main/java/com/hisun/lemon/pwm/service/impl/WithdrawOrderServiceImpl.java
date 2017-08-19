@@ -190,7 +190,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		withdrawOrderDO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_P);
 		withdrawOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		withdrawOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
-		//不确定用户名是查还是传
+		//用户姓名
 		withdrawOrderDO.setUserName("");
 		withdrawOrderDO.setOrderStatus(PwmConstants.WITHDRAW_ORD_W1);
         /**
