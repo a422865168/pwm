@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
-import com.hisun.lemon.csh.dto.cashier.InitCashierDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
@@ -87,6 +86,8 @@ public class RechargeOrderController {
 	@PostMapping(value = "/order/sea")
 	@ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
 	public GenericRspDTO<CashierViewDTO> createHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
+		String aa="aa";
+		String bb=aa;
 		return this.service.createHCouponOrder(rechargeHCouponDTO);
 	}
 

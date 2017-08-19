@@ -45,7 +45,7 @@ import com.hisun.lemon.pwm.component.AcmComponent;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
-import com.hisun.lemon.pwm.service.IRechargeOrderService;
+import com.hisun.lemon.pwm.service.IRechargeOrderService;	
 import com.hisun.lemon.tfm.client.TfmServerClient;
 import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
 import com.hisun.lemon.tfm.dto.TradeRateRspDTO;
@@ -93,12 +93,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		// 会计日期
 		rechargeDO.setAcTm(rechargeHCouponDTO.getAccDate());
 		rechargeDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
-		String ymd = DateTimeUtils.getCurrentDateStr();
-		String orderNo = IdGenUtils.generateId(PwmConstants.R_SEA_GEN_PRE + ymd, 15);
 		// 1:100的充值比例
 		BigDecimal hCouponAmt=rechargeDTO.gethCouponAmt();
 		BigDecimal amount = hCouponAmt.multiply(BigDecimal.valueOf(PwmConstants.H_USD_RATE)).setScale(2, BigDecimal.ROUND_DOWN);
 		rechargeDO.sethCouponAmt(hCouponAmt);
+		String ymd = DateTimeUtils.getCurrentDateStr();
+		String orderNo= IdGenUtils.generateId(PwmConstants.R_SEA_GEN_PRE + ymd, 15);
 		rechargeDO.setOrderNo(ymd + orderNo);
 		rechargeDO.setOrderAmt(amount);
 		// 交易时间
@@ -251,6 +251,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
+		
 		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
 		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		rechargeOrderDO.setBusType(rechargeDTO.getBusType());

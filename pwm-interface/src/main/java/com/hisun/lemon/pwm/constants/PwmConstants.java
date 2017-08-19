@@ -5,7 +5,7 @@ public class PwmConstants {
 	/**
 	 * 生成充海币订单号的前缀
 	 */
-	public static final String R_SEA_GEN_PRE="pwmRechangeSeaNo"; 
+	public static final String R_SEA_GEN_PRE="pwmRechangeSeaOrdNo"; 
 	/**
 	 * 生成充值订单号的前缀
 	 */
