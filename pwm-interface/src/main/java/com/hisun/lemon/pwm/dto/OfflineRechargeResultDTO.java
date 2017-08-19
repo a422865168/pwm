@@ -23,7 +23,7 @@ public class OfflineRechargeResultDTO {
 	 * 交易订单号
 	 */
 	@ApiModelProperty(name = "cshOrderNo", value = "交易订单号")
-	@Length(max =24)
+	@Length(max =28)
 	private String orderNo;
 
 	/**
