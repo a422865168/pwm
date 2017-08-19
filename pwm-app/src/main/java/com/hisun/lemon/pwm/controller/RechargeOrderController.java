@@ -46,6 +46,7 @@ public class RechargeOrderController {
 	IRechargeOrderService service;
 
 	@ApiOperation(value = "充值下单", notes = "生成充值订单，调用收银台")
+	@ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
 	@ApiResponse(code = 200, message = "充值下单")
 	@PostMapping(value = "/order")
 	public GenericRspDTO createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {

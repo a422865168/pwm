@@ -77,6 +77,39 @@ CREATE TABLE `pwm_withdraw_order` (
   PRIMARY KEY (`order_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP TABLE IF EXISTS `pwm_withdraw_card`;
+CREATE TABLE `pwm_withdraw_card` (
+  `card_id` varchar(24) NOT NULL COMMENT '主键',
+  `card_no` varchar(64) NOT NULL COMMENT '加密银行卡号',
+  `card_no_last` varchar(4) NOT NULL COMMENT '银行卡后四位',
+  `branch_name` varchar(24) NOT NULL COMMENT '支行名称',
+  `user_id` varchar(20) NOT NULL COMMENT '用户编号',
+  `cap_corg` varchar(16) NOT NULL COMMENT '资金机构',
+  `card_status` char(1) NOT NULL DEFAULT '1' COMMENT '卡状态 1生效 0失效',
+  `eft_tm` datetime NOT NULL COMMENT '生效时间',
+  `fail_tm` varchar(20) DEFAULT '' COMMENT '失效时间',
+  `remark` varchar(128) DEFAULT '' COMMENT '备注',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `modify_time` datetime NOT NULL COMMENT '修改时间',
+  `tm_smp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '时间戳',
+  PRIMARY KEY (`card_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `pwm_withdraw_bank`;
+CREATE TABLE `pwm_withdraw_bank` (
+  `bin_id` varchar(20) NOT NULL COMMENT '主键',
+  `card_bin` varchar(12) NOT NULL DEFAULT '123' COMMENT '卡bin',
+  `cap_corg` varchar(16) NOT NULL DEFAULT 'ABC' COMMENT '资金机构',
+  `bank_name` varchar(24) NOT NULL DEFAULT '' COMMENT '提现银行',
+  `card_ac_type` char(1) NOT NULL DEFAULT 'D' COMMENT '卡类型，D借记卡，C贷记卡',
+  `card_length` int(11) NOT NULL DEFAULT '16' COMMENT '卡长度',
+  `opr_id` varchar(16) NOT NULL DEFAULT '' COMMENT '操作员',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `modify_time` datetime NOT NULL COMMENT '修改时间',
+  `tm_smp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '时间戳',
+  PRIMARY KEY (`bin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10001','zh','充值金额非法!',now(),now());
@@ -212,6 +245,8 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20019','zh','更新提现银行卡状态失败!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20020','zh','添加提现银行卡失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20021','zh','不能重复下单!',now(),now());
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30001','zh','该用户为黑名单!',now(),now());
