@@ -739,6 +739,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			this.service.updateOrder(updatOrderDO);
 			LemonException.throwBusinessException(genericCashierViewDTO.getMsgCd());
 		}
+		//更新充值订单的收银业务订单号
+		rechargeOrderDO.setExtOrderNo(cashierViewDTO.getOrderNo());
+		this.service.updateOrder(rechargeOrderDO);
 
 		GenericRspDTO<List<RouteDTO>> GenericRounteList = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
 		List<RouteDTO> rounteList = GenericRounteList.getBody();
