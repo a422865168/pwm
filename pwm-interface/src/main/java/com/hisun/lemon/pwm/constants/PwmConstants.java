@@ -87,9 +87,9 @@ public class PwmConstants {
 	public static final String WITHDRAW_ORD_W1="W1";
 
 	/**
-	 * 提现订单状态W2：资金流出已受理
+	 * 提现订单状态W3：资金流出已受理
 	 */
-	public static final String WITHDRAW_ORD_W2="W2";
+	public static final String WITHDRAW_ORD_W3="W3";
 
 	/**
 	 * 提现订单状态S1：付款成功
@@ -100,16 +100,6 @@ public class PwmConstants {
 	 * 提现订单状态F1：付款失败
 	 */
 	public static final String WITHDRAW_ORD_F1="F1";
-
-	/**
-	 * 提现订单状态F2：付款核销
-	 */
-	public static final String WITHDRAW_ORD_F2="F2";
-
-	/**
-	 * 提现订单状态R9：审批拒绝
-	 */
-	public static final String WITHDRAW_ORD_R9="R9";
 
 	/**
 	 * 营业厅充值操作状态：充值申请
