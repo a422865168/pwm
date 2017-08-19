@@ -154,8 +154,8 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
                 balance = acBalRspDTO.getAcCurBal();
             }
         }
-		//校验提现余额加手续费大于用户账户余额,则抛出异常
-		if(balance.compareTo(totalAmt) == 1){
+		//校验提现金额加手续费大于用户账户余额,则抛出异常
+		if(totalAmt.compareTo(balance) == 1){
 			LemonException.throwBusinessException("PWM30002");
 		}
 
