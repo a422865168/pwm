@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.annotation.Resource;
 import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.cpi.client.RouteClient;
-import com.hisun.lemon.cpi.dto.RouteDTO;
+import com.hisun.lemon.cpi.dto.RouteRspDTO;
 import com.hisun.lemon.cpi.enums.CorpBusSubTyp;
 import com.hisun.lemon.cpi.enums.CorpBusTyp;
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
@@ -743,10 +743,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setExtOrderNo(cashierViewDTO.getOrderNo());
 		this.service.updateOrder(rechargeOrderDO);
 
-		GenericRspDTO<List<RouteDTO>> GenericRounteList = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
-		List<RouteDTO> rounteList = GenericRounteList.getBody();
-		if(JudgeUtils.isNotSuccess(GenericRounteList.getMsgCd())) {
-			LemonException.throwBusinessException(GenericRounteList.getMsgCd());
+		GenericRspDTO<RouteRspDTO> genericRounteListRsp = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
+		RouteRspDTO routeRspDTO = genericRounteListRsp.getBody();
+		List<RouteRspDTO.RouteDTO> rounteList = routeRspDTO.getList();
+		if(JudgeUtils.isNotSuccess(genericRounteListRsp.getMsgCd())) {
+			LemonException.throwBusinessException(genericRounteListRsp.getMsgCd());
 		}
 		GenericRspDTO<UserBasicInfDTO> genericUserBasicInfDTO = userBasicInfClient.queryUser(offlineRechargeApplyDTO.getPayerId());
 		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
@@ -762,7 +763,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			offlineRechargeResultDTO.setMblNo(userBasicInfDTO.getMblNo());
 		}
 		String crdCorpOrg = offlineRechargeApplyDTO.getCrdCorpOrg();
-		for(RouteDTO rd : rounteList) {
+		for(RouteRspDTO.RouteDTO rd : rounteList) {
 			if(JudgeUtils.equals(crdCorpOrg,rd.getCrdCorpOrg())) {
 				//汇款银行账号
 				offlineRechargeResultDTO.setCrdNo(rd.getCorpAccNo());
@@ -794,12 +795,13 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
 
 		//根据资金机构查询汇款账户
-		GenericRspDTO<List<RouteDTO>> GenericRounteList = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
-		List<RouteDTO> rounteList = GenericRounteList.getBody();
-		if(JudgeUtils.isNotSuccess(GenericRounteList.getMsgCd())) {
-			LemonException.throwBusinessException(GenericRounteList.getMsgCd());
+		GenericRspDTO<RouteRspDTO> genericRounteListRsp = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
+		RouteRspDTO routeRspDTO = genericRounteListRsp.getBody();
+		List<RouteRspDTO.RouteDTO> rounteList = routeRspDTO.getList();
+		if(JudgeUtils.isNotSuccess(genericRounteListRsp.getMsgCd())) {
+			LemonException.throwBusinessException(genericRounteListRsp.getMsgCd());
 		}
-		RouteDTO routeDTO = rounteList.get(0);
+		RouteRspDTO.RouteDTO routeDTO = rounteList.get(0);
 		GenericDTO<OfflinePaymentDTO> genericOfflinePaymentDTO = new GenericDTO<>();
 		OfflinePaymentDTO offlinePaymentDTO = new OfflinePaymentDTO();
 		offlinePaymentDTO.setCashRemittUrl(remittanceUploadDTO.getRemittUrl());
