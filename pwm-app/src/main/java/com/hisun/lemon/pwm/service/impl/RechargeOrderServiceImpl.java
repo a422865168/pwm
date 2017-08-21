@@ -330,15 +330,15 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//账号资金属性：1 现金 8 待结算
 		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 		String payerId = rechargeResultDTO.getPayerId();
-		if(JudgeUtils.isBlank(payerId)){
-		    payerId = LemonUtils.getUserId();
-        }
 		//现金账户
 		String balAcNo=acmComponent.getAcmAcNo(payerId, balCapType);
 
 		switch (busType) {
 			//个人快捷支付账户充值
 			case PwmConstants.BUS_TYPE_RECHARGE_QP:
+				if(JudgeUtils.isBlank(balAcNo)){
+					throw new LemonException("PWM20022");
+				}
 				// 借：其他应付款-暂收-收银台
 				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), rechargeOrderDO.getExtOrderNo(), rechargeOrderDO.getTxType(),
 						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
