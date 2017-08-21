@@ -185,7 +185,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		withdrawOrderDO.setTxType(PwmConstants.TX_TYPE_WITHDRAW);
 		//提现总金额=实际提现金额+手续费
         withdrawOrderDO.setWcTotalAmt(totalAmt);
-        withdrawOrderDO.setWcActAmt(totalAmt.divide(fee));
+        withdrawOrderDO.setWcActAmt(totalAmt.subtract(fee));
 		//业务类型 0401个人提现
 		withdrawOrderDO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_P);
 		withdrawOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
