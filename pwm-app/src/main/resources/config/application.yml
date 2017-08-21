@@ -175,7 +175,7 @@ lemon :
   redisson :
     enabled : true
     mode : single
-    address : 120.76.22.56:6379
+    address : 192.168.1.39:6379
     password : Hisunpay2017
     poolSize : 30
     idleSize : 5
