@@ -342,7 +342,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 				// 贷：其他应付款-支付账户-xx用户现金账户
 				userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), rechargeOrderDO.getExtOrderNo(), rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), null, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), null, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
 						CshConstants.AC_ITEM_CSH_BAL, balAcNo, null, null, null, null);
 				acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
 				break;
