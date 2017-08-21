@@ -340,12 +340,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					throw new LemonException("PWM20022");
 				}
 				// 借：其他应付款-暂收-收银台
-				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,28), rechargeOrderDO.getTxType(),
+				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14), rechargeOrderDO.getTxType(),
 						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
 						CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
 
 				// 贷：其他应付款-支付账户-xx用户现金账户
-				userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,28), rechargeOrderDO.getTxType(),
+				userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14), rechargeOrderDO.getTxType(),
 						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
 						CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "快捷充值$"+rechargeOrderDO.getOrderAmt());
 				acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
