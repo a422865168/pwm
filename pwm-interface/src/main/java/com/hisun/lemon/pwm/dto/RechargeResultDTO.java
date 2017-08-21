@@ -39,7 +39,7 @@ public class RechargeResultDTO {
 	private String payerId;
 
 	@ApiModelProperty(name = "txJrnNo", value = "收银订单流水")
-	@Length(max =26)
+	@Length(max =30)
 	private String txJrnNo;
 
 	/**
