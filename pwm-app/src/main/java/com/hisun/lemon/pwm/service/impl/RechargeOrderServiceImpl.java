@@ -336,13 +336,13 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			//个人快捷支付账户充值
 			case PwmConstants.BUS_TYPE_RECHARGE_QP:
 				// 借：其他应付款-暂收-收银台
-				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getExtOrderNo(), rechargeResultDTO.getTxJrnNo(), rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
+				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), rechargeOrderDO.getExtOrderNo(), rechargeOrderDO.getTxType(),
+						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
 						CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
 
 				// 贷：其他应付款-支付账户-xx用户现金账户
-				userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getExtOrderNo(), rechargeResultDTO.getTxJrnNo(), rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), null, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+				userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), rechargeOrderDO.getExtOrderNo(), rechargeOrderDO.getTxType(),
+						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), null, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
 						CshConstants.AC_ITEM_CSH_BAL, balAcNo, null, null, null, null);
 				acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
 				break;
