@@ -21,6 +21,7 @@ import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
+import com.jcraft.jsch.Logger;
 
 /**
  * 账务组件
@@ -147,10 +148,9 @@ public class AcmComponent {
 		GenericDTO<List<AccountingReqDTO>> userAccDto = new GenericDTO<>();
 		userAccDto.setBody(accList);
 		GenericRspDTO<NoBody> accountingTreatment = accountingTreatmentClient.accountingTreatment(userAccDto);
-
-		if (JudgeUtils.isNotSuccess(accountingTreatment.getMsgCd())) {
+		/*if (JudgeUtils.isNotSuccess(accountingTreatment.getMsgCd())) {
 			LemonException.throwBusinessException(accountingTreatment.getMsgCd());
-		}
+		}*/
 		return accountingTreatment;
 	}
 
