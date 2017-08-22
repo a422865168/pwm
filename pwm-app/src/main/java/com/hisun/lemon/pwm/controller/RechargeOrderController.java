@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.pwm.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -18,16 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RemittanceUploadDTO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
 
 import io.swagger.annotations.Api;
@@ -62,14 +53,13 @@ public class RechargeOrderController {
 		return GenericRspDTO.newSuccessInstance();
 	}
 
-	@ApiOperation(value = "营业厅查询", notes = "查询用户与充值订单信息")
-	@ApiResponse(code = 200, message = "查询到的用户与订单信息")
+	@ApiOperation(value = "营业厅查询", notes = "查询用户账户信息")
+	@ApiResponse(code = 200, message = "查询到的用户与账户信息")
 	@GetMapping(value = "/hall/info")
-	public GenericRspDTO<HallQueryResultDTO> queryUserOrOrderInfo(@Validated @RequestParam(value = "key",required = false) String key,
-														   @Validated @RequestParam(value = "hallOrderNo") String hallOrderNo,
+	public GenericRspDTO<HallQueryResultDTO> queryUserInfo(@Validated @RequestParam(value = "key",required = true) String key,
 														   @Validated @RequestParam(value = "amount",required = false) BigDecimal amount,
-														   @Validated @RequestParam(value = "type",required = false) String type) {
-		HallQueryResultDTO resultDTO = service.queryUserOrOrderInfo(key,hallOrderNo,amount,type);
+														   @Validated @RequestParam(value = "type",required = true) String type) {
+		HallQueryResultDTO resultDTO = service.queryUserInfo(key,amount,type);
 		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 
@@ -123,6 +113,14 @@ public class RechargeOrderController {
 	@PatchMapping(value = "/offline/pay")
 	public GenericRspDTO<OfflineRechargeResultDTO> offlineRemittanceUpload(@Validated @RequestBody GenericDTO<RemittanceUploadDTO> genericDTO) {
 		OfflineRechargeResultDTO resultDTO = service.offlineRemittanceUpload(genericDTO);
+		return GenericRspDTO.newSuccessInstance(resultDTO);
+	}
+
+	@ApiOperation(value = "营业厅订单查询", notes = "查询充值订单详细信息")
+	@ApiResponse(code = 200, message = "查询到订单详细信息")
+	@GetMapping(value = "/order/info")
+	public GenericRspDTO<HallOrderQueryResultDTO> queryOrderInfo(@Validated @RequestParam(value = "hallOrderNo") String hallOrderNo) {
+		HallOrderQueryResultDTO resultDTO = service.queryOrderInfo(hallOrderNo);
 		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 }
