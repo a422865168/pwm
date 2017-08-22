@@ -180,6 +180,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		// 账务处理
 		AccountingReqDTO userAccountReqDTO = null; // xx用户海币账户
 		AccountingReqDTO cshItemReqDTO = null; // 暂收收银台账务对象
+		BigDecimal orderAmt=rechargeSeaDO.getOrderAmt();
 		//流水号
 		String payJrnNo=LemonUtils.getRequestId();
 		// 查询用户帐号
@@ -192,7 +193,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					payJrnNo, 
 					rechargeSeaDO.getTxType(), 
 					ACMConstants.ACCOUNTING_NOMARL, 
-					rechargeSeaDO.getOrderAmt(),
+					orderAmt,
 					balAcNo, 
 					ACMConstants.ITM_AC_TYP, 
 					balCapType, 
@@ -210,7 +211,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					payJrnNo, 
 					rechargeSeaDO.getTxType(), 
 					ACMConstants.ACCOUNTING_NOMARL, 
-					rechargeSeaDO.getOrderAmt(),
+					orderAmt,
 					null, 
 					ACMConstants.USER_AC_TYP,
 					balCapType,

@@ -87,8 +87,6 @@ public class RechargeOrderController {
 	@PostMapping(value = "/order/sea")
 	@ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
 	public GenericRspDTO<CashierViewDTO> createHCouponOrder(@Validated @RequestBody GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO) {
-		String aa="aa";
-		String bb=aa;
 		return this.service.createHCouponOrder(rechargeHCouponDTO);
 	}
 
