@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.hisun.lemon.acm.client.AccountManagementClient;
@@ -31,6 +32,7 @@ import com.jcraft.jsch.Logger;
  */
 @Component
 public class AcmComponent {
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AcmComponent.class);
 
 	@Resource
 	private AccountingTreatmentClient accountingTreatmentClient;
@@ -64,6 +66,22 @@ public class AcmComponent {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 *
+	 * @param userId
+	 *            用户ID
+	 * @param acType
+	 *            账户类型 1 现金 2 待结算款
+	 * @return
+	 */
+	public BigDecimal getAccountBal(String userId,String acType){
+		QueryAcBalRspDTO queryAcBalRspDTO=this.getAcmAcInfo(userId,acType);
+		if(JudgeUtils.isNull(queryAcBalRspDTO)){
+			LemonException.throwBusinessException("CSH20050");
+		}
+		return queryAcBalRspDTO.getAcCurBal();
 	}
 
 	/**
@@ -148,10 +166,35 @@ public class AcmComponent {
 		GenericDTO<List<AccountingReqDTO>> userAccDto = new GenericDTO<>();
 		userAccDto.setBody(accList);
 		GenericRspDTO<NoBody> accountingTreatment = accountingTreatmentClient.accountingTreatment(userAccDto);
-		/*if (JudgeUtils.isNotSuccess(accountingTreatment.getMsgCd())) {
+		if (JudgeUtils.isNotSuccess(accountingTreatment.getMsgCd())) {
 			LemonException.throwBusinessException(accountingTreatment.getMsgCd());
-		}*/
+		}
 		return accountingTreatment;
+	}
+
+	private QueryAcBalRspDTO getAcmAcInfo(String userId, String acTye) {
+		UserAccountDTO userDTO = new UserAccountDTO();
+		userDTO.setUserId(userId);
+		GenericDTO<UserAccountDTO> user=new GenericDTO<UserAccountDTO>();
+		user.setBody(userDTO);
+		GenericRspDTO<List<QueryAcBalRspDTO>> genericQueryAcBalRspDTO = accountManagementClient.queryAcBal(userDTO);
+		if(JudgeUtils.isNotSuccess(genericQueryAcBalRspDTO.getMsgCd())){
+			logger.error("查询账户信息失败："+userId);
+			LemonException.throwBusinessException(genericQueryAcBalRspDTO.getMsgCd());
+		}
+
+		List<QueryAcBalRspDTO> acmAcBalInfList = genericQueryAcBalRspDTO.getBody();
+
+		if (JudgeUtils.isNull(acmAcBalInfList) || JudgeUtils.isEmpty(acmAcBalInfList)) {
+			throw new LemonException("CSH20050");
+		}
+
+		for (QueryAcBalRspDTO queryAcBalRspDTO : acmAcBalInfList) {
+			if (StringUtils.equals(queryAcBalRspDTO.getCapTyp(), acTye)) {
+				return queryAcBalRspDTO;
+			}
+		}
+		return null;
 	}
 
 }

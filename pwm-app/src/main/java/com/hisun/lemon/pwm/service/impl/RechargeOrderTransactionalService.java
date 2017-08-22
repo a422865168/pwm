@@ -75,7 +75,7 @@ public class RechargeOrderTransactionalService {
   }
 
 	/**
-	 * 根据外部充值订单号与订单状态查询充值订单
+	 * 根据外部收银订订单号与订单状态查询充值订单
 	 * @param extOrderNo 外部充值订单号
 	 * @return
 	 */
@@ -83,6 +83,17 @@ public class RechargeOrderTransactionalService {
 		RechargeOrderDO rechargeOrderDO = this.rechangeOrderDao.getRechargeOrderByExtOrderNo(extOrderNo);
 		return rechargeOrderDO;
 	}
+
+	/**
+	 * 根据营业厅充值订单号查询充值订单信息
+	 * @param hallOrderNo
+	 * @return
+	 */
+	public RechargeOrderDO getRechargeOrderByHallOrderNo(String hallOrderNo) {
+		RechargeOrderDO rechargeOrderDO = this.rechangeOrderDao.getRechargeOrderByHallOrderNo(hallOrderNo);
+		return rechargeOrderDO;
+	}
+
 	public IRechargeOrderDao getRechangeOrderDao() {
 		return rechangeOrderDao;
 	}

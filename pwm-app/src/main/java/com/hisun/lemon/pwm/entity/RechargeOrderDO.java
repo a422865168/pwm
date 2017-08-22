@@ -39,6 +39,14 @@ public class RechargeOrderDO extends BaseDO {
      */
     private String orderStatus;
     /**
+     * @Fields fee 充值手续费
+     */
+    private BigDecimal fee;
+    /**
+     * @Fields hallOrderNo 营业厅充值订单号
+     */
+    private String hallOrderNo;
+    /**
      * @Fields orderSuccTm 订单成功时间
      */
     private LocalDateTime orderSuccTm;
@@ -212,5 +220,22 @@ public class RechargeOrderDO extends BaseDO {
 
     public void setCrdCorpOrg(String crdCorpOrg) {
         this.crdCorpOrg = crdCorpOrg;
+    }
+
+
+    public String getHallOrderNo() {
+        return hallOrderNo;
+    }
+
+    public void setHallOrderNo(String hallOrderNo) {
+        this.hallOrderNo = hallOrderNo;
+    }
+
+    public BigDecimal getFee() {
+        return fee;
+    }
+
+    public void setFee(BigDecimal fee) {
+        this.fee = fee;
     }
 }

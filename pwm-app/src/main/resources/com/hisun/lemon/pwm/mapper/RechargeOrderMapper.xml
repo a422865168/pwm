@@ -22,12 +22,14 @@
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
         <result column="corp_org" property="crdCorpOrg" jdbcType="VARCHAR" />
+        <result column="fee" property="fee" jdbcType="DECIMAL" />
+        <result column="hall_order_no" property="hallOrderNo" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="Base_Column_List" >
         order_no, order_tm, ac_tm, tx_type, bus_type, order_ccy, order_amt, order_status, 
         order_succ_tm, psn_flag, order_exp_tm, sys_channel, ip_address, remark,ext_order_no, modify_opr,
-        create_time, modify_time,corp_org
+        create_time, modify_time,corp_org,fee,hall_order_no
     </sql>
 
     <select id="get" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -102,6 +104,12 @@
             <if test="crdCorpOrg != null" >
                 corp_org,
             </if>
+            <if test="fee != null" >
+                fee,
+            </if>
+            <if test="hallOrderNo != null" >
+                hall_order_no,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null" >
@@ -161,6 +169,12 @@
             <if test="crdCorpOrg != null" >
                 #{crdCorpOrg,jdbcType=VARCHAR},
             </if>
+            <if test="fee != null" >
+                #{fee,jdbcType=DECIMAL},
+            </if>
+            <if test="hallOrderNo != null" >
+                #{hallOrderNo,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
 
@@ -218,6 +232,12 @@
             <if test="crdCorpOrg != null" >
                 corp_org = #{crdCorpOrg,jdbcType=VARCHAR},
             </if>
+            <if test="fee != null" >
+                fee = #{fee,jdbcType=DECIMAL},
+            </if>
+            <if test="hallOrderNo != null" >
+                hall_order_no = #{hallOrderNo,jdbcType=VARCHAR},
+            </if>
         </set>
         where order_no = #{orderNo,jdbcType=VARCHAR}
     </update>
@@ -247,5 +267,12 @@
                 </foreach>
             </if>
         </where>
+    </select>
+
+    <select id="getRechargeOrderByHallOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_rechange_order
+        where hall_order_no = #{hallOrderNo,jdbcType=VARCHAR}
     </select>
 </mapper>

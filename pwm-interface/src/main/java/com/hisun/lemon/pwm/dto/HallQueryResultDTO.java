@@ -9,17 +9,15 @@ import io.swagger.annotations.ApiModelProperty;
 
 
 /**
- * 营业厅充值查询结果 传输对象
+ * 营业厅用户账户查询结果 传输对象
  * @author tone
  * @date 2017年7月21日
  * @time 上午9:27:30
  *
  */
-@ApiModel("营业厅充值查询结果传输对象")
+@ApiModel("营业厅用户账户查询结果 传输对象")
 public class HallQueryResultDTO {
 
-	@ApiModelProperty(name = "orderNo", value = "平台充值订单号")
-	private  String orderNo;
 	/**
 	 * 查询关键字
 	 */
@@ -44,31 +42,11 @@ public class HallQueryResultDTO {
 	private BigDecimal fee;
 
 	/**
-	 * 营业厅充值订单号
+	 * 用户账户余额/商户结算余额
 	 */
-	@ApiModelProperty(name = "hallOrderNo", value = "营业厅充值订单号")
-	private  String hallOrderNo;
+	@ApiModelProperty(name = "acBalAmt", value = "账户余额")
+	private BigDecimal acBalAmt;
 
-	/**
-	 * 营业厅充值订单状态
-	 */
-	@ApiModelProperty(name = "orderStatus", value = "营业厅充值订单状态")
-	private  String orderStatus;
-
-	@ApiModelProperty(name = "orderAmt", value = "订单金额")
-	private  BigDecimal orderAmt;
-
-	/**
-	 * 下单时间
-	 */
-	@ApiModelProperty(name = "orderTm", value = "下单时间")
-	private LocalDateTime orderTm;
-
-	/**
-	 * 订单交易成功时间
-	 */
-	@ApiModelProperty(name = "orderTm", value = "交易完成时间")
-	private LocalDateTime orderSuccTm;
 
 	public String getKey() {
 		return key;
@@ -102,51 +80,11 @@ public class HallQueryResultDTO {
 		this.fee = fee;
 	}
 
-	public String getHallOrderNo() {
-		return hallOrderNo;
+	public BigDecimal getAcBalAmt() {
+		return acBalAmt;
 	}
 
-	public void setHallOrderNo(String hallOrderNo) {
-		this.hallOrderNo = hallOrderNo;
-	}
-
-	public String getOrderStatus() {
-		return orderStatus;
-	}
-
-	public void setOrderStatus(String orderStatus) {
-		this.orderStatus = orderStatus;
-	}
-
-	public String getOrderNo() {
-		return orderNo;
-	}
-
-	public void setOrderNo(String orderNo) {
-		this.orderNo = orderNo;
-	}
-
-	public BigDecimal getOrderAmt() {
-		return orderAmt;
-	}
-
-	public void setOrderAmt(BigDecimal orderAmt) {
-		this.orderAmt = orderAmt;
-	}
-
-	public LocalDateTime getOrderTm() {
-		return orderTm;
-	}
-
-	public void setOrderTm(LocalDateTime orderTm) {
-		this.orderTm = orderTm;
-	}
-
-	public LocalDateTime getOrderSuccTm() {
-		return orderSuccTm;
-	}
-
-	public void setOrderSuccTm(LocalDateTime orderSuccTm) {
-		this.orderSuccTm = orderSuccTm;
+	public void setAcBalAmt(BigDecimal acBalAmt) {
+		this.acBalAmt = acBalAmt;
 	}
 }

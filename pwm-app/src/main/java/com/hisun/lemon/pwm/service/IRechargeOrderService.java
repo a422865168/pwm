@@ -5,15 +5,7 @@ import java.math.BigDecimal;
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
-import com.hisun.lemon.pwm.dto.RemittanceUploadDTO;
+import com.hisun.lemon.pwm.dto.*;
 
 
 /**
@@ -34,12 +26,11 @@ public interface IRechargeOrderService {
     /**
      * 查询用户与订单信息
      * @param key
-     * @param hallOrderNo
      * @param amount
      * @param type
      * @return
      */
-    public HallQueryResultDTO queryUserOrOrderInfo(String key,String hallOrderNo,BigDecimal amount,String type);
+    public HallQueryResultDTO queryUserInfo(String key,BigDecimal amount,String type);
 
     /**
      * 营业厅充值处理
@@ -82,4 +73,11 @@ public interface IRechargeOrderService {
      * @return
      */
     public OfflineRechargeResultDTO offlineRemittanceUpload(GenericDTO<RemittanceUploadDTO> genericDTO);
+
+    /**
+     * 查询营业厅订单查询详细信息
+     * @param hallOrderNo
+     * @return
+     */
+    public HallOrderQueryResultDTO queryOrderInfo(String hallOrderNo);
 }
