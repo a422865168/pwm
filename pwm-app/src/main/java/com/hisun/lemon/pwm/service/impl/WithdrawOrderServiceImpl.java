@@ -104,7 +104,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         jrnReqDTO.setTxTime(DateTimeUtils.getCurrentLocalTime());
         jrnReqDTO.setTxJrnNo(ymd+orderNo);
         jrnReqDTO.setTxOrdNo(ymd+orderNo);
-        jrnReqDTO.setStlUserId(genericWithdrawDTO.getUserId());
+        jrnReqDTO.setStlUserId(withdrawDTO.getUserId());
         genericRspDTO = riskCheckClient.riskControl(jrnReqDTO);
 		if(JudgeUtils.isNull(genericRspDTO)){
 		    LemonException.throwBusinessException("PWM30007");
@@ -134,7 +134,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         //总提现金额
         BigDecimal totalAmt = tradeGenericRspDTO.getBody().getTradeTotalAmt();
         //校验前端传入的手续费与计算出的手续费是否一致
-        if(!JudgeUtils.equals(fee, withdrawDTO.getFeeAmt())){
+        if(fee.compareTo(withdrawDTO.getFeeAmt())!=0){
             LemonException.throwBusinessException("PWM30006");
         }
 
@@ -150,7 +150,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         }
         //判断资金类型为现金，则填充账户余额
         for(QueryAcBalRspDTO acBalRspDTO: queryAcBalRspDTO) {
-            if(JudgeUtils.equals(CapTypEnum.CAP_TYP_CASH,acBalRspDTO.getCapTyp())) {
+            if(JudgeUtils.equals(CapTypEnum.CAP_TYP_CASH.getCapTyp(),acBalRspDTO.getCapTyp())) {
                 balance = acBalRspDTO.getAcCurBal();
             }
         }
