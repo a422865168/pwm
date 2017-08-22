@@ -81,9 +81,9 @@ spring :
           enable : true
           #binder topic
           destination : ${spring.application.name}
-        output1 :
-          enable : false
-          destination : PRD
+        output6 :
+          enable : true
+          destination : BIL
 
 ribbon :
   #retry next Server times

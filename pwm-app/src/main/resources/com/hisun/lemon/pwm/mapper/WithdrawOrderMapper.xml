@@ -327,7 +327,7 @@
     <select id="queryList" resultMap="BaseResultMap" parameterType="java.util.Map" >
         select
         <include refid="Base_Column_List" />
-        from csh_order
+        from pwm_withdraw_order
         <where>
             <if test="acTm != null">
                 <![CDATA[and ac_tm = #{acTm}]]>
