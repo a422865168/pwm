@@ -187,12 +187,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
         }   
 		//String balAcNo = acmComponent.getAcmAcNo(LemonUtils.getUserId(), balCapType);
 		//借：其他应付款-暂收-收银台         100
-		cshItemReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), payJrnNo, rechargeSeaDO.getBusType(),
+		cshItemReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), payJrnNo, rechargeSeaDO.getTxType(),
                 ACMConstants.ACCOUNTING_NOMARL, orderAmt, acNo, ACMConstants.USER_AC_TYP, balCapType,
                 ACMConstants.AC_D_FLG, PwmConstants.AC_ITEM_CSH_PAY, null, null, null,
                 null, null);
                 
-		userAccountReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), payJrnNo, rechargeSeaDO.getBusType(),
+		userAccountReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), payJrnNo, rechargeSeaDO.getTxType(),
                 ACMConstants.ACCOUNTING_NOMARL,orderAmt, null, ACMConstants.ITM_AC_TYP, balCapType,
                 ACMConstants.AC_C_FLG, PwmConstants.AC_ITEM_HCOUPONE, PwmConstants.AC_ITEM_HCOUPONE, null, null,
                 null, null);
