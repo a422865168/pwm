@@ -321,10 +321,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		String busType = rechargeResultDTO.getBusType();
 		AccountingReqDTO userAccountReqDTO=null;     //用户现金账户账务对象
 		AccountingReqDTO cshItemReqDTO=null;         //暂收收银台账务对象
-		AccountingReqDTO couponItemReqDTO=null;      //优惠账务对象
-		AccountingReqDTO crdItemReqDTO=null;         //补款账务对象
-		AccountingReqDTO cnlRechargeBnkReqDTO=null;  //充值渠道银行账务对象
-		AccountingReqDTO depositAccountBnkReqDTO=null; //备付金账户银行账务对象
 
 		//账号资金属性：1 现金 8 待结算
 		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
@@ -363,14 +359,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 						CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "汇款充值$"+rechargeOrderDO.getOrderAmt());
 				acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
 
-//			case PwmConstants.BUS_TYPE_RECHARGE_HALL:
-//				break;
-			case PwmConstants.BUS_TYPE_RECHARGE_BNB:
-			break;
-			case PwmConstants.BUS_TYPE_WITHDRAW_P:
-				break;
-			case PwmConstants.BUS_TYPE_WITHDRAW_M:
-				break;
 			default:
 				break;
 		}
