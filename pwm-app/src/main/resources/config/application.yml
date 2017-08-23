@@ -295,6 +295,15 @@ pwm :
   recharge :
     #营业厅充值签名KEY值
     HALLKEY : PWM123456789002
+    onlineDesc :
+       en : online recharge amount $$amount$
+       zh : 在线充值 $$amount$
+    hallDesc :
+       en : hall recharge amount $$amount$
+       zh : 营业厅充值 $$amount$
+    remitDesc :
+       en : hall recharge amount $$amount$
+       zh : 汇款充值 $$amount$
   sftp :
     ip : 192.168.1.38
     port : 22

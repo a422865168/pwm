@@ -269,7 +269,15 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 	  	initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
-		initCashierDTO.setGoodsDesc("在线充值$"+rechargeDTO.getAmount());
+
+		String language=LemonUtils.getLocale().getLanguage();
+		if(StringUtils.isBlank(language)){
+			language="en";
+		}
+		String descFormat=LemonUtils.getProperty("pwm.recharge.onlineDesc."+language);
+		String desc=descFormat.replace("$amount$",String.valueOf(rechargeOrderDO.getOrderAmt()));
+
+		initCashierDTO.setGoodsDesc(desc);
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		logger.info("订单："+rechargeOrderDO.getOrderNo()+" 请求收银台");
@@ -310,10 +318,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		String busType = rechargeResultDTO.getBusType();
 		AccountingReqDTO userAccountReqDTO=null;     //用户现金账户账务对象
 		AccountingReqDTO cshItemReqDTO=null;         //暂收收银台账务对象
-		AccountingReqDTO couponItemReqDTO=null;      //优惠账务对象
-		AccountingReqDTO crdItemReqDTO=null;         //补款账务对象
-		AccountingReqDTO cnlRechargeBnkReqDTO=null;  //充值渠道银行账务对象
-		AccountingReqDTO depositAccountBnkReqDTO=null; //备付金账户银行账务对象
 
 		//账号资金属性：1 现金 8 待结算
 		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
@@ -352,14 +356,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 						CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "汇款充值$"+rechargeOrderDO.getOrderAmt());
 				acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
 
-//			case PwmConstants.BUS_TYPE_RECHARGE_HALL:
-//				break;
-			case PwmConstants.BUS_TYPE_RECHARGE_BNB:
-			break;
-			case PwmConstants.BUS_TYPE_WITHDRAW_P:
-				break;
-			case PwmConstants.BUS_TYPE_WITHDRAW_M:
-				break;
 			default:
 				break;
 		}
@@ -417,7 +413,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			hallQueryResultDTO.setUmId(userBasicInfDTO.getUserId());
 			hallQueryResultDTO.setKey(key);
 			hallQueryResultDTO.setAcBalAmt(curAcBal);
-			if(JudgeUtils.equals(PwmConstants.HALL_QUERY_TYPE_U,type)) {
+			if(JudgeUtils.equals(PwmConstants.HALL_QUERY_TYPE_U, type)) {
 				hallQueryResultDTO.setUmName(userBasicInfDTO.getUsrNm());
 			} else if (JudgeUtils.equals(PwmConstants.HALL_QUERY_TYPE_M,type)) {
 				hallQueryResultDTO.setUmName(userBasicInfDTO.getMercName());
@@ -733,7 +729,14 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
 		initCashierDTO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
 		initCashierDTO.setPayerName("");
-		initCashierDTO.setGoodsDesc("汇款充值$"+rechargeOrderDO.getOrderAmt());
+
+		String language=LemonUtils.getLocale().getLanguage();
+		if(StringUtils.isBlank(language)){
+			language="en";
+		}
+		String descFormat=LemonUtils.getProperty("pwm.recharge.remitDesc."+language);
+		String desc=descFormat.replace("$amount$",String.valueOf(rechargeOrderDO.getOrderAmt()));
+		initCashierDTO.setGoodsDesc(desc);
 
 		GenericDTO<InitCashierDTO> genericCashierDTO = new GenericDTO<>();
 		genericCashierDTO.setBody(initCashierDTO);
