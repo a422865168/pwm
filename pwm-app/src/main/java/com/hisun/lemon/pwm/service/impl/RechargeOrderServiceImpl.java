@@ -176,26 +176,23 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		AccountingReqDTO cshItemReqDTO = null; // 暂收收银台账务对象
 		BigDecimal orderAmt=rechargeSeaDO.getOrderAmt();
 		//流水号
-		String payJrnNo=LemonUtils.getRequestId();
+		//String payJrnNo=LemonUtils.getRequestId();
+		String acmJrnNo =  IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
 		// 查询用户帐号
 		String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
 		//查询用户账号
 		String userId=rechargeSeaDO.getUserId();
-        String acNo = accountManagementClient.queryAcNo(userId).getBody();
-        if(JudgeUtils.isEmpty(acNo)){
-            LemonException.throwBusinessException("PWM40006");
-        }   
-		//String balAcNo = acmComponent.getAcmAcNo(LemonUtils.getUserId(), balCapType);
+		String balAcNo = acmComponent.getAcmAcNo(userId, balCapType);
 		//借：其他应付款-暂收-收银台         100
-		cshItemReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), payJrnNo, rechargeSeaDO.getTxType(),
-                ACMConstants.ACCOUNTING_NOMARL, orderAmt, acNo, ACMConstants.USER_AC_TYP, balCapType,
+		cshItemReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), acmJrnNo, rechargeSeaDO.getTxType(),
+                ACMConstants.ACCOUNTING_NOMARL, orderAmt, balAcNo, ACMConstants.ITM_AC_TYP, balCapType,
                 ACMConstants.AC_D_FLG, PwmConstants.AC_ITEM_CSH_PAY, null, null, null,
-                null, null);
+                null, "PWM海币充值");
                 
-		userAccountReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), payJrnNo, rechargeSeaDO.getTxType(),
+		userAccountReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(),acmJrnNo, rechargeSeaDO.getTxType(),
                 ACMConstants.ACCOUNTING_NOMARL,orderAmt, null, ACMConstants.ITM_AC_TYP, balCapType,
                 ACMConstants.AC_C_FLG, PwmConstants.AC_ITEM_HCOUPONE, PwmConstants.AC_ITEM_HCOUPONE, null, null,
-                null, null);
+                null, "PWM海币充值");
 		acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);	
 		// 账务更新成功  调用海币充值接口
 		logger.info("调用营销======"+rechargeSeaDO.getOrderNo());
