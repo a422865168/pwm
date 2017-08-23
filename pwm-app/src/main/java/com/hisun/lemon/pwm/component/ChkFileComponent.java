@@ -8,6 +8,7 @@ import com.hisun.lemon.framework.data.BaseDO;
 import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.jcommon.file.FileSftpUtils;
 import com.hisun.lemon.jcommon.file.FileUtils;
+import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.dao.IRechargeHCouponDao;
 import com.hisun.lemon.pwm.dao.IRechargeOrderDao;
 import com.hisun.lemon.pwm.dao.IWithdrawOrderDao;
@@ -67,6 +68,14 @@ public class ChkFileComponent {
 		return withdrawOrderDao.queryList(queryDo);
 	}
 
+	public List<RechargeOrderDO> queryHallRecharges(LocalDate date,String[] chkOrderStatus){
+		Map queryDo=new HashMap<>();
+		queryDo.put("acTm",date);
+		queryDo.put("statusList",chkOrderStatus);
+		queryDo.put("busType", PwmConstants.BUS_TYPE_RECHARGE_HALL);
+		return rechargeOrderDao.queryListOfHall(queryDo);
+	}
+
 	/**
 	 * 获取对账数据日期
 	 * @return
@@ -113,7 +122,7 @@ public class ChkFileComponent {
 			LemonException.throwBusinessException("CSH20035");
 		}
 
-	}
+}
 
 	/**
 	 * 文件上传SFTP服务器
@@ -164,7 +173,7 @@ public class ChkFileComponent {
 	 * @param appCnl
 	 * @return
 	 */
-	private String getLocalPath(String appCnl){
+	public String getLocalPath(String appCnl){
 		String localPath=LemonUtils.getProperty("pwm.chk.localPath")+appCnl+"/";
 		File localPathFile=new File(localPath);
 		if(localPathFile.exists()){
