@@ -79,6 +79,12 @@ public class WithdrawDTO {
 	@Length(max =100)
 	private String wcRemark;
 
+	//银行卡户名
+	@ApiModelProperty(name = "cardUserName", value = "银行卡户名")
+	@NotEmpty(message="PWM10047")
+	@Length(max =20)
+	private String cardUserName;
+
 	public String getUserId() {
 		return userId;
 	}
@@ -173,5 +179,13 @@ public class WithdrawDTO {
 
 	public void setWcRemark(String wcRemark) {
 		this.wcRemark = wcRemark;
+	}
+
+	public String getCardUserName() {
+		return cardUserName;
+	}
+
+	public void setCardUserName(String cardUserName) {
+		this.cardUserName = cardUserName;
 	}
 }
