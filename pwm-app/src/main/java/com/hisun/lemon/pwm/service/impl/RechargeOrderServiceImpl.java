@@ -179,43 +179,23 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		String payJrnNo=LemonUtils.getRequestId();
 		// 查询用户帐号
 		String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
-		//先静静
-		String balAcNo = acmComponent.getAcmAcNo(LemonUtils.getUserId(), balCapType);
+		//查询用户账号
+		String userId=rechargeSeaDO.getUserId();
+        String acNo = accountManagementClient.queryAcNo(userId).getBody();
+        if(JudgeUtils.isEmpty(acNo)){
+            LemonException.throwBusinessException("PWM40006");
+        }   
+		//String balAcNo = acmComponent.getAcmAcNo(LemonUtils.getUserId(), balCapType);
 		//借：其他应付款-暂收-收银台         100
-		cshItemReqDTO=acmComponent.createAccountingReqDTO(
-					rechargeSeaDO.getOrderNo(),
-					payJrnNo, 
-					rechargeSeaDO.getTxType(), 
-					ACMConstants.ACCOUNTING_NOMARL, 
-					orderAmt,
-					balAcNo, 
-					ACMConstants.ITM_AC_TYP, 
-					balCapType, 
-					ACMConstants.AC_D_FLG, 
-					PwmConstants.AC_ITEM_CSH_PAY,
-					null, 
-					null, 
-					null, 
-					null, 
-					null);  
-						
-		//贷：其他应付款-中转挂账-海币       100
-		userAccountReqDTO=acmComponent.createAccountingReqDTO(
-					rechargeSeaDO.getOrderNo(),
-					payJrnNo, 
-					rechargeSeaDO.getTxType(), 
-					ACMConstants.ACCOUNTING_NOMARL, 
-					orderAmt,
-					null, 
-					ACMConstants.USER_AC_TYP,
-					balCapType,
-					ACMConstants.AC_C_FLG, 
-					PwmConstants.AC_ITEM_HCOUPONE, 
-					balAcNo, 
-					null, 
-					null, 
-					null, 
-					null);	
+		cshItemReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), payJrnNo, rechargeSeaDO.getBusType(),
+                ACMConstants.ACCOUNTING_NOMARL, orderAmt, acNo, ACMConstants.USER_AC_TYP, balCapType,
+                ACMConstants.AC_D_FLG, PwmConstants.AC_ITEM_CSH_PAY, null, null, null,
+                null, null);
+                
+		userAccountReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), payJrnNo, rechargeSeaDO.getBusType(),
+                ACMConstants.ACCOUNTING_NOMARL,orderAmt, null, ACMConstants.ITM_AC_TYP, balCapType,
+                ACMConstants.AC_C_FLG, PwmConstants.AC_ITEM_HCOUPONE, PwmConstants.AC_ITEM_HCOUPONE, null, null,
+                null, null);
 		acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);	
 		// 账务更新成功  调用海币充值接口
 		logger.info("调用营销======"+rechargeSeaDO.getOrderNo());
@@ -223,7 +203,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		mkmReqDTO.setSeq(rechargeSeaDO.getOrderNo());
 		mkmReqDTO.setType("00");
 		mkmReqDTO.setMkTool("02");
-		String userId=rechargeSeaDO.getUserId();
 		mkmReqDTO.setUserId(userId);
 		String mblNo=accountManagementClient.queryAcNo(userId).getBody();
 		String mobile=mblNo;
