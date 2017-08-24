@@ -944,7 +944,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		try {
 			locker.lock("PWM_LOCK" + rechargeOrderNo, 18, 22, () -> {
 				//差错处理前校验
-				RechargeOrderDO rechargeOrderDO = checkBeforeErrHandle(hallRechargeFundRepDTO, PwmConstants.HALL_CHK_LONG_AMT);
+				RechargeOrderDO rechargeOrderDO = checkBeforeErrHandle(hallRechargeFundRepDTO, PwmConstants.HALL_CHK_SHORT_AMT);
 
 				//营业厅短款撤单处理
 				List<AccountingReqDTO> accList = createShortAmtErrAccList(rechargeOrderDO);
