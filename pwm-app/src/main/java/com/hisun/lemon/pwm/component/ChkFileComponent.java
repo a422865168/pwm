@@ -92,7 +92,7 @@ public class ChkFileComponent {
 	 * @return
 	 */
 	public String getChkFileName(String appCnl,LocalDate chkDate){
-		return appCnl+"_"+DateTimeUtils.formatLocalDate(chkDate,yyyyMMdd)+".ck";
+		return LemonUtils.getApplicationName()+"_"+appCnl+"_"+DateTimeUtils.formatLocalDate(chkDate,yyyyMMdd)+".ck";
 	}
 
 	/**
@@ -119,7 +119,7 @@ public class ChkFileComponent {
 			String localPath=getLocalPath(appCnl);
 			FileUtils.write(contextBuilder.toString(), localPath + fileName);
 		} catch (Exception e) {
-			LemonException.throwBusinessException("CSH20035");
+			LemonException.throwBusinessException("PWM40701");
 		}
 
 }
@@ -150,7 +150,7 @@ public class ChkFileComponent {
 			FileSftpUtils.upload(uploadFileNames,remoteIp,remotePort,connectTimeout,remotePath,name,pwd);
 		} catch (Exception e) {
 			logger.error(chkFileName+"上传SFTP文件服务器失败",e);
-			LemonException.throwBusinessException("CSH20037");
+			LemonException.throwBusinessException("PWM40702");
 		}
 	}
 
@@ -164,7 +164,7 @@ public class ChkFileComponent {
 			String localPath=getLocalPath(appCnl);
 			FileUtils.write("flag", localPath+flagName);
 		} catch (Exception e) {
-			LemonException.throwBusinessException("CSH20036");
+			LemonException.throwBusinessException("PWM40703");
 		}
 	}
 
@@ -187,7 +187,7 @@ public class ChkFileComponent {
 		boolean success=localPathFile.mkdirs();
 		if(!success){
 			logger.error(localPath+"目录创建失败，任务退出");
-			LemonException.throwBusinessException("CSH20038");
+			LemonException.throwBusinessException("PWM40704");
 
 		}
 		return localPath;

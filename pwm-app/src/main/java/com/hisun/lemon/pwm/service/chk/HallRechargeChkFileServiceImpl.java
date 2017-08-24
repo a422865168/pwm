@@ -46,7 +46,7 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
         List<RechargeOrderDO> orders=chkFileComponent.queryHallRecharges(chkDate,chkOrderStatus);
 
         //生成文件
-        writeToFile(appCnl,orders,chkFileName);
+        writeToFile(appCnl, orders, chkFileName);
         logger.info("生成对账文件"+flagName+"完成，开始上传至SFTP");
 
         //上传服务器
@@ -74,7 +74,7 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
             String localPath=chkFileComponent.getLocalPath(appCnl);
             FileUtils.write(contextBuilder.toString(), localPath + fileName);
         } catch (Exception e) {
-            LemonException.throwBusinessException("CSH20035");
+            LemonException.throwBusinessException("PWM40701");
         }
 
     }
