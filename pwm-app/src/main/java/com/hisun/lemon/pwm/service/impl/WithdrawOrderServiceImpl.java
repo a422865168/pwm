@@ -293,11 +293,13 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
             /**
              * 账务处理
              */
-            //查询用户账号
-            String acNo = accountManagementClient.queryAcNo(LemonUtils.getUserId()).getBody();
-            if(JudgeUtils.isEmpty(acNo)){
+            String userId = LemonUtils.getUserId();
+            GenericRspDTO genericRspDTO = accountManagementClient.queryAcNo(userId);
+            if(JudgeUtils.isNull(genericRspDTO)){
                 LemonException.throwBusinessException("PWM40006");
             }
+            //查询用户账号
+            String acNo = (String)genericRspDTO.getBody();
             //流水号
             String jrnNo = LemonUtils.getRequestId();
             //资金属性
