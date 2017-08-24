@@ -94,6 +94,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         //生成订单号
         String ymd= DateTimeUtils.getCurrentDateStr();
         String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE+ymd,15);
+        orderNo = PwmConstants.BUS_TYPE_WITHDRAW_P+ymd+orderNo;
 		WithdrawDTO withdrawDTO = genericWithdrawDTO.getBody();
         GenericRspDTO genericRspDTO = null;
         GenericDTO genericDTO = new GenericDTO();
@@ -104,8 +105,8 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         jrnReqDTO.setTxCnl("app");
         jrnReqDTO.setTxDate(DateTimeUtils.getCurrentLocalDate());
         jrnReqDTO.setTxTime(DateTimeUtils.getCurrentLocalTime());
-        jrnReqDTO.setTxJrnNo(ymd+orderNo);
-        jrnReqDTO.setTxOrdNo(ymd+orderNo);
+        jrnReqDTO.setTxJrnNo(orderNo);
+        jrnReqDTO.setTxOrdNo(orderNo);
         jrnReqDTO.setStlUserId(withdrawDTO.getUserId());
         genericRspDTO = riskCheckClient.riskControl(jrnReqDTO);
 		if(JudgeUtils.isNull(genericRspDTO)){
@@ -118,7 +119,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
         //填充查询手续费数据
         TradeFeeReqDTO tradeFeeReqDTO = new TradeFeeReqDTO();
-        tradeFeeReqDTO.setBusOrderNo(ymd+orderNo);
+        tradeFeeReqDTO.setBusOrderNo(orderNo);
         tradeFeeReqDTO.setBusOrderTime(DateTimeUtils.getCurrentLocalDateTime());
         tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_P);
         tradeFeeReqDTO.setCcy(withdrawDTO.getOrderCcy());
@@ -182,7 +183,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		//初始化提现订单数据
 		WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
 		BeanUtils.copyProperties(withdrawOrderDO, withdrawDTO);
-		withdrawOrderDO.setOrderNo(ymd+orderNo);
+		withdrawOrderDO.setOrderNo(orderNo);
 		//交易类型 04提现
 		withdrawOrderDO.setTxType(PwmConstants.TX_TYPE_WITHDRAW);
 		//提现总金额=实际提现金额+手续费
