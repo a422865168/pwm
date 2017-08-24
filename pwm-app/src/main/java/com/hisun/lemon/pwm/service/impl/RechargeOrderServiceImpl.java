@@ -274,7 +274,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	  	initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
 	  	initCashierDTO.setSysChannel(rechargeDTO.getSysChannel());
 	  	initCashierDTO.setPayerId(LemonUtils.getUserId());
-		initCashierDTO.setPayeeId("");
+        initCashierDTO.setPayeeId(LemonUtils.getUserId());
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 	  	initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
