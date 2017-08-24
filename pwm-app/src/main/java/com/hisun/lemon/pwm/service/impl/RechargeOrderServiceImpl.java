@@ -185,7 +185,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		BigDecimal orderAmt=rechargeSeaDO.getOrderAmt();
 		//流水号
 		//String payJrnNo=LemonUtils.getRequestId();
-		String acmJrnNo =  IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
+		String acmJrnNo =LemonUtils.getRequestId();
 		// 查询用户帐号
 		String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
 		//查询用户账号
