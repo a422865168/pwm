@@ -158,7 +158,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
             }
         }
 		//校验提现金额加手续费大于用户账户余额,则抛出异常
-		if(totalAmt.compareTo(balance) == 1){
+		if(totalAmt.compareTo(balance) > 0){
 			LemonException.throwBusinessException("PWM30002");
 		}
 
@@ -219,7 +219,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
                 ACMConstants.AC_C_FLG, PwmConstants.AC_ITEM_FOR_PAY, null, null, null,
                 null, null);
         //贷：手续费收入-支付账户-提现  2（如果手续费等于0则不做账）
-        if(fee.compareTo(BigDecimal.ZERO)==1) {
+        if(fee.compareTo(BigDecimal.ZERO)>0) {
             AccountingReqDTO feeItemReqDTO = acmComponent.createAccountingReqDTO(orderNo, jrnNo, withdrawOrderDO.getBusType(),
                     ACMConstants.ACCOUNTING_NOMARL, withdrawOrderDO.getFeeAmt(), null, ACMConstants.ITM_AC_TYP, balCapType,
                     ACMConstants.AC_C_FLG, PwmConstants.AC_ITEM_FEE_PAY_WIDR, null, null, null,
