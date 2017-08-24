@@ -24,12 +24,13 @@
         <result column="corp_org" property="crdCorpOrg" jdbcType="VARCHAR" />
         <result column="fee" property="fee" jdbcType="DECIMAL" />
         <result column="hall_order_no" property="hallOrderNo" jdbcType="VARCHAR" />
+        <result column="payer_id" property="payerId" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="Base_Column_List" >
         order_no, order_tm, ac_tm, tx_type, bus_type, order_ccy, order_amt, order_status, 
         order_succ_tm, psn_flag, order_exp_tm, sys_channel, ip_address, remark,ext_order_no, modify_opr,
-        create_time, modify_time,corp_org,fee,hall_order_no
+        create_time, modify_time,corp_org,fee,hall_order_no,payer_id
     </sql>
 
     <select id="get" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -110,6 +111,9 @@
             <if test="hallOrderNo != null" >
                 hall_order_no,
             </if>
+            <if test="payerId != null" >
+                payer_id,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null" >
@@ -175,6 +179,9 @@
             <if test="hallOrderNo != null" >
                 #{hallOrderNo,jdbcType=VARCHAR},
             </if>
+            <if test="payerId != null" >
+                #{payerId,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
 
@@ -237,6 +244,9 @@
             </if>
             <if test="hallOrderNo != null" >
                 hall_order_no = #{hallOrderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="payerId != null" >
+                payer_id = #{payerId,jdbcType=VARCHAR},
             </if>
         </set>
         where order_no = #{orderNo,jdbcType=VARCHAR}

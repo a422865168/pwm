@@ -3,18 +3,14 @@ package com.hisun.lemon.pwm.controller;
 import java.math.BigDecimal;
 
 import javax.annotation.Resource;
+import javax.ws.rs.POST;
 
+import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
@@ -120,5 +116,30 @@ public class RechargeOrderController {
 	public GenericRspDTO<HallOrderQueryResultDTO> queryOrderInfo(@Validated @RequestParam(value = "hallOrderNo") String hallOrderNo) {
 		HallOrderQueryResultDTO resultDTO = service.queryOrderInfo(hallOrderNo);
 		return GenericRspDTO.newSuccessInstance(resultDTO);
+	}
+
+	@ApiOperation(value = "营业厅长款补款处理", notes = "处理营业厅长款补款操作")
+	@ApiResponse(code = 200, message = "长款补单操作结果")
+	@PostMapping(value = "/hall/longAmt")
+	public GenericRspDTO<HallRechargeFundRspDTO> longAmtHandle(@Validated @RequestBody GenericDTO<HallRechargeFundRepDTO> genericDTO) {
+		HallRechargeFundRspDTO resultDTO = service.longAmtHandle(genericDTO);
+		return GenericRspDTO.newSuccessInstance(resultDTO);
+	}
+
+	@ApiOperation(value = "营业厅短款撤单处理", notes = "处理营业短款处理操作")
+	@ApiResponse(code = 200, message = "短款撤单操作结果")
+	@PostMapping(value = "/hall/shortAmt")
+	public GenericRspDTO<HallRechargeFundRspDTO> shortAmtHandle(@Validated @RequestBody GenericDTO<HallRechargeFundRepDTO> genericDTO) {
+		HallRechargeFundRspDTO resultDTO = service.shortAmtHandle(genericDTO);
+		return GenericRspDTO.newSuccessInstance(resultDTO);
+	}
+
+	@ApiOperation(value = "获取营业厅充值对账文件", notes = "处理营业对账文件上传服务器")
+	@ApiResponse(code = 200, message = "获取营业厅对账文件结果")
+	@GetMapping(value = "/chk/{type}/{date}/{filename}")
+	public GenericRspDTO<NoBody> uploadHallChkFile(@PathVariable(value="type",required = true) String type, @PathVariable(value="date",required = true) String date,
+												  @PathVariable(value="filename",required = true) String filename) {
+		service.uploadHallRechargeChkFile(type,date,filename);
+		return GenericRspDTO.newSuccessInstance();
 	}
 }

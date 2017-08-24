@@ -295,6 +295,13 @@ pwm :
   recharge :
     #营业厅充值签名KEY值
     HALLKEY : PWM123456789002
+    #营业厅ftp服务器配置
+    hall-sftp:
+       ip: 192.168.1.38
+       port: 22
+       name: payment
+       password: Hisunpay2017
+       connectTimeout: 2000
     onlineDesc :
        en : online recharge amount $$amount$
        zh : 在线充值 $$amount$
@@ -313,3 +320,5 @@ pwm :
   chk :
     remotePath : /home/payment/data/pwm/
     localPath : /home/payment/data/localchk/pwm/
+    #营业厅指定对账文件目录地址s
+    hallRemotePath: /home/payment/data/pwm/

@@ -231,4 +231,24 @@ public class PwmConstants {
 	 * 提现银行卡状态"0"：失效
 	 */
 	public static final String WITHDRAW_CARD_STAT_FAIL="0";
+
+	/**
+	 * 营业厅对账文件业务类型：提现
+	 */
+	public static final String HALL_CHK_TYPE_WC="WC";
+
+	/**
+	 * 营业厅对账文件业务类型：充值
+	 */
+	public static final String HALL_CHK_TYPE_RC="RC";
+
+	/**
+	 * 营业厅账务差错处理类型：长款
+	 */
+	public static final String HALL_CHK_LONG_AMT="L";
+
+	/**
+	 * 营业厅账务差错处理类型：短款
+	 */
+	public static final String HALL_CHK_SHORT_AMT="S";
 }

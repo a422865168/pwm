@@ -23,6 +23,7 @@ CREATE TABLE `pwm_rechange_order` (
   `fee` decimal(10,2) DEFAULT NULL,
   `hall_order_no` varchar(28) DEFAULT NULL,
   `remark` varchar(255) DEFAULT NULL,
+  `payer_id` varchar(20) NOT NULL,
   `ext_order_no` varchar(24) NOT NULL DEFAULT  '',
   `modify_opr` varchar(20) DEFAULT NULL,
   `create_time` datetime NOT NULL,
@@ -255,6 +256,16 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20022','zh','账户不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20023','zh','该充值订单的收银订单号为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20024','zh','找不到原充值订单信息!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20025','zh','账务差错处理类型校验失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20026','zh','订单账务借贷不平衡!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20027','zh','营业厅长款补单失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20028','zh','营业厅短款撤单失败!',now(),now());
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30001','zh','该用户为黑名单!',now(),now());
@@ -286,6 +297,8 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30014','zh','该提现银行卡已失效!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30015','zh','查询汇款银行账户未找到结果!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30016','zh','获取营业厅对账文件失败!',now(),now());
 -------------------------
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM40001','zh','调用营销接口返回接口异常!',now(),now());

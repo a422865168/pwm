@@ -80,4 +80,26 @@ public interface IRechargeOrderService {
      * @return
      */
     public HallOrderQueryResultDTO queryOrderInfo(String hallOrderNo);
+
+    /**
+     * 营业厅对账长款处理接口
+     * @param genericDTO
+     * @return
+     */
+    public HallRechargeFundRspDTO longAmtHandle(GenericDTO<HallRechargeFundRepDTO> genericDTO);
+
+    /**
+     * 营业厅对账短款处理接口
+     * @param genericDTO
+     * @return
+     */
+    public HallRechargeFundRspDTO shortAmtHandle(GenericDTO<HallRechargeFundRepDTO> genericDTO);
+
+    /**
+     * 获取营业厅对账文件
+     * @param type
+     * @param date
+     * @param fileName
+     */
+    public void uploadHallRechargeChkFile(String type,String date,String fileName);
 }

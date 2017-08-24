@@ -35,6 +35,10 @@ public class RechargeOrderDO extends BaseDO {
      */
     private BigDecimal orderAmt;
     /**
+     * @Fields payerId  充值用户id
+     */
+    private String payerId;
+    /**
      * @Fields orderStatus  订单状态
      */
     private String orderStatus;
@@ -237,5 +241,13 @@ public class RechargeOrderDO extends BaseDO {
 
     public void setFee(BigDecimal fee) {
         this.fee = fee;
+    }
+
+    public String getPayerId() {
+        return payerId;
+    }
+
+    public void setPayerId(String payerId) {
+        this.payerId = payerId;
     }
 }
