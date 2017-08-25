@@ -1,14 +1,18 @@
 package com.hisun.lemon.pwm.service.chk;
 
 import com.hisun.lemon.common.exception.LemonException;
+import com.hisun.lemon.common.utils.JudgeUtils;
 import com.hisun.lemon.jcommon.file.FileUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 生成营业厅充值对账文件，上传至服务器
@@ -45,8 +49,23 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
         //读取数据
         List<RechargeOrderDO> orders=chkFileComponent.queryHallRecharges(chkDate,chkOrderStatus);
 
+        //读取对账文件汇总信息项:
+        Map<String,Object> headItemMap = new HashMap<String,Object>();
+        BigDecimal totalFee = BigDecimal.valueOf(0);
+        BigDecimal totalAmt = BigDecimal.valueOf(0);
+        for(RechargeOrderDO ro : orders) {
+            BigDecimal tmpFee = ro.getFee();
+            if(JudgeUtils.isNotNull(tmpFee)){
+                totalFee = totalFee.add(tmpFee);
+            }
+            totalAmt = totalAmt.add(ro.getOrderAmt());
+        }
+        headItemMap.put("count",orders.size());
+        headItemMap.put("totalAmt",totalAmt);
+        headItemMap.put("totalFee",totalFee);
+
         //生成文件
-        writeToFile(appCnl, orders, chkFileName);
+        writeToFile(appCnl, orders, chkFileName,headItemMap);
         logger.info("生成对账文件"+flagName+"完成，开始上传至SFTP");
 
         //上传服务器
@@ -60,14 +79,19 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
      * @param datas
      * @param fileName
      */
-    private void writeToFile(String appCnl,List<RechargeOrderDO> datas,String fileName){
+    private void writeToFile(String appCnl,List<RechargeOrderDO> datas,String fileName,Map<String,Object> headItemMap){
         final String itemSeperator = "|";
         String lineSeparator = System.getProperty("line.separator", "\n");
         StringBuilder contextBuilder=new StringBuilder();
-        //营业厅订单号|充值订单号|订单金额
+        //添加对账文件首行总明细(总笔数|总金额|总服务费)
+        contextBuilder.append(headItemMap.get("count")).append(itemSeperator)
+                      .append(headItemMap.get("totalAmt")).append(itemSeperator)
+                      .append(headItemMap.get("totalFee")).append(lineSeparator);
+
+        //营业厅订单号|充值订单号|订单金额|手续费|订单日期
         for(RechargeOrderDO rdo : datas){
             contextBuilder.append(rdo.getHallOrderNo()).append(itemSeperator).append(rdo.getOrderNo()).append(itemSeperator)
-                          .append(rdo.getOrderAmt()).append(lineSeparator);
+                          .append(rdo.getOrderAmt()).append(rdo.getFee()).append(rdo.getAcTm()).append(lineSeparator);
         }
         //写入文件
         try {

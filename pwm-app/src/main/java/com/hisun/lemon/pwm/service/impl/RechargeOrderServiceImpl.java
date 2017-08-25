@@ -353,7 +353,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		switch (busType) {
 			//个人快捷支付账户充值
 			case PwmConstants.BUS_TYPE_RECHARGE_QP:
-				String tmpJrnNo =  IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
+				String tmpJrnNo =  PwmConstants.BUS_TYPE_RECHARGE_QP + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
 				// 借：其他应付款-暂收-收银台
 				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
 						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
@@ -366,7 +366,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
 				break;
 			case PwmConstants.BUS_TYPE_RECHARGE_OFL:
-				String acmJrnNo =  IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
+				String acmJrnNo =  PwmConstants.BUS_TYPE_RECHARGE_OFL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
 				// 借：其他应付款-暂收-收银台
 				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
 						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
