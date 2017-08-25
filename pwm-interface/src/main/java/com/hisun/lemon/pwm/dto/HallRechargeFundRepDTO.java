@@ -58,4 +58,12 @@ public class HallRechargeFundRepDTO {
     public void setChkOrdDt(LocalDate chkOrdDt) {
         this.chkOrdDt = chkOrdDt;
     }
+
+    public String getChkErrId() {
+        return chkErrId;
+    }
+
+    public void setChkErrId(String chkErrId) {
+        this.chkErrId = chkErrId;
+    }
 }
