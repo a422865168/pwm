@@ -472,23 +472,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setRemark("");
 		rechargeOrderDO.setPayerId(bussinessBody.getPayerId());
-		//计算交易手续费
-		TradeFeeReqDTO tradeFeeReqDTO = new TradeFeeReqDTO();
-		tradeFeeReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
-		tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
-		tradeFeeReqDTO.setTradeAmt(orderAmt);
-		tradeFeeReqDTO.setUserId(bussinessBody.getPayerId());
-		tradeFeeReqDTO.setBusOrderTime(DateTimeUtils.getCurrentLocalDateTime());
-		tradeFeeReqDTO.setBusOrderNo(rechargeOrderDO.getOrderNo());
-		GenericDTO<TradeFeeReqDTO> genericTradeFeeReqDTO = new GenericDTO<>();
-		genericTradeFeeReqDTO.setBody(tradeFeeReqDTO);
-		GenericRspDTO<TradeFeeRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeFee(genericTradeFeeReqDTO);
-		if(JudgeUtils.isNotSuccess(genericTradeFeeRspDTO.getMsgCd())){
-			logger.error("营业厅充值手续费计算失败");
-			LemonException.throwBusinessException(genericTradeFeeRspDTO.getMsgCd());
-		}
-		TradeFeeRspDTO tradeFeeRspDTO = genericTradeFeeRspDTO.getBody();
-		rechargeOrderDO.setFee(tradeFeeRspDTO.getTradeFee());
+
 		this.service.initOrder(rechargeOrderDO);
 
 		//调用收银台线下收款接口，完成用户线下充值
@@ -570,6 +554,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 		updOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
 		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+		updOrderDO.setFee(hallPayResult.getFee());
 		service.updateOrder(updOrderDO);
 		//调用平台短信能力通知充值到账
 
