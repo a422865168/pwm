@@ -612,12 +612,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			//个人账户信息
 			String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 			String balAcNo=acmComponent.getAcmAcNo(busBody.getPayerId(), balCapType);
-
+			String tmpJrnNo =  PwmConstants.BUS_TYPE_RECHARGE_HALL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
 			//营业厅冲正账务处理
 			//借：其他应付款-支付账户-现金账户
 			AccountingReqDTO cshItemReqDTO=acmComponent.createAccountingReqDTO(
 					rechargeOrderDO.getOrderNo(),
-					rechargeOrderDO.getExtOrderNo(),
+					tmpJrnNo,
 					rechargeOrderDO.getTxType(),
 					ACMConstants.ACCOUNTING_CANCEL,
 					rechargeOrderDO.getOrderAmt(),
@@ -635,7 +635,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			//贷：应收账款-渠道充值-营业厅
 			AccountingReqDTO cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
 					rechargeOrderDO.getOrderNo(),
-					rechargeOrderDO.getExtOrderNo(),
+					tmpJrnNo,
 					rechargeOrderDO.getTxType(),
 					ACMConstants.ACCOUNTING_CANCEL,
 					rechargeOrderDO.getOrderAmt(),
