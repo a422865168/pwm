@@ -601,7 +601,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		OrderDTO orderDto = orderDTORsp.getBody();
 		if(JudgeUtils.isNotSuccess(orderDTORsp.getMsgCd())){
 			LemonException.throwBusinessException(orderDTORsp.getMsgCd());
-		}
+	}
 		//查询充值订单和收银订单状态
 		if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_S)
 				&& JudgeUtils.equals(orderDto.getOrderStatus(),CshConstants.ORD_STS_S)){
@@ -609,16 +609,16 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 			String balAcNo=acmComponent.getAcmAcNo(busBody.getPayerId(), balCapType);
 			String tmpJrnNo =  LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_HALL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
-			//营业厅冲正账务处理
+			//营业厅撤销账务处理
 			//借：其他应付款-支付账户-现金账户
 			AccountingReqDTO cshItemReqDTO=acmComponent.createAccountingReqDTO(
 					rechargeOrderDO.getOrderNo(),
 					tmpJrnNo,
 					rechargeOrderDO.getTxType(),
-					ACMConstants.ACCOUNTING_CANCEL,
+					ACMConstants.ACCOUNTING_NOMARL,
 					rechargeOrderDO.getOrderAmt(),
 					balAcNo,
-					ACMConstants.ITM_AC_TYP,
+					ACMConstants.USER_AC_TYP,
 					balCapType,
 					ACMConstants.AC_D_FLG,
 					CshConstants.AC_ITEM_CSH_BAL,
@@ -626,14 +626,14 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					null,
 					null,
 					null,
-					"营业厅冲正$"+rechargeOrderDO.getOrderAmt());
+					"营业厅撤销$"+rechargeOrderDO.getOrderAmt());
 
 			//贷：应收账款-渠道充值-营业厅
 			AccountingReqDTO cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
 					rechargeOrderDO.getOrderNo(),
 					tmpJrnNo,
 					rechargeOrderDO.getTxType(),
-					ACMConstants.ACCOUNTING_CANCEL,
+					ACMConstants.ACCOUNTING_NOMARL,
 					rechargeOrderDO.getOrderAmt(),
 					null,
 					ACMConstants.ITM_AC_TYP,
@@ -673,8 +673,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_C);
 		updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
 		updOrderDO.setOrderCcy(rechargeOrderDO.getOrderCcy());
+		updOrderDO.setOrderAmt(rechargeOrderDO.getOrderAmt());
 		updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 		updOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
+		updOrderDO.setHallOrderNo(rechargeOrderDO.getHallOrderNo());
 		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		service.updateOrder(updOrderDO);
 
@@ -683,7 +685,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		hallRechargeResultDTO.setAmount(updOrderDO.getOrderAmt());
 		hallRechargeResultDTO.setStatus(updOrderDO.getOrderStatus());
 		hallRechargeResultDTO.setFee(BigDecimal.valueOf(busBody.getFee()));
-		hallRechargeResultDTO.setHallOrderNo(updOrderDO.getExtOrderNo());
+		hallRechargeResultDTO.setHallOrderNo(updOrderDO.getHallOrderNo());
 		hallRechargeResultDTO.setOrderNo(updOrderDO.getOrderNo());
 		return hallRechargeResultDTO;
 
