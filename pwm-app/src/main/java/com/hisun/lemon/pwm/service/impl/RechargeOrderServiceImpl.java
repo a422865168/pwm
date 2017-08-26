@@ -485,7 +485,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setRemark("");
 		rechargeOrderDO.setPayerId(bussinessBody.getPayerId());
-
+		rechargeOrderDO.setHallOrderNo(bussinessBody.getHallOrderNo());
 		this.service.initOrder(rechargeOrderDO);
 
 		//调用收银台线下收款接口，完成用户线下充值
@@ -553,7 +553,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				null,
 				null,
 				null,
-				null);
+				"营业厅充值$"+rechargeOrderDO.getOrderAmt());
 		acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
 
 		//更新充值订单
@@ -576,8 +576,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		hallRechargeResultDTO.setAmount(hallPayResult.getAmount());
 		hallRechargeResultDTO.setStatus(PwmConstants.RECHARGE_ORD_S);
 		hallRechargeResultDTO.setFee(hallPayResult.getFee());
-		hallRechargeResultDTO.setHallOrderNo(hallPayResult.getHallOrderNo());
-		hallRechargeResultDTO.setOrderNo(hallPayResult.getCashierOrderNo());
+		hallRechargeResultDTO.setHallOrderNo(rechargeOrderDO.getHallOrderNo());
+		hallRechargeResultDTO.setOrderNo(hallPayResult.getOrderNo());
 		return hallRechargeResultDTO;
 	}
 
@@ -596,12 +596,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isNull(rechargeOrderDO)) {
 			throw new LemonException("PWM20010");
 		}
-		String cshOrderNo = rechargeOrderDO.getExtOrderNo();
-		if(JudgeUtils.isBlank(cshOrderNo)){
-			throw new LemonException("PWM20023");
-		}
 
-		GenericRspDTO<OrderDTO> orderDTORsp = cshOrderClient.query(cshOrderNo);
+		GenericRspDTO<OrderDTO> orderDTORsp = cshOrderClient.query(rechargeOrderDO.getOrderNo());
 		OrderDTO orderDto = orderDTORsp.getBody();
 		if(JudgeUtils.isNotSuccess(orderDTORsp.getMsgCd())){
 			LemonException.throwBusinessException(orderDTORsp.getMsgCd());
@@ -623,14 +619,14 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					rechargeOrderDO.getOrderAmt(),
 					balAcNo,
 					ACMConstants.ITM_AC_TYP,
-					null,
+					balCapType,
 					ACMConstants.AC_D_FLG,
 					CshConstants.AC_ITEM_CSH_BAL,
 					null,
 					null,
 					null,
 					null,
-					null);
+					"营业厅冲正$"+rechargeOrderDO.getOrderAmt());
 
 			//贷：应收账款-渠道充值-营业厅
 			AccountingReqDTO cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
@@ -641,7 +637,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					rechargeOrderDO.getOrderAmt(),
 					null,
 					ACMConstants.ITM_AC_TYP,
-					null,
+					balCapType,
 					ACMConstants.AC_C_FLG,
 					CshConstants.AC_ITEM_CNL_RECHARGE_HALL,
 					null,
