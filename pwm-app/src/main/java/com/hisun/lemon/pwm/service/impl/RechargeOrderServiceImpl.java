@@ -353,7 +353,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		switch (busType) {
 			//个人快捷支付账户充值
 			case PwmConstants.BUS_TYPE_RECHARGE_QP:
-				String tmpJrnNo =  PwmConstants.BUS_TYPE_RECHARGE_QP + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
+				String tmpJrnNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_QP + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
 				// 借：其他应付款-暂收-收银台
 				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
 						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
@@ -366,7 +366,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
 				break;
 			case PwmConstants.BUS_TYPE_RECHARGE_OFL:
-				String acmJrnNo =  PwmConstants.BUS_TYPE_RECHARGE_OFL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
+				String acmJrnNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_OFL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
 				// 借：其他应付款-暂收-收银台
 				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
 						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
@@ -519,11 +519,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isBlank(balAcNo)){
 			throw new LemonException("PWM20022");
 		}
-		String tmpJrnNo =  IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
+		String tmpJrnNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_HALL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
 		//借：其他应付款-暂收-收银台
 		AccountingReqDTO cshItemReqDTO=acmComponent.createAccountingReqDTO(
 				rechargeOrderDO.getOrderNo(),
-				LemonUtils.getRequestId(),
+				tmpJrnNo,
 				PwmConstants.TX_TYPE_RECHANGE,
 				ACMConstants.ACCOUNTING_NOMARL,
 				hallPayResult.getAmount(),
@@ -540,7 +540,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//贷：其他应付款-支付账户-现金账户
 		AccountingReqDTO userAccountReqDTO=acmComponent.createAccountingReqDTO(
 				rechargeOrderDO.getOrderNo(),
-				LemonUtils.getRequestId(),
+				tmpJrnNo,
 				PwmConstants.TX_TYPE_RECHANGE,
 				ACMConstants.ACCOUNTING_NOMARL,
 				hallPayResult.getAmount(),
@@ -612,7 +612,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			//个人账户信息
 			String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 			String balAcNo=acmComponent.getAcmAcNo(busBody.getPayerId(), balCapType);
-			String tmpJrnNo =  PwmConstants.BUS_TYPE_RECHARGE_HALL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
+			String tmpJrnNo =  LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_HALL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
 			//营业厅冲正账务处理
 			//借：其他应付款-支付账户-现金账户
 			AccountingReqDTO cshItemReqDTO=acmComponent.createAccountingReqDTO(
