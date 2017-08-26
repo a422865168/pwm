@@ -353,9 +353,11 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
         //订单成功或者失败时，做消息推送
         if(JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_S1, withdrawOrderDO.getOrderStatus())) {
+            withdrawOrderDO.setAcTm(withdrawResultDTO.getAcTm());
             sendMessage(withdrawOrderDO, withdrawResultDTO.getCardNoLast());
         }
         if(JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_F1, withdrawOrderDO.getOrderStatus())) {
+            withdrawOrderDO.setAcTm(withdrawResultDTO.getAcTm());
             sendMessage(withdrawOrderDO, "");
         }
 
@@ -523,10 +525,12 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         if(JudgeUtils.equals("",cardNoLast)) {
             messageReq.setMessageTemplateId(PwmConstants.WITHDRAW_FAIL_TEMPL);
             map.put("amount",withdrawOrderDO.getWcActAmt().toString());
+            map.put("date",DateTimeUtils.formatLocalDate(withdrawOrderDO.getAcTm(), "yyyy-MM-dd"));
         }else {
             messageReq.setMessageTemplateId(PwmConstants.WITHDRAW_SUCC_TEMPL);
             map.put("amount", withdrawOrderDO.getWcActAmt().toString());
             map.put("cardNoLast",cardNoLast);
+            map.put("date",DateTimeUtils.formatLocalDate(withdrawOrderDO.getAcTm(), "yyyy-MM-dd"));
         }
         messageReq.setReplaceFieldMap(map);
         messageReqDTO.setBody(messageReq);
