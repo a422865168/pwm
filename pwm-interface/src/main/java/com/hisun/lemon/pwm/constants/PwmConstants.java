@@ -251,4 +251,14 @@ public class PwmConstants {
 	 * 营业厅账务差错处理类型：短款
 	 */
 	public static final String HALL_CHK_SHORT_AMT="S";
+
+	/**
+	 * 提现成功消息推送模板
+	 */
+	public static final String WITHDRAW_SUCC_TEMPL="00000009";
+
+	/**
+	 * 提现失败消息推送模板
+	 */
+	public static final String WITHDRAW_FAIL_TEMPL="00000008";
 }

@@ -9,6 +9,8 @@ import com.hisun.lemon.acm.dto.QueryAcBalRspDTO;
 import com.hisun.lemon.acm.dto.UserAccountDTO;
 import com.hisun.lemon.bil.dto.CreateUserBillDTO;
 import com.hisun.lemon.bil.dto.UpdateUserBillDTO;
+import com.hisun.lemon.cmm.client.CmmServerClient;
+import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
@@ -19,6 +21,7 @@ import com.hisun.lemon.cpo.enums.CorpBusSubTyp;
 import com.hisun.lemon.cpo.enums.CorpBusTyp;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.jcommon.encrypt.EncryptionUtils;
@@ -41,6 +44,8 @@ import com.hisun.lemon.tfm.dto.TradeFeeRspDTO;
 import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
 import com.hisun.lemon.urm.client.UserAuthenticationClient;
 import com.hisun.lemon.urm.dto.CheckPayPwdDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,12 +53,15 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Transactional
 @Service("withdrawOrderService")
 public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
+    private static final Logger logger = LoggerFactory.getLogger(WithdrawOrderServiceImpl.class);
 
 	@Resource
     private WithdrawOrderTransactionalService withdrawOrderTransactionalService;
@@ -83,6 +91,9 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
     private IWithdrawCardBindDao withdrawCardBindDao;
 
     @Resource
+    private CmmServerClient cmmServerClient;
+
+    @Resource
     BillSyncHandler billSyncHandler;
     /**
      * 生成提现订单
@@ -108,6 +119,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         jrnReqDTO.setTxJrnNo(orderNo);
         jrnReqDTO.setTxOrdNo(orderNo);
         jrnReqDTO.setStlUserId(withdrawDTO.getUserId());
+        jrnReqDTO.setStlUserTyp("02");
         genericRspDTO = riskCheckClient.riskControl(jrnReqDTO);
 		if(JudgeUtils.isNull(genericRspDTO)){
 		    LemonException.throwBusinessException("PWM30007");
@@ -242,7 +254,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         withdrawReqDTO.setCorpBusTyp(CorpBusTyp.WITHDRAW);
         withdrawReqDTO.setCorpBusSubTyp(CorpBusSubTyp.PER_WITHDRAW);
         withdrawReqDTO.setWcAplAmt(withdrawOrderDO.getWcApplyAmt());
-        withdrawReqDTO.setUserNm(withdrawOrderDO.getUserId());
+        withdrawReqDTO.setUserNm(withdrawOrderDO.getUserName());
         withdrawReqDTO.setCrdNoEnc(withdrawOrderDO.getCapCardNo());
         withdrawReqDTO.setCapCrdNm(withdrawOrderDO.getUserName());
         withdrawReqDTO.setReqOrdNo(withdrawOrderDO.getOrderNo());
@@ -338,6 +350,14 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
         BeanUtils.copyProperties(updateUserBillDTO, withdrawOrderDO);
         billSyncHandler.updateBill(updateUserBillDTO);
+
+        //订单成功或者失败时，做消息推送
+        if(JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_S1, withdrawOrderDO.getOrderStatus())) {
+            sendMessage(withdrawOrderDO, withdrawResultDTO.getCardNoLast());
+        }
+        if(JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_F1, withdrawOrderDO.getOrderStatus())) {
+            sendMessage(withdrawOrderDO, "");
+        }
 
         WithdrawRspDTO withdrawRspDTO = new WithdrawRspDTO();
         withdrawRspDTO.setOrderNo(withdrawOrderDO.getOrderNo());
@@ -478,5 +498,38 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         WithdrawCardDelRspDTO withdrawCardDelRspDTO = new WithdrawCardDelRspDTO();
         BeanUtils.copyProperties(withdrawCardDelRspDTO, withdrawCardBindDO1);
         return GenericRspDTO.newSuccessInstance(withdrawCardDelRspDTO);
+    }
+
+    /**
+     * 消息推送
+     *
+     * @param withdrawOrderDO
+     */
+    public void sendMessage(WithdrawOrderDO withdrawOrderDO, String cardNoLast) {
+
+        logger.info("message send to User : " + withdrawOrderDO.getUserId());
+
+        String language = LemonUtils.getLocale().getLanguage();
+        if (JudgeUtils.isBlank(language)) {
+            language = "en";
+            logger.error("language  ======  " + language);
+        }
+
+        GenericDTO<MessageSendReqDTO> messageReqDTO = new GenericDTO<MessageSendReqDTO>();
+        MessageSendReqDTO messageReq = new MessageSendReqDTO();
+        messageReq.setUserId(withdrawOrderDO.getUserId());
+        messageReq.setMessageLanguage(language);
+        Map<String, String> map = new HashMap<String, String>();
+        if(JudgeUtils.equals("",cardNoLast)) {
+            messageReq.setMessageTemplateId(PwmConstants.WITHDRAW_FAIL_TEMPL);
+            map.put("amount",withdrawOrderDO.getWcActAmt().toString());
+        }else {
+            messageReq.setMessageTemplateId(PwmConstants.WITHDRAW_SUCC_TEMPL);
+            map.put("amount", withdrawOrderDO.getWcActAmt().toString());
+            map.put("cardNoLast",cardNoLast);
+        }
+        messageReq.setReplaceFieldMap(map);
+        messageReqDTO.setBody(messageReq);
+        GenericRspDTO<NoBody> rspDto = cmmServerClient.messageSend(messageReqDTO);
     }
 }
