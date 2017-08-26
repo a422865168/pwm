@@ -22,7 +22,7 @@ public class WithdrawResultDTO {
     //提现订单号
 	@ApiModelProperty(name = "orderNo", value = "提现订单号")
     @NotEmpty(message="PWM10005")
-	@Length(max=24)
+	@Length(max=32)
     private String orderNo;
     //实际提现金额
 	@ApiModelProperty(name = "wcActAmt", value = "实际提现金额")
@@ -35,9 +35,13 @@ public class WithdrawResultDTO {
 	@ApiModelProperty(name = "acTm", value = "记账时间")
     private LocalDate acTm;
     //提现状态
-	@ApiModelProperty(name = "orderStatus", value = "提现状态")
+    @ApiModelProperty(name = "orderStatus", value = "提现状态")
     @NotEmpty(message="PWM10009")
     private String orderStatus;
+    //银行卡后四位
+    @ApiModelProperty(name = "cardNoLast", value = "银行卡后四位")
+    @NotEmpty(message="PWM10048")
+    private String cardNoLast;
 
     public String getOrderNo() {
         return orderNo;
@@ -77,5 +81,13 @@ public class WithdrawResultDTO {
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public String getCardNoLast() {
+        return cardNoLast;
+    }
+
+    public void setCardNoLast(String cardNoLast) {
+        this.cardNoLast = cardNoLast;
     }
 }

@@ -18,6 +18,7 @@ dependencies {
     compile("com.hisun:urm-interface")
     compile("com.hisun:bil-interface")
     compile("com.hisun:jcommon")
+    compile("com.hisun:cmm-interface")
 }
 
 mainClassName = 'com.hisun.lemon.Application'

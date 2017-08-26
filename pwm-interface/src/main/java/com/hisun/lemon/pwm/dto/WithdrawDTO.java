@@ -29,7 +29,7 @@ public class WithdrawDTO {
 	//提现银行卡号
 	@ApiModelProperty(name = "capCardNo", value = "提现银行卡号")
 	@NotEmpty(message="PWM10028")
-	@Length(max =30)
+	@Length(max =64)
     private String capCardNo;
 	//申请提现金额
 	@ApiModelProperty(name = "wcApplyAmt", value = "申请提现金额")
