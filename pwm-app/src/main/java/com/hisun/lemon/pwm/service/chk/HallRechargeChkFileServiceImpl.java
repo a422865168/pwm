@@ -91,7 +91,7 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
         //营业厅订单号|充值订单号|订单金额|手续费|订单日期
         for(RechargeOrderDO rdo : datas){
             contextBuilder.append(rdo.getHallOrderNo()).append(itemSeperator).append(rdo.getOrderNo()).append(itemSeperator)
-                          .append(rdo.getOrderAmt()).append(rdo.getFee()).append(rdo.getAcTm()).append(lineSeparator);
+                          .append(rdo.getOrderAmt()).append(itemSeperator).append(rdo.getFee()).append(itemSeperator).append(rdo.getAcTm()).append(lineSeparator);
         }
         //写入文件
         try {
