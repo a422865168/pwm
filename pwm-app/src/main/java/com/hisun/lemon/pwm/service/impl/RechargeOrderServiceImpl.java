@@ -879,7 +879,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			if(JudgeUtils.isNull(rechargeOrderDO.getFee())){
 				hallOrderQueryResultDTO.setTotalAmt(rechargeOrderDO.getOrderAmt());
 			}else{
-				hallOrderQueryResultDTO.setTotalAmt(rechargeOrderDO.getOrderAmt().multiply(rechargeOrderDO.getFee()).setScale(2));
+				hallOrderQueryResultDTO.setTotalAmt(rechargeOrderDO.getOrderAmt().add(rechargeOrderDO.getFee()).setScale(2));
 			}
 
 		}
