@@ -301,7 +301,7 @@ pwm :
        port: 22
        name: payment
        password: Hisunpay2017
-       connectTimeout: 2000
+       connectTimeout: 120000
     onlineDesc :
        en : online recharge amount $$amount$
        zh : 在线充值 $$amount$
@@ -316,9 +316,9 @@ pwm :
     port : 22
     name : payment
     password : Hisunpay2017
-    connectTimeout : 2000
+    connectTimeout : 120000
   chk :
     remotePath : /home/payment/data/pwm/
     localPath : /home/payment/data/localchk/pwm/
-    #营业厅指定对账文件目录地址s
+    #营业厅指定对账文件目录地址
     hallRemotePath: /home/payment/data/pwm/
