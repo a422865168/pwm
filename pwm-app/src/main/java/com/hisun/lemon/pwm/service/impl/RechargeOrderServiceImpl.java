@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.jcommon.file.FileSftpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -984,24 +985,23 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		final int hall_port = Integer.valueOf(LemonUtils.getProperty("pwm.recharge.hall-sftp.port"));
 		final String hall_userName = LemonUtils.getProperty("pwm.recharge.hall-sftp.name");
 		final String hall_passd = LemonUtils.getProperty("pwm.recharge.hall-sftp.password");
-		final String hallRemotePath = LemonUtils.getProperty("pwm.recharge.hall-sftp.hallRemotePath");
-		final String localPath = LemonUtils.getProperty("pwm.recharge.hall-sftp.localPath");
-
+		final String connectTimeout = LemonUtils.getProperty("pwm.recharge.hall-sftp.connectTimeout");
+		final String hallRemotePath = LemonUtils.getProperty("pwm.chk.hallRemotePath");
+		final String localPath = LemonUtils.getProperty("pwm.chk.localPath");
 		logger.info("从营业厅ip>>"+ hall_server + ",端口号>> " + hall_port + ",目录>>" +
 				hallRemotePath +", " + "获取对账文件名>>" + fileName);
 
-		FileFtpUtils fileFtpUtils = new FileFtpUtils(hall_server,hall_port,hall_userName,hall_passd);
+		if(JudgeUtils.isNotBlank(fileName) && !fileName.startsWith(".ck")){
+			fileName = fileName + ".ck";
+		}
 		//充值对账文件获取
 		if(JudgeUtils.equals(type,PwmConstants.HALL_CHK_TYPE_RC)){
 			try{
 				//将营业厅对账文件生成到服务器指定路径
-				boolean result = fileFtpUtils.get(hallRemotePath,fileName,localPath);
-				if(!result){
-					logger.error("获取营业厅对账文件失败!!");
-					throw new LemonException("PWM30016");
-				}
+				FileSftpUtils.download(hall_server,hall_port,Integer.valueOf(connectTimeout),hallRemotePath,fileName,localPath,hall_userName,hall_passd);
 			}catch (Exception e){
-
+				logger.error("获取营业厅对账文件失败!!");
+				throw new LemonException("PWM30016");
 			}
 			//提现账务文件
 		}else if(JudgeUtils.equals(type,PwmConstants.HALL_CHK_TYPE_WC)){
