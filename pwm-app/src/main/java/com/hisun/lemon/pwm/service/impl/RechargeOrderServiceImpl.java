@@ -401,11 +401,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		HallQueryResultDTO hallQueryResultDTO = new HallQueryResultDTO();
 
 		if(JudgeUtils.isNotBlank(key)){
-			//判断是否是通过手机号查询
-			boolean isPhone = PhoneNumberUtils.isValidNumber(key,PwmConstants.COUNTRY_CODE_KHM);
+			//判断是否是通过手机号查询,手机号格式 国家编码+手机号
+			boolean isPhone = PhoneNumberUtils.isValidNumber(key);
+//			boolean isPhone = PhoneNumberUtils.isValidNumber(key,PwmConstants.COUNTRY_CODE_KHM);
 			if(isPhone){
-				String phone = PwmConstants.COUNTRY_CODE_KHM + "-" + key;
-				genericUserBasicInfDTO = userBasicInfClient.queryUserByLoginId(phone);
+//				String phone = PwmConstants.COUNTRY_CODE_KHM + "-" + key;
+				genericUserBasicInfDTO = userBasicInfClient.queryUserByLoginId(key);
 			}else{
 				//根据id查询
 				genericUserBasicInfDTO = userBasicInfClient.queryUser(key);
