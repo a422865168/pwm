@@ -48,6 +48,13 @@ public interface IRechargeOrderService {
     public GenericRspDTO<CashierViewDTO> createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
     
     /**
+     * 海币充值下单(对外接口)
+     * @param rechargeHCouponDTO
+     * @return
+     */
+    public GenericRspDTO<RechargeRspHCouponDTO> createOutHCouponOrder(GenericDTO<RechargeReqHCouponDTO> rechargeHCouponDTO);
+    
+    /**
      * 海币充值结果处理
      * @param rechargeHCouponDTO
      */

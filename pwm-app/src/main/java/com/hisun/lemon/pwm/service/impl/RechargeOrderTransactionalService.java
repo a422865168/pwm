@@ -94,6 +94,17 @@ public class RechargeOrderTransactionalService {
 		return rechargeOrderDO;
 	}
 
+	/**
+	 * 查询订单信息
+	 * 
+	 * @param orderNo
+	 * @return
+	 */
+	@Transactional(readOnly = true)
+	public RechargeHCouponDO rechargeInfo(String orderNo) {
+		return this.getHCoupon(orderNo);
+	}
+	
 	public IRechargeOrderDao getRechangeOrderDao() {
 		return rechangeOrderDao;
 	}

@@ -261,4 +261,18 @@ public class PwmConstants {
 	 * 提现失败消息推送模板
 	 */
 	public static final String WITHDRAW_FAIL_TEMPL="00000008";
+
+	
+	/**
+	 * 支付方式
+	 */
+	public static final String BUS_PAY_TYPE="00100000";
+	
+	/**
+	 * 海币充值订单状态 S
+	 */
+	public static final String ORD_STS_S="S";
+	
+	
+	
 }
