@@ -7,7 +7,7 @@ import com.hisun.lemon.framework.data.GenericCmdDTO;
 import com.hisun.lemon.framework.stream.MessageHandler;
 import com.hisun.lemon.framework.utils.ObjectMapperHelper;
 import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
-import com.hisun.lemon.pwm.service.impl.WithdrawOrderServiceImpl;
+import com.hisun.lemon.pwm.service.IWithdrawOrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class NoticeHandler implements MessageHandler<WithdrawResultDTO> {
     private static final Logger logger = LoggerFactory.getLogger(NoticeHandler.class);
 
     @Resource
-    protected WithdrawOrderServiceImpl withdrawOrderService;
+    protected IWithdrawOrderService withdrawOrderService;
 
     @Resource
     ObjectMapper objectMapper;
