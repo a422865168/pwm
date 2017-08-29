@@ -79,23 +79,23 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
      * @param datas
      * @param fileName
      */
-    private void writeToFile(String appCnl,List<RechargeOrderDO> datas,String fileName,Map<String,Object> headItemMap){
+    private void writeToFile(String appCnl, List<RechargeOrderDO> datas, String fileName, Map<String, Object> headItemMap) {
         final String itemSeperator = "|";
         String lineSeparator = System.getProperty("line.separator", "\n");
-        StringBuilder contextBuilder=new StringBuilder();
+        StringBuilder contextBuilder = new StringBuilder();
         //添加对账文件首行总明细(总笔数|总金额|总服务费)
         contextBuilder.append(headItemMap.get("count")).append(itemSeperator)
-                      .append(headItemMap.get("totalAmt")).append(itemSeperator)
-                      .append(headItemMap.get("totalFee")).append(lineSeparator);
+                .append(headItemMap.get("totalAmt")).append(itemSeperator)
+                .append(headItemMap.get("totalFee")).append(lineSeparator);
 
         //营业厅订单号|充值订单号|订单金额|手续费|订单日期
-        for(RechargeOrderDO rdo : datas){
+        for (RechargeOrderDO rdo : datas) {
             contextBuilder.append(rdo.getHallOrderNo()).append(itemSeperator).append(rdo.getOrderNo()).append(itemSeperator)
-                          .append(rdo.getOrderAmt()).append(itemSeperator).append(rdo.getFee()).append(itemSeperator).append(rdo.getAcTm()).append(lineSeparator);
+                    .append(rdo.getOrderAmt()).append(itemSeperator).append(rdo.getFee()).append(itemSeperator).append(rdo.getAcTm()).append(lineSeparator);
         }
         //写入文件
         try {
-            String localPath=chkFileComponent.getLocalPath(appCnl);
+            String localPath = chkFileComponent.getLocalPath(appCnl);
             FileUtils.write(contextBuilder.toString(), localPath + fileName);
         } catch (Exception e) {
             LemonException.throwBusinessException("PWM40701");
