@@ -3,6 +3,7 @@ package com.hisun.lemon.pwm.service.impl;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.hisun.lemon.common.exception.LemonException;
@@ -68,17 +69,18 @@ public class RechargeOrderTransactionalService {
 	 * 
 	 * @return
 	 */
-  public  RechargeHCouponDO getHCoupon(String orderNo)
-  {
-	  RechargeHCouponDO rechargeHCouponDO=this.rechargeHCouponDao.get(orderNo);
-	  return rechargeHCouponDO;
-  }
+	@Transactional(propagation = Propagation.SUPPORTS,readOnly = true)
+	public RechargeHCouponDO getHCoupon(String orderNo) {
+		RechargeHCouponDO rechargeHCouponDO = this.rechargeHCouponDao.get(orderNo);
+		return rechargeHCouponDO;
+	}
 
 	/**
 	 * 根据外部收银订订单号与订单状态查询充值订单
 	 * @param extOrderNo 外部充值订单号
 	 * @return
 	 */
+	@Transactional(propagation = Propagation.SUPPORTS,readOnly = true)
 	public RechargeOrderDO getRechargeOrderByExtOrderNo(String extOrderNo) {
 		RechargeOrderDO rechargeOrderDO = this.rechangeOrderDao.getRechargeOrderByExtOrderNo(extOrderNo);
 		return rechargeOrderDO;
@@ -89,6 +91,7 @@ public class RechargeOrderTransactionalService {
 	 * @param hallOrderNo
 	 * @return
 	 */
+	@Transactional(propagation = Propagation.SUPPORTS,readOnly = true)
 	public RechargeOrderDO getRechargeOrderByHallOrderNo(String hallOrderNo) {
 		RechargeOrderDO rechargeOrderDO = this.rechangeOrderDao.getRechargeOrderByHallOrderNo(hallOrderNo);
 		return rechargeOrderDO;

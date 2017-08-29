@@ -7,6 +7,7 @@ import com.hisun.lemon.pwm.dao.IWithdrawOrderDao;
 import com.hisun.lemon.pwm.entity.WithdrawCardBindDO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -52,6 +53,7 @@ public class WithdrawOrderTransactionalService {
     /**
      * 校验订单是否存在
      */
+    @Transactional(propagation = Propagation.SUPPORTS,readOnly = true)
     public WithdrawOrderDO query(String orderNo){
 
         WithdrawOrderDO withdrawOrderDO = withdrawOrderDao.get(orderNo);
