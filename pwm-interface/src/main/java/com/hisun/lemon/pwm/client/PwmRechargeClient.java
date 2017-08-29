@@ -35,7 +35,7 @@ public interface PwmRechargeClient {
      * @param rechargeResultDTO 通知数据
      * @return
      */
-    @PatchMapping("/pwm/recharge/order/sea/out")
+	@PostMapping("/pwm/recharge/order/sea/out")
     public GenericRspDTO<RechargeRspHCouponDTO> createHCouponOrderOut(@Validated  @RequestBody GenericDTO<RechargeReqHCouponDTO> rechargeHCouponDT);
     
 	/**
