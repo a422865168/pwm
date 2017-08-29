@@ -305,7 +305,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
             /**
              * 账务处理
              */
-            String userId = LemonUtils.getUserId();
+            String userId = queryWithdrawOrderDO.getUserId();
             GenericRspDTO genericRspDTO = accountManagementClient.queryAcNo(userId);
             if(JudgeUtils.isNull(genericRspDTO)){
                 LemonException.throwBusinessException("PWM40006");
