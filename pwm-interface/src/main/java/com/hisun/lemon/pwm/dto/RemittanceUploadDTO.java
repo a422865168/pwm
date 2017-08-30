@@ -16,9 +16,9 @@ import java.math.BigDecimal;
 public class RemittanceUploadDTO {
 
     /**
-     * 充值订单号
+     * 收银订单号
      */
-    @ApiModelProperty(name = "orderNo", value = "充值订单号")
+    @ApiModelProperty(name = "orderNo", value = "收银订单号")
     @NotEmpty(message="PWM10007")
     @Length(max =28)
     private String orderNo;

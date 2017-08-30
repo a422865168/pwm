@@ -645,7 +645,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setExtOrderNo("");
 		rechargeOrderDO.setOrderAmt(orderAmt);
 		rechargeOrderDO.setOrderCcy(bussinessBody.getCcy());
-		rechargeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
+		rechargeOrderDO.setOrderExpTm(DateTimeUtils.getCurrentLocalDateTime().plusMinutes(15));
 		rechargeOrderDO.setOrderNo(orderNo);
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setOrderStatus(bussinessBody.getStatus());
@@ -972,8 +972,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	public OfflineRechargeResultDTO offlineRemittanceUpload(GenericDTO<RemittanceUploadDTO> genericDTO) {
 		RemittanceUploadDTO remittanceUploadDTO = genericDTO.getBody();
 		//原订单校验
-		String orderNo = remittanceUploadDTO.getOrderNo();
-		RechargeOrderDO rechargeOrderDO = this.service.getRechangeOrderDao().get(orderNo);
+		String cashOrderNo = remittanceUploadDTO.getOrderNo();
+		RechargeOrderDO rechargeOrderDO = this.service.getRechangeOrderDao().getRechargeOrderByExtOrderNo(cashOrderNo);
 
 		if(JudgeUtils.isNull(rechargeOrderDO)) {
 			throw new LemonException("PWM20015");

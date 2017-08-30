@@ -150,7 +150,7 @@ public class RechargeOrderController {
 		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 
-	@ApiOperation(value = "营业厅长款补款处理", notes = "处理营业厅长款补款操作")
+	@ApiOperation(value = "营业厅长款补单处理", notes = "处理营业厅长款补单操作")
 	@ApiResponse(code = 200, message = "长款补单操作结果")
 	@PostMapping(value = "/hall/longAmt")
 	public GenericRspDTO<HallRechargeFundRspDTO> longAmtHandle(@Validated @RequestBody GenericDTO<HallRechargeFundRepDTO> genericDTO) {
