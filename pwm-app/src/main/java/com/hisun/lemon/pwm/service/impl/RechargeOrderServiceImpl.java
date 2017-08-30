@@ -439,7 +439,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setModifyOpr("");
 		rechargeOrderDO.setOrderAmt(rechargeDTO.getAmount());
 		rechargeOrderDO.setOrderCcy("USD");
-		rechargeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
+		rechargeOrderDO.setOrderExpTm(DateTimeUtils.getCurrentLocalDateTime().plusDays(2));
 		rechargeOrderDO.setOrderNo(orderNo);
 		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
@@ -450,7 +450,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setTxType("01");
 		service.initOrder(rechargeOrderDO);
 
-		logger.info("登记充值订单成功，订单号："+rechargeOrderDO.getOrderNo());
+		logger.info("登记充值订单成功，订单号：" + rechargeOrderDO.getOrderNo());
 		//调用收银
 		InitCashierDTO initCashierDTO=new InitCashierDTO();
 	  	initCashierDTO.setBusPaytype(null);
@@ -462,6 +462,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 	  	initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
+		initCashierDTO.setEffTm(rechargeOrderDO.getOrderExpTm());
 
 		String language=LemonUtils.getLocale().getLanguage();
 		if(StringUtils.isBlank(language)){
@@ -473,7 +474,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setGoodsDesc(desc);
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
-		logger.info("订单："+rechargeOrderDO.getOrderNo()+" 请求收银台");
+		logger.info("订单：" + rechargeOrderDO.getOrderNo()+" 请求收银台");
 		return cshOrderClient.initCashier(genericDTO);
 	}
 
