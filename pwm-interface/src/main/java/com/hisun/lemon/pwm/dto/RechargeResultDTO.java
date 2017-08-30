@@ -3,7 +3,6 @@ package com.hisun.lemon.pwm.dto;
 import java.math.BigDecimal;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;

@@ -50,7 +50,7 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
         List<RechargeOrderDO> orders=chkFileComponent.queryHallRecharges(chkDate,chkOrderStatus);
 
         //读取对账文件汇总信息项:
-        Map<String,Object> headItemMap = new HashMap<String,Object>();
+        Map<String,Object> headItemMap = new HashMap<>();
         BigDecimal totalFee = BigDecimal.valueOf(0);
         BigDecimal totalAmt = BigDecimal.valueOf(0);
         for(RechargeOrderDO ro : orders) {

@@ -188,7 +188,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		directPaymentDTO.sethCouponAmt(0);
 		directPaymentDTO.setCashAmt(rechargeDO.getOrderAmt());
 		logger.info("订单：" + rechargeDO.getOrderNo() + " 请求收银台");
-		GenericDTO<DirectPaymentDTO> DirectPayment = new GenericDTO<DirectPaymentDTO>();
+		GenericDTO<DirectPaymentDTO> DirectPayment = new GenericDTO<>();
 		DirectPayment.setBody(directPaymentDTO);
 		GenericRspDTO<PaymentResultDTO> rspDTO = cshOrderClient.payByDirectBal(DirectPayment);
 		if (!JudgeUtils.isSuccess(rspDTO.getMsgCd())) {
@@ -551,7 +551,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
 						CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "汇款充值$"+rechargeOrderDO.getOrderAmt());
 				acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
-
+				break;
 			default:
 				break;
 		}
@@ -576,9 +576,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isNotBlank(key)){
 			//判断是否是通过手机号查询,手机号格式 国家编码+手机号
 			boolean isPhone = PhoneNumberUtils.isValidNumber(key);
-//			boolean isPhone = PhoneNumberUtils.isValidNumber(key,PwmConstants.COUNTRY_CODE_KHM);
 			if(isPhone){
-//				String phone = PwmConstants.COUNTRY_CODE_KHM + "-" + key;
 				genericUserBasicInfDTO = userBasicInfClient.queryUserByLoginId(key);
 			}else{
 				//根据id查询

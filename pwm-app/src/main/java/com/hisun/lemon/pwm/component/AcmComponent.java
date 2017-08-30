@@ -22,7 +22,6 @@ import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
-import com.jcraft.jsch.Logger;
 
 /**
  * 账务组件
@@ -51,7 +50,7 @@ public class AcmComponent {
 	public String getAcmAcNo(String userId, String acTye) {
 		UserAccountDTO userDTO = new UserAccountDTO();
 		userDTO.setUserId(userId);
-		GenericDTO<UserAccountDTO> user=new GenericDTO<UserAccountDTO>();
+		GenericDTO<UserAccountDTO> user=new GenericDTO<>();
 		user.setBody(userDTO);
 		GenericDTO<List<QueryAcBalRspDTO>> genericQueryAcBalRspDTO = accountManagementClient.queryAcBal(userDTO);
 		List<QueryAcBalRspDTO> acmAcBalInfList = genericQueryAcBalRspDTO.getBody();
@@ -175,7 +174,7 @@ public class AcmComponent {
 	private QueryAcBalRspDTO getAcmAcInfo(String userId, String acTye) {
 		UserAccountDTO userDTO = new UserAccountDTO();
 		userDTO.setUserId(userId);
-		GenericDTO<UserAccountDTO> user=new GenericDTO<UserAccountDTO>();
+		GenericDTO<UserAccountDTO> user=new GenericDTO<>();
 		user.setBody(userDTO);
 		GenericRspDTO<List<QueryAcBalRspDTO>> genericQueryAcBalRspDTO = accountManagementClient.queryAcBal(userDTO);
 		if(JudgeUtils.isNotSuccess(genericQueryAcBalRspDTO.getMsgCd())){
