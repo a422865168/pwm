@@ -68,6 +68,12 @@ public class RechargeResultDTO {
 	@ApiModelProperty(name = "status", value = "订单状态(S:成功|F:失败)")
 	private String status;
 
+	/**
+	 * 充值备注信息
+	 */
+	@ApiModelProperty(name = "remark", value = "备注")
+	private String remark;
+
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -130,5 +136,13 @@ public class RechargeResultDTO {
 
 	public void setTxJrnNo(String txJrnNo) {
 		this.txJrnNo = txJrnNo;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 }

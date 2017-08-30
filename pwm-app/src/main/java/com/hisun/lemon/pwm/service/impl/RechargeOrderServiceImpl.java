@@ -497,6 +497,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			updOrderDO.setOrderCcy(rechargeResultDTO.getOrderCcy());
 			updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 			updOrderDO.setOrderNo(orderNo);
+			//若是汇款充值，此处为审核失败原因
+			updOrderDO.setRemark(rechargeResultDTO.getRemark());
 			service.updateOrder(updOrderDO);
 			return;
 		}
