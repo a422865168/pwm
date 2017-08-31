@@ -272,8 +272,8 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         BeanUtils.copyProperties(createUserBillDTO, withdrawOrderDO);
         createUserBillDTO.setTxTm(withdrawOrderDO.getOrderTm());
         createUserBillDTO.setPayerId(withdrawOrderDO.getUserId());
-        createUserBillDTO.setOrderAmt(totalAmt);
-        createUserBillDTO.setFee(fee);
+        createUserBillDTO.setOrderAmt(withdrawOrderDO.getWcApplyAmt());
+        createUserBillDTO.setFee(withdrawOrderDO.getFeeAmt());
         billSyncHandler.createBill(createUserBillDTO);
 
         WithdrawRspDTO withdrawRspDTO = new WithdrawRspDTO();
