@@ -978,7 +978,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM20015");
 		}
 		//判断充值订单是否已提交审核
-		if(JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_W1,rechargeOrderDO.getOrderStatus())) {
+		if(JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_W1,rechargeOrderDO.getOrderStatus()) || JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_S,rechargeOrderDO.getOrderStatus())) {
 			throw new LemonException("PWM20017");
 		}
 
