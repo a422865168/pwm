@@ -272,7 +272,11 @@ values ('PWM20027','zh','营业厅长款补单失败!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20028','zh','营业厅短款撤单失败!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM20029','zh','营业厅短款撤单失败!',now(),now());
+values ('PWM20029','zh','不能对已成功订单进行补单!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20030','zh','不能对失败订单进行撤单!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20031','zh','长短款差错处理业务类型非法!',now(),now());
 
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
