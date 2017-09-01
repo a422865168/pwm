@@ -1,13 +1,12 @@
 package com.hisun.lemon.pwm.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.cmm.client.CmmServerClient;
+import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -81,6 +80,8 @@ import com.hisun.lemon.urm.dto.UserBasicInfDTO;
 
 @Service
 public class RechargeOrderServiceImpl implements IRechargeOrderService {
+    public static final int RECHARGE_SUCCESS=1;
+    public static final int RECHARGE_OFFLINE_BACK=2;
 
 	private static final Logger logger = LoggerFactory.getLogger(RechargeOrderServiceImpl.class);
 	@Resource
@@ -103,7 +104,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	protected AccountingTreatmentClient accountingTreatmentClient;
 	@Resource
 	protected DistributedLocker locker;
-	
+    @Resource
+    private CmmServerClient cmmServerClient;
 	
 	/**
 	 * 查询账户信息
@@ -497,9 +499,19 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
 			updOrderDO.setOrderCcy(rechargeResultDTO.getOrderCcy());
 			updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+			updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 			updOrderDO.setOrderNo(orderNo);
 			//若是汇款充值，此处为审核失败原因
 			updOrderDO.setRemark(rechargeResultDTO.getRemark());
+			if(JudgeUtils.equals(rechargeOrderDO.getBusType(),PwmConstants.BUS_TYPE_RECHARGE_OFL)){
+			    try {
+                    //充值退回通知发送
+                    logger.info("汇款拒绝理由: " + rechargeOrderDO.getRemark());
+                    sendMsgCenterInfo(rechargeOrderDO,RECHARGE_OFFLINE_BACK);
+                }catch (Exception e){
+			        logger.error("汇款充值审核失败原因通知失败:" + e.getMessage());
+                }
+            }
 			service.updateOrder(updOrderDO);
 			return;
 		}
@@ -747,8 +759,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		updOrderDO.setFee(hallPayResult.getFee());
 		service.updateOrder(updOrderDO);
-		//调用平台短信能力通知充值到账
-
+		try{
+            //调用平台短信能力通知充值到账
+            sendMsgCenterInfo(rechargeOrderDO,RECHARGE_SUCCESS);
+        }catch (Exception e){
+		    logger.error("充值成功，推送充值消息失败:" + e.getMessage());
+        }
 		//返回
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(hallPayResult.getAmount());
@@ -1394,4 +1410,52 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		return accList;
 	}
+
+
+    /**
+     * 充值信息中心推送
+     * @param rechargeOrderDO
+     * @param messageFlag
+     * @throws LemonException
+     */
+    public void sendMsgCenterInfo(RechargeOrderDO rechargeOrderDO,int messageFlag) throws LemonException{
+	    String userId = rechargeOrderDO.getPayerId();
+        logger.info("recharge message send to userId : " + userId);
+        String language = LemonUtils.getLocale().getLanguage();
+        if (JudgeUtils.isBlank(language)) {
+            language = "en";
+            logger.error("setting default language : " + language);
+        }
+        Map<String, String> map = new HashMap<>();
+        GenericDTO<MessageSendReqDTO> reqDTO = new GenericDTO();
+        MessageSendReqDTO messageSendReqDTO = new MessageSendReqDTO();
+        messageSendReqDTO.setUserId(userId);
+        messageSendReqDTO.setMessageLanguage(language);
+        switch (messageFlag){
+            case RECHARGE_SUCCESS:
+                messageSendReqDTO.setMessageTemplateId(PwmConstants.RECHARGE_SUCC_TEMPL);
+                BigDecimal orderAmt = rechargeOrderDO.getOrderAmt();
+                if(JudgeUtils.isNotNull(orderAmt)){
+                    map.put("orderAmt",String.valueOf(rechargeOrderDO.getOrderAmt()));
+                }else{
+                    map.put("orderAmt","");
+                }
+                break;
+            case RECHARGE_OFFLINE_BACK:
+                messageSendReqDTO.setMessageTemplateId(PwmConstants.RECHARGE_OFFLINE_BACK_TEMPL);
+                map.put("reason",rechargeOrderDO.getRemark());
+                break;
+            default:
+                break;
+        }
+        map.put("date",DateTimeUtils.formatLocalDate(rechargeOrderDO.getAcTm(), "yyyy-MM-dd"));
+        messageSendReqDTO.setReplaceFieldMap(map);
+        reqDTO.setBody(messageSendReqDTO);
+        GenericRspDTO<NoBody> genericRspDTO = cmmServerClient.messageSend(reqDTO);
+        if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
+            logger.error("充值通知类型:" + messageFlag +", 推送订单号："+ rechargeOrderDO.getOrderNo()+"信息失败。");
+            LemonException.throwLemonException(genericRspDTO.getMsgCd(), genericRspDTO.getMsgInfo());
+        }
+        logger.info("充值消息推动成功");
+    }
 }
