@@ -1085,6 +1085,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	public HallRechargeFundRspDTO longAmtHandle(GenericDTO<HallRechargeFundRepDTO> genericDTO) {
 		HallRechargeFundRepDTO hallRechargeFundRepDTO = genericDTO.getBody();
 		String rechargeOrderNo = hallRechargeFundRepDTO.getOrderNo();
+        HallRechargeFundRspDTO hallRechargeFundRspDTO = new HallRechargeFundRspDTO();
+        hallRechargeFundRspDTO.setChkErrId(hallRechargeFundRepDTO.getChkErrId());
 		logger.error("营业厅充值订单" + rechargeOrderNo + "长款补单");
 		try {
 			locker.lock("PWM_LOCK" + rechargeOrderNo, 18, 22, () -> {
@@ -1130,21 +1132,29 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					logger.error("更新收银订单失败：" + rechargeOrderDO.getExtOrderNo()+ updateOrderRspDTO.getMsgCd());
 					LemonException.throwBusinessException(updateOrderRspDTO.getMsgCd());
 				}
-				HallRechargeFundRspDTO hallRechargeFundRspDTO = new HallRechargeFundRspDTO();
+                logger.info("营业厅充值订单" + rechargeOrderNo + "补单成功");
+                hallRechargeFundRspDTO.setOrderNo(rechargeOrderNo);
+                hallRechargeFundRspDTO.setStatus(PwmConstants.CHK_ERR_SUCCESS);
 				return hallRechargeFundRspDTO;
 
 			});
 		} catch (Exception e) {
 			LemonException.throwBusinessException("PWM20027");
 		}
-		return null;
+        logger.info("营业厅充值订单" + rechargeOrderNo + "补单失败");
+        hallRechargeFundRspDTO.setOrderNo(rechargeOrderNo);
+        hallRechargeFundRspDTO.setStatus(PwmConstants.CHK_ERR_FAIL);
+        return hallRechargeFundRspDTO;
 	}
 
 	@Override
 	public HallRechargeFundRspDTO shortAmtHandle(GenericDTO<HallRechargeFundRepDTO> genericDTO){
 		HallRechargeFundRepDTO hallRechargeFundRepDTO = genericDTO.getBody();
 		String rechargeOrderNo = hallRechargeFundRepDTO.getOrderNo();
-		logger.error("营业厅充值订单" + rechargeOrderNo + "短款撤单");
+        HallRechargeFundRspDTO hallRechargeFundRspDTO = new HallRechargeFundRspDTO();
+        hallRechargeFundRspDTO.setChkErrId(hallRechargeFundRepDTO.getChkErrId());
+
+		logger.info("营业厅充值订单" + rechargeOrderNo + "短款撤单");
 		try {
 			locker.lock("PWM_LOCK" + rechargeOrderNo, 18, 22, () -> {
 				//差错处理前校验
@@ -1188,13 +1198,18 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					logger.error("更新收银订单失败：" + rechargeOrderDO.getExtOrderNo()+ updateOrderRspDTO.getMsgCd());
 					LemonException.throwBusinessException(updateOrderRspDTO.getMsgCd());
 				}
-				HallRechargeFundRspDTO hallRechargeFundRspDTO = new HallRechargeFundRspDTO();
+                logger.info("营业厅充值订单" + rechargeOrderNo + "撤单成功");
+                hallRechargeFundRspDTO.setStatus(PwmConstants.CHK_ERR_SUCCESS);
+                hallRechargeFundRspDTO.setOrderNo(rechargeOrderNo);
 				return hallRechargeFundRspDTO;
 			});
 		} catch (Exception e) {
 			LemonException.throwBusinessException("PWM20028");
 		}
-		return null;
+        logger.info("营业厅充值订单" + rechargeOrderNo + "撤单失败");
+		hallRechargeFundRspDTO.setStatus(PwmConstants.CHK_ERR_FAIL);
+        hallRechargeFundRspDTO.setOrderNo(rechargeOrderNo);
+		return hallRechargeFundRspDTO;
 	}
 
 	@Override

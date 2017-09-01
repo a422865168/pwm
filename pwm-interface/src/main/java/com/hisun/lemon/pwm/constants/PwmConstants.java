@@ -282,5 +282,15 @@ public class PwmConstants {
 	 * 汇款充值失败消息推送模板
 	 */
 	public static final String RECHARGE_OFFLINE_BACK_TEMPL="00000011";
+
+	/**
+	 * 对账差错处理结果：成功(S)
+	 */
+	public static final String CHK_ERR_SUCCESS="S";
+
+	/**
+	 * 对账差错处理结果：失败(F)
+	 */
+	public static final String CHK_ERR_FAIL="F";
 	
 }

@@ -12,8 +12,38 @@ import org.hibernate.validator.constraints.NotEmpty;
  *
  */
 public class HallRechargeFundRspDTO {
-    @ApiModelProperty(name = "chkOrderNo", value = "对账处理订单号")
+    @ApiModelProperty(name = "chkErrId", value = "对账处理订单号")
     @NotEmpty
     @Length(max = 32)
-    private  String chkOrderNo;
+    private  String chkErrId;
+
+    @ApiModelProperty(name = "status", value = "差错处理结果状态(S:成功|F:失败)")
+    private String status;
+
+    @ApiModelProperty(name = "orderNo",value = "差错订单号")
+    private String orderNo;
+
+    public String getChkErrId() {
+        return chkErrId;
+    }
+
+    public void setChkErrId(String chkErrId) {
+        this.chkErrId = chkErrId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
 }
