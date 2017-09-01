@@ -675,9 +675,14 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		HallRechargePaymentResultDTO hallPayResult = genericRspHallPaymentResult.getBody();
 
 		if(JudgeUtils.isNotSuccess(genericRspHallPaymentResult.getMsgCd())) {
-			//更新充值订单状态
+			//失败更新充值订单外部收银订单号
+			GenericRspDTO<OrderDTO> genericOrderDTO = cshOrderClient.query(rechargeOrderDO.getOrderNo());
+			OrderDTO orderDTO = genericOrderDTO.getBody();
 			RechargeOrderDO updatOrderDO = new RechargeOrderDO();
 			updatOrderDO.setOrderNo(orderNo);
+			if(JudgeUtils.isNotNull(orderDTO)){
+				updatOrderDO.setExtOrderNo(orderDTO.getOrderNo());
+			}
 			updatOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 			updatOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
 			updatOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
@@ -1104,7 +1109,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 				this.service.updateOrder(rechargeOrderDO);
 				//更新收银订单
-				cshOrderClient.updateOrder(rechargeOrderDO.getExtOrderNo(),PwmConstants.RECHARGE_ORD_S);
+				GenericRspDTO updateOrderRspDTO = cshOrderClient.updateOrder(rechargeOrderDO.getExtOrderNo(),PwmConstants.RECHARGE_ORD_S);
+				if(JudgeUtils.isNotSuccess(updateOrderRspDTO.getMsgCd())){
+					logger.error("更新收银订单失败：" + rechargeOrderDO.getExtOrderNo()+ updateOrderRspDTO.getMsgCd());
+					LemonException.throwBusinessException(updateOrderRspDTO.getMsgCd());
+				}
 				HallRechargeFundRspDTO hallRechargeFundRspDTO = new HallRechargeFundRspDTO();
 				return hallRechargeFundRspDTO;
 
@@ -1158,7 +1167,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 				this.service.updateOrder(rechargeOrderDO);
 				//更新收银订单
-				cshOrderClient.updateOrder(rechargeOrderDO.getExtOrderNo(),PwmConstants.RECHARGE_ORD_F);
+				GenericRspDTO updateOrderRspDTO = cshOrderClient.updateOrder(rechargeOrderDO.getExtOrderNo(),PwmConstants.RECHARGE_ORD_F);
+				if(JudgeUtils.isNotSuccess(updateOrderRspDTO.getMsgCd())){
+					logger.error("更新收银订单失败：" + rechargeOrderDO.getExtOrderNo()+ updateOrderRspDTO.getMsgCd());
+					LemonException.throwBusinessException(updateOrderRspDTO.getMsgCd());
+				}
 				HallRechargeFundRspDTO hallRechargeFundRspDTO = new HallRechargeFundRspDTO();
 				return hallRechargeFundRspDTO;
 			});
