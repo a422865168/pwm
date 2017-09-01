@@ -897,7 +897,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeOrderDO.setExtOrderNo("");
 		rechargeOrderDO.setOrderAmt(offlineRechargeApplyDTO.getAmount());
 		rechargeOrderDO.setOrderCcy(offlineRechargeApplyDTO.getCcy());
-		rechargeOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
+		rechargeOrderDO.setOrderExpTm(DateTimeUtils.getCurrentLocalDateTime().plusDays(2));
 		rechargeOrderDO.setOrderNo(orderNo);
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setIpAddress("");

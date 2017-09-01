@@ -272,7 +272,15 @@ public class PwmConstants {
 	 * 海币充值订单状态 S
 	 */
 	public static final String ORD_STS_S="S";
-	
-	
+
+	/**
+	 * 充值成功消息推送模板
+	 */
+	public static final String RECHARGE_SUCC_TEMPL="00000010";
+
+	/**
+	 * 汇款充值失败消息推送模板
+	 */
+	public static final String RECHARGE_OFFLINE_BACK_TEMPL="00000011";
 	
 }
