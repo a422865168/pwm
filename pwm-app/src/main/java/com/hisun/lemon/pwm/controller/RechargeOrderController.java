@@ -60,7 +60,7 @@ public class RechargeOrderController {
 
 	@ApiOperation(value = "充值处理结果通知", notes = "接收收银台的处理结果通知")
 	@ApiResponse(code = 200, message = "处理通知结果")
-	@PatchMapping(value = "/result")
+	@PostMapping(value = "/result")
 	public GenericRspDTO completeOrder(@Validated @RequestBody GenericDTO<RechargeResultDTO> genericResultDTO) {
 		service.handleResult(genericResultDTO);
 		return GenericRspDTO.newSuccessInstance();
