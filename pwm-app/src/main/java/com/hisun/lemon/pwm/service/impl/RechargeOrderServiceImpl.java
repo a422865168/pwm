@@ -929,7 +929,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
 		initCashierDTO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
 		initCashierDTO.setPayerName("");
-
+		initCashierDTO.setCrdCorpOrg(rechargeOrderDO.getCrdCorpOrg());
 		String language=LemonUtils.getLocale().getLanguage();
 		if(StringUtils.isBlank(language)){
 			language="en";
