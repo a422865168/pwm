@@ -53,4 +53,12 @@ public interface PwmRechargeClient {
 	 */
 	@PostMapping("/pwm/recharge/hall/error/handler")
 	public GenericRspDTO<NoBody> hallRechargeErrorHandler(@Validated @RequestBody GenericDTO<HallRechargeErrorFundDTO> genericResultDTO);
+
+	/**
+	 * 营业厅对平金额处理
+	 * @param genericDTO
+	 * @return
+	 */
+	@PostMapping("/pwm/recharge/hall/match")
+	public GenericRspDTO<NoBody> hallRechargeMatchHandler(@Validated @RequestBody GenericDTO<HallRechargeMatchDTO> genericDTO);
 }

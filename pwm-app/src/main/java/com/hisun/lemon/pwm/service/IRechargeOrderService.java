@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.dto.*;
 
 
@@ -109,4 +110,10 @@ public interface IRechargeOrderService {
      * @param fileName
      */
     public void uploadHallRechargeChkFile(String type,String date,String fileName);
+
+    /**
+     * 营业厅充值对平账处理
+     * @param genericDTO
+     */
+    public void hallRechargeMatchHandler(GenericDTO<HallRechargeMatchDTO> genericDTO);
 }

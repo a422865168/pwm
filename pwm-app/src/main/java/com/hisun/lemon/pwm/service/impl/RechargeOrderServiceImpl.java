@@ -1224,6 +1224,46 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 	}
 
+	@Override
+	public void  hallRechargeMatchHandler(GenericDTO<HallRechargeMatchDTO> genericDTO){
+		HallRechargeMatchDTO hallRechargeMatchDTO = genericDTO.getBody();
+		if(JudgeUtils.isNull(hallRechargeMatchDTO)){
+			throw new LemonException("PWM20033");
+		}
+		//对账类型校验
+		String chkSubType = hallRechargeMatchDTO.getChkSubType();
+		if(!JudgeUtils.equals(chkSubType,"0404")){
+			throw new LemonException("PWM20034");
+		}
+		List<AccountingReqDTO> accList = createMatchAmtAccList(hallRechargeMatchDTO);
+
+		BigDecimal dAmt = BigDecimal.ZERO;
+		BigDecimal cAmt = BigDecimal.ZERO;
+		for (AccountingReqDTO dto : accList) {
+			if (JudgeUtils.isNotNull(dto)) {
+				if (JudgeUtils.equals(dto.getDcFlg(), ACMConstants.AC_D_FLG)) {
+					dAmt = dAmt.add(dto.getTxAmt());
+				} else {
+					cAmt = cAmt.add(dto.getTxAmt());
+				}
+			}
+		}
+
+		// 借贷平衡校验
+		if (cAmt.compareTo(dAmt) != 0) {
+			LemonException.throwBusinessException("PWM20026");
+		}
+
+		GenericDTO<List<AccountingReqDTO>> userAccDto = new GenericDTO<>();
+		userAccDto.setBody(accList);
+		GenericRspDTO<NoBody> accountingTreatment = accountingTreatmentClient.accountingTreatment(userAccDto);
+		if (!JudgeUtils.isSuccess(accountingTreatment.getMsgCd())) {
+			logger.error("营业厅对平金额账务处理失败：" + accountingTreatment.getMsgCd());
+			LemonException.throwBusinessException(accountingTreatment.getMsgCd());
+		}
+		logger.info("营业厅对平金额账务处理成功，总金额：" + hallRechargeMatchDTO.getTotalAmt());
+	}
+
 	private String md5Str(HallRechargeApplyDTO.BussinessBody busBody, String key) {
 		ObjectMapper om = new ObjectMapper();
 		String retStr = "";
@@ -1398,6 +1438,54 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				null,
 				null,
 				"营业厅短款撤单$"+totalAmt);
+
+		accList.add(cnlRechargeHallReqDTO);
+		accList.add(userAccountReqDTO);
+
+		return accList;
+	}
+
+	private List<AccountingReqDTO> createMatchAmtAccList(HallRechargeMatchDTO hallRechargeMatchDTO){
+		List<AccountingReqDTO> accList=new ArrayList<>();
+
+		String tmpNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_HALL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
+
+		BigDecimal totalAmt = hallRechargeMatchDTO.getTotalAmt();
+		//贷:应收账款-渠道充值-营业厅
+		AccountingReqDTO cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
+				tmpNo,
+				tmpNo,
+				PwmConstants.TX_TYPE_RECHANGE,
+				ACMConstants.ACCOUNTING_NOMARL,
+				totalAmt,
+				null,
+				ACMConstants.ITM_AC_TYP,
+				null,
+				ACMConstants.AC_C_FLG,
+				PwmConstants.AC_ITEM_CNL_RECHARGE_HALL,
+				null,
+				null,
+				null,
+				null,
+				null);
+
+		//借:应收账款-待结算款-营业厅
+		AccountingReqDTO userAccountReqDTO=acmComponent.createAccountingReqDTO(
+				tmpNo,
+				tmpNo,
+				PwmConstants.TX_TYPE_RECHANGE,
+				ACMConstants.ACCOUNTING_NOMARL,
+				totalAmt,
+				null,
+				ACMConstants.ITM_AC_TYP,
+				null,
+				ACMConstants.AC_D_FLG,
+				PwmConstants.AC_ITEM_PAY_HALL,
+				null,
+				null,
+				null,
+				null,
+				"营业厅对平金额$"+totalAmt);
 
 		accList.add(cnlRechargeHallReqDTO);
 		accList.add(userAccountReqDTO);

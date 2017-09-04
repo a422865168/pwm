@@ -204,6 +204,18 @@ public class PwmConstants {
      */
     public static final String AC_ITEM_PAY_CASH_ACNO="2241010001";
 
+	/**
+	 * 内部科目
+	 * 应收账款-待结算款-营业厅
+	 */
+	public static final String AC_ITEM_PAY_HALL ="1122021001";
+
+	/**
+	 * 内部科目
+	 * 应收账款-渠道充值-营业厅
+	 */
+	public static final String AC_ITEM_CNL_RECHARGE_HALL ="1122010001";
+
     /**
      * 内部科目
      * 应付账款-待结算款-批量付款

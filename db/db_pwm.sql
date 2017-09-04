@@ -213,6 +213,8 @@ values ('PWM10048','zh','卡后四位不能为空!',now(),now());
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10049','zh','手机号不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10050','zh','对平总金额不能为空!',now(),now());
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20001','zh','业务类型与交易类型不匹配!',now(),now());
@@ -279,6 +281,10 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20031','zh','长短款差错处理业务类型非法!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20032','zh','不支持的差错处理操作!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20033','zh','对平金额处理请求数据为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM20034','zh','对平金额处理对账类型不匹配!',now(),now());
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30001','zh','该用户为黑名单!',now(),now());

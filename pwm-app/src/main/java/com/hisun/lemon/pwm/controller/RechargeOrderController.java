@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.JudgeUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
+import com.hisun.lemon.pwm.dto.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,20 +22,6 @@ import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
-import com.hisun.lemon.pwm.dto.HallOrderQueryResultDTO;
-import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeErrorFundDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeReqHCouponDTO;
-import com.hisun.lemon.pwm.dto.RechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeRspHCouponDTO;
-import com.hisun.lemon.pwm.dto.RemittanceUploadDTO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
 
 import io.swagger.annotations.Api;
@@ -172,6 +159,14 @@ public class RechargeOrderController {
 	public GenericRspDTO<NoBody> uploadHallChkFile(@PathVariable(value="type",required = true) String type, @PathVariable(value="date",required = true) String date,
 												  @PathVariable(value="filename",required = true) String filename) {
 		service.uploadHallRechargeChkFile(type,date,filename);
+		return GenericRspDTO.newSuccessInstance();
+	}
+
+	@ApiOperation(value="营业厅充值对平金额处理", notes="营业厅充值对平金额处理")
+	@ApiResponse(code = 200, message = "营业厅充值对平金额处理")
+	@PostMapping(value = "/hall/match")
+	public GenericRspDTO<NoBody> hallRechargeMatchHandler(@Validated @RequestBody GenericDTO<HallRechargeMatchDTO> genericDTO) {
+		service.hallRechargeMatchHandler(genericDTO);
 		return GenericRspDTO.newSuccessInstance();
 	}
 }
