@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.common.exception.LemonException;
+import com.hisun.lemon.common.utils.JudgeUtils;
+import com.hisun.lemon.pwm.constants.PwmConstants;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,8 +24,7 @@ import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.dto.HallOrderQueryResultDTO;
 import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeFundRepDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeFundRspDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeErrorFundDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
 import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
 import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
@@ -147,20 +149,21 @@ public class RechargeOrderController {
 		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 
-	@ApiOperation(value = "营业厅长款补单处理", notes = "处理营业厅长款补单操作")
-	@ApiResponse(code = 200, message = "长款补单操作结果")
-	@PostMapping(value = "/hall/longAmt")
-	public GenericRspDTO<HallRechargeFundRspDTO> longAmtHandle(@Validated @RequestBody GenericDTO<HallRechargeFundRepDTO> genericDTO) {
-		HallRechargeFundRspDTO resultDTO = service.longAmtHandle(genericDTO);
-		return GenericRspDTO.newSuccessInstance(resultDTO);
-	}
+	@ApiOperation(value="营业厅差错处理", notes="营业厅差错处理")
+	@ApiResponse(code = 200, message = "与营业厅充值对账的差错处理")
+	@PostMapping(value = "/hall/error/handler")
+	public GenericRspDTO<NoBody> hallRechargeErrorHandler(@Validated @RequestBody GenericDTO<HallRechargeErrorFundDTO> genericDTO) {
+		HallRechargeErrorFundDTO hallRechargeErrorFundDTO = genericDTO.getBody();
+		String errorType = hallRechargeErrorFundDTO.getFundType();
+		if(JudgeUtils.equals(errorType, PwmConstants.HALL_CHK_LONG_AMT)){
+			service.longAmtHandle(hallRechargeErrorFundDTO);
+		}else if(JudgeUtils.equals(errorType,PwmConstants.HALL_CHK_SHORT_AMT)){
+			service.shortAmtHandle(hallRechargeErrorFundDTO);
+		}else{
+			LemonException.throwBusinessException("PWM20032");
+		}
 
-	@ApiOperation(value = "营业厅短款撤单处理", notes = "处理营业短款处理操作")
-	@ApiResponse(code = 200, message = "短款撤单操作结果")
-	@PostMapping(value = "/hall/shortAmt")
-	public GenericRspDTO<HallRechargeFundRspDTO> shortAmtHandle(@Validated @RequestBody GenericDTO<HallRechargeFundRepDTO> genericDTO) {
-		HallRechargeFundRspDTO resultDTO = service.shortAmtHandle(genericDTO);
-		return GenericRspDTO.newSuccessInstance(resultDTO);
+		return GenericRspDTO.newSuccessInstance();
 	}
 
 	@ApiOperation(value = "获取营业厅充值对账文件", notes = "处理营业对账文件上传服务器")

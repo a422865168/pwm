@@ -13,7 +13,7 @@ import java.time.LocalDate;
  * @time 上午10:27:30
  *
  */
-public class HallRechargeFundRepDTO {
+public class HallRechargeErrorFundDTO {
 
     @ApiModelProperty(name = "orderNo", value = "充值订单号")
     @NotEmpty
@@ -33,6 +33,8 @@ public class HallRechargeFundRepDTO {
     @ApiModelProperty(name = "chkOrdDt", value = "对账处理时间")
     private LocalDate chkOrdDt;
 
+    @ApiModelProperty(name = "remark", value = "备注信息")
+    private String remark;
 
     public String getOrderNo() {
         return orderNo;
@@ -65,5 +67,13 @@ public class HallRechargeFundRepDTO {
 
     public void setChkErrId(String chkErrId) {
         this.chkErrId = chkErrId;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }
