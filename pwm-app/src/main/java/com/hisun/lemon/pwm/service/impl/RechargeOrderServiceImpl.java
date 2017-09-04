@@ -695,6 +695,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			if(JudgeUtils.isNotNull(orderDTO)){
 				updatOrderDO.setExtOrderNo(orderDTO.getOrderNo());
 			}
+			updatOrderDO.setFee(orderDTO.getFee());
 			updatOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 			updatOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
 			updatOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
@@ -1126,11 +1127,13 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 				rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 				//更新充值订单关联的收银订单信息
-				GenericRspDTO<OrderDTO> genericRspDTO = cshOrderClient.query(rechargeOrderDO.getOrderNo());
-				OrderDTO orderDTO = genericRspDTO.getBody();
-				if(JudgeUtils.isSuccess(genericRspDTO.getMsgCd()) && JudgeUtils.isNotNull(orderDTO)){
-					rechargeOrderDO.setFee(orderDTO.getFee());
-					rechargeOrderDO.setExtOrderNo(orderDTO.getOrderNo());
+				if(JudgeUtils.isNull(rechargeOrderDO.getFee()) || JudgeUtils.isBlank(rechargeOrderDO.getExtOrderNo())){
+					GenericRspDTO<OrderDTO> genericRspDTO = cshOrderClient.query(rechargeOrderDO.getOrderNo());
+					OrderDTO orderDTO = genericRspDTO.getBody();
+					if(JudgeUtils.isSuccess(genericRspDTO.getMsgCd()) && JudgeUtils.isNotNull(orderDTO)){
+						rechargeOrderDO.setFee(orderDTO.getFee());
+						rechargeOrderDO.setExtOrderNo(orderDTO.getOrderNo());
+					}
 				}
 				this.service.updateOrder(rechargeOrderDO);
 				//更新收银订单
