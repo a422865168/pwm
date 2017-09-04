@@ -1,6 +1,7 @@
 package com.hisun.lemon.pwm.client;
 
 import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.dto.*;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.validation.annotation.Validated;
@@ -45,20 +46,11 @@ public interface PwmRechargeClient {
 	public GenericRspDTO completeSeaOrder(@Validated @RequestBody GenericDTO<RechargeHCouponResultDTO> genericResultDTO);
 
 	/**
-	 * 营业厅长款补单操作
+	 * 营业厅充值差错处理
 	 *
 	 * @param genericResultDTO
 	 * @return
 	 */
-	@PatchMapping("/pwm/recharge/hall/longAmt")
-	public GenericRspDTO<HallRechargeFundRspDTO> longAmtHandle(@Validated @RequestBody GenericDTO<HallRechargeFundRepDTO> genericResultDTO);
-
-	/**
-	 * 营业厅短款撤单操作
-	 *
-	 * @param genericResultDTO
-	 * @return
-	 */
-	@PatchMapping("/pwm/recharge/hall/shortAmt")
-	public GenericRspDTO<HallRechargeFundRspDTO> shortAmtHandle(@Validated @RequestBody GenericDTO<HallRechargeFundRepDTO> genericResultDTO);
+	@PatchMapping("/pwm/recharge/hall/error/handler")
+	public GenericRspDTO<NoBody> hallRechargeErrorHandler(@Validated @RequestBody GenericDTO<HallRechargeErrorFundDTO> genericResultDTO);
 }

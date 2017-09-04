@@ -90,17 +90,17 @@ public interface IRechargeOrderService {
 
     /**
      * 营业厅对账长款处理接口
-     * @param genericDTO
+     * @param HallRechargeErrorFundDTO
      * @return
      */
-    public HallRechargeFundRspDTO longAmtHandle(GenericDTO<HallRechargeFundRepDTO> genericDTO);
+    public void longAmtHandle(HallRechargeErrorFundDTO HallRechargeErrorFundDTO);
 
     /**
      * 营业厅对账短款处理接口
-     * @param genericDTO
+     * @param HallRechargeErrorFundDTO
      * @return
      */
-    public HallRechargeFundRspDTO shortAmtHandle(GenericDTO<HallRechargeFundRepDTO> genericDTO);
+    public void shortAmtHandle(HallRechargeErrorFundDTO HallRechargeErrorFundDTO);
 
     /**
      * 获取营业厅对账文件

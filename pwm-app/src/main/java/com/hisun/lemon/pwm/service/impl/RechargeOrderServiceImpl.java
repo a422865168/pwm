@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 
 import com.hisun.lemon.cmm.client.CmmServerClient;
 import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
+import com.hisun.lemon.pwm.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -53,22 +54,7 @@ import com.hisun.lemon.mkm.req.dto.RechargeMkmToolReqDTO;
 import com.hisun.lemon.mkm.res.dto.RechargeMkmToolResDTO;
 import com.hisun.lemon.pwm.component.AcmComponent;
 import com.hisun.lemon.pwm.constants.PwmConstants;
-import com.hisun.lemon.pwm.dto.HallOrderQueryResultDTO;
-import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeFundRepDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeFundRspDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeReqHCouponDTO;
-import com.hisun.lemon.pwm.dto.RechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeRspHCouponDTO;
-import com.hisun.lemon.pwm.dto.RemittanceUploadDTO;
-import com.hisun.lemon.pwm.dto.UserInfoRspDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeErrorFundDTO;
 import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
@@ -1083,16 +1069,13 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	}
 
 	@Override
-	public HallRechargeFundRspDTO longAmtHandle(GenericDTO<HallRechargeFundRepDTO> genericDTO) {
-		HallRechargeFundRepDTO hallRechargeFundRepDTO = genericDTO.getBody();
-		String rechargeOrderNo = hallRechargeFundRepDTO.getOrderNo();
-        HallRechargeFundRspDTO hallRechargeFundRspDTO = new HallRechargeFundRspDTO();
-        hallRechargeFundRspDTO.setChkErrId(hallRechargeFundRepDTO.getChkErrId());
+	public void longAmtHandle(HallRechargeErrorFundDTO hallRechargeErrorFundDTO) {
+		String rechargeOrderNo = hallRechargeErrorFundDTO.getOrderNo();
 		logger.error("营业厅充值订单" + rechargeOrderNo + "长款补单");
 		try {
 			locker.lock("PWM_LOCK" + rechargeOrderNo, 18, 22, () -> {
 				//差错处理前校验
-				RechargeOrderDO rechargeOrderDO = checkBeforeErrHandle(hallRechargeFundRepDTO, PwmConstants.HALL_CHK_LONG_AMT);
+				RechargeOrderDO rechargeOrderDO = checkBeforeErrHandle(hallRechargeErrorFundDTO, PwmConstants.HALL_CHK_LONG_AMT);
 
 				//营业厅长款补单处理
 				List<AccountingReqDTO> accList = createLongAmtErrAccList(rechargeOrderDO);
@@ -1143,32 +1126,23 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					LemonException.throwBusinessException(updateOrderRspDTO.getMsgCd());
 				}
                 logger.info("营业厅充值订单" + rechargeOrderNo + "补单成功");
-                hallRechargeFundRspDTO.setOrderNo(rechargeOrderNo);
-                hallRechargeFundRspDTO.setStatus(PwmConstants.CHK_ERR_SUCCESS);
-				return hallRechargeFundRspDTO;
+
+				return null;
 
 			});
 		} catch (Exception e) {
 			LemonException.throwBusinessException("PWM20027");
 		}
-        logger.info("营业厅充值订单" + rechargeOrderNo + "补单失败");
-        hallRechargeFundRspDTO.setOrderNo(rechargeOrderNo);
-        hallRechargeFundRspDTO.setStatus(PwmConstants.CHK_ERR_FAIL);
-        return hallRechargeFundRspDTO;
 	}
 
 	@Override
-	public HallRechargeFundRspDTO shortAmtHandle(GenericDTO<HallRechargeFundRepDTO> genericDTO){
-		HallRechargeFundRepDTO hallRechargeFundRepDTO = genericDTO.getBody();
-		String rechargeOrderNo = hallRechargeFundRepDTO.getOrderNo();
-        HallRechargeFundRspDTO hallRechargeFundRspDTO = new HallRechargeFundRspDTO();
-        hallRechargeFundRspDTO.setChkErrId(hallRechargeFundRepDTO.getChkErrId());
-
+	public void shortAmtHandle(HallRechargeErrorFundDTO hallRechargeErrorFundDTO){
+		String rechargeOrderNo = hallRechargeErrorFundDTO.getOrderNo();
 		logger.info("营业厅充值订单" + rechargeOrderNo + "短款撤单");
 		try {
 			locker.lock("PWM_LOCK" + rechargeOrderNo, 18, 22, () -> {
 				//差错处理前校验
-				RechargeOrderDO rechargeOrderDO = checkBeforeErrHandle(hallRechargeFundRepDTO, PwmConstants.HALL_CHK_SHORT_AMT);
+				RechargeOrderDO rechargeOrderDO = checkBeforeErrHandle(hallRechargeErrorFundDTO, PwmConstants.HALL_CHK_SHORT_AMT);
 
 				//营业厅短款撤单处理
 				List<AccountingReqDTO> accList = createShortAmtErrAccList(rechargeOrderDO);
@@ -1209,17 +1183,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					LemonException.throwBusinessException(updateOrderRspDTO.getMsgCd());
 				}
                 logger.info("营业厅充值订单" + rechargeOrderNo + "撤单成功");
-                hallRechargeFundRspDTO.setStatus(PwmConstants.CHK_ERR_SUCCESS);
-                hallRechargeFundRspDTO.setOrderNo(rechargeOrderNo);
-				return hallRechargeFundRspDTO;
+
+				return null;
 			});
 		} catch (Exception e) {
 			LemonException.throwBusinessException("PWM20028");
 		}
-        logger.info("营业厅充值订单" + rechargeOrderNo + "撤单失败");
-		hallRechargeFundRspDTO.setStatus(PwmConstants.CHK_ERR_FAIL);
-        hallRechargeFundRspDTO.setOrderNo(rechargeOrderNo);
-		return hallRechargeFundRspDTO;
 	}
 
 	@Override
@@ -1289,7 +1258,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	}
 
 
-	private RechargeOrderDO checkBeforeErrHandle(HallRechargeFundRepDTO hallrep,String handleType){
+	private RechargeOrderDO checkBeforeErrHandle(HallRechargeErrorFundDTO hallrep, String handleType){
 		String orderNo = hallrep.getOrderNo();
 		//差错处理类型校验：长款/短款
 		if(!JudgeUtils.equals(handleType,hallrep.getFundType())){
