@@ -51,6 +51,6 @@ public interface PwmRechargeClient {
 	 * @param genericResultDTO
 	 * @return
 	 */
-	@PatchMapping("/pwm/recharge/hall/error/handler")
+	@PostMapping("/pwm/recharge/hall/error/handler")
 	public GenericRspDTO<NoBody> hallRechargeErrorHandler(@Validated @RequestBody GenericDTO<HallRechargeErrorFundDTO> genericResultDTO);
 }
