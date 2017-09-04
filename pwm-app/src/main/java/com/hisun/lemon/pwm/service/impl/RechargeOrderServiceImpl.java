@@ -172,7 +172,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		directPaymentDTO.setPayeeId(rechargeDO.getUserId());
 		directPaymentDTO.setAppCnl(LemonUtils.getApplicationName());
 		directPaymentDTO.setBusPaytype(PwmConstants.BUS_PAY_TYPE);
-		directPaymentDTO.setGoodsDesc("海币充值");
+		//directPaymentDTO.setGoodsDesc("海币充值");
 		directPaymentDTO.sethCouponAmt(0);
 		directPaymentDTO.setCashAmt(rechargeDO.getOrderAmt());
 		logger.info("订单：" + rechargeDO.getOrderNo() + " 请求收银台");
@@ -307,7 +307,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 		initCashierDTO.setTxType(rechargeDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDO.getOrderAmt());
-		initCashierDTO.setGoodsDesc("海币充值");
+		//initCashierDTO.setGoodsDesc("海币充值");
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		GenericRspDTO<CashierViewDTO> rspDTO = new GenericRspDTO<CashierViewDTO>();
