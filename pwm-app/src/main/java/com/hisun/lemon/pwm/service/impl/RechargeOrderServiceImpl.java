@@ -1402,7 +1402,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 		String tmpJrnNo =  IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
 		//订单交易总金额
-		BigDecimal totalAmt = rechargeOrderDO.getOrderAmt().multiply(rechargeOrderDO.getFee());
+//		BigDecimal totalAmt = rechargeOrderDO.getOrderAmt().multiply(rechargeOrderDO.getFee());
+		BigDecimal totalAmt = rechargeOrderDO.getOrderAmt();
 		//贷:应收账款-渠道充值-营业厅
 		AccountingReqDTO cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
 				rechargeOrderDO.getOrderNo(),
