@@ -15,6 +15,7 @@ import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.JudgeUtils;
+import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.cpo.client.WithdrawClient;
 import com.hisun.lemon.cpo.dto.WithdrawReqDTO;
 import com.hisun.lemon.cpo.enums.CorpBusSubTyp;
@@ -175,10 +176,6 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		}
 
 		//查询支付密码错误次数是否超过5次
-		/*if("支付密码错误次数是否超过5".equals(withdrawOrderDO.getUserId())){
-			LemonException.throwBusinessException("PWM30003");
-		}*/
-
 		//查询用户支付密码，校验支付密码，错误则抛异常
         CheckPayPwdDTO checkPayPwdDTO =new CheckPayPwdDTO();
         checkPayPwdDTO.setUserId(withdrawDTO.getUserId());
@@ -207,6 +204,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		withdrawOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
 		//用户姓名
 		withdrawOrderDO.setUserName(withdrawDTO.getCardUserName());
+		withdrawOrderDO.setCapCardName(withdrawDTO.getCardUserName());
 		withdrawOrderDO.setOrderStatus(PwmConstants.WITHDRAW_ORD_W1);
         /**
          * 账务处理
@@ -267,6 +265,16 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
             LemonException.throwBusinessException("PWM40007");
         }
 
+        //国际化订单信息
+        WithdrawCardBindDO withdrawCardBindDO = withdrawCardBindDao.query(withdrawOrderDO.getCapCardNo());
+        String language=LemonUtils.getLocale().getLanguage();
+        if(StringUtils.isBlank(language)){
+            language="en";
+        }
+        String descFormat=LemonUtils.getProperty("pwm.withdraw."+withdrawOrderDO.getCapCorgNo()+"Desc."+language);
+        String desc=descFormat.replace("$last$",withdrawCardBindDO.getCardNoLast());
+        desc=desc.replace("$amount$",String.valueOf(withdrawOrderDO.getWcApplyAmt()));
+
 		//同步账单数据
         CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
         BeanUtils.copyProperties(createUserBillDTO, withdrawOrderDO);
@@ -274,6 +282,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         createUserBillDTO.setPayerId(withdrawOrderDO.getUserId());
         createUserBillDTO.setOrderAmt(withdrawOrderDO.getWcApplyAmt());
         createUserBillDTO.setFee(withdrawOrderDO.getFeeAmt());
+        createUserBillDTO.setGoodsInfo(desc);
         billSyncHandler.createBill(createUserBillDTO);
 
         WithdrawRspDTO withdrawRspDTO = new WithdrawRspDTO();
