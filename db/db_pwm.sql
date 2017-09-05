@@ -215,6 +215,8 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10049','zh','手机号不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10050','zh','对平总金额不能为空!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM10051','zh','附言摘要不能为空!',now(),now());
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20001','zh','业务类型与交易类型不匹配!',now(),now());

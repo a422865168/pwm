@@ -40,7 +40,7 @@ public class RemittanceUploadDTO {
      * 附言摘要
      */
     @ApiModelProperty(name = "remark", value = "附言摘要")
-    @NotEmpty(message="PWM10003")
+    @NotEmpty(message="PWM10051")
     @Length(max = 256)
     private String remark;
 
