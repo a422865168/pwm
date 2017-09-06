@@ -19,8 +19,7 @@ public class Scheduler {
 	@Resource
 	private List<AbstractChkFileService> scheduleService;
 
-//	@Scheduled(cron="0 20 0 * * ?")
-    @Scheduled(cron="0 *  * * * *")
+//    @Scheduled(cron="0 *  * * * *")
 	public void createChkFile(){
 		for(AbstractChkFileService item:scheduleService){
 			executorService.submit(item);
