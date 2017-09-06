@@ -492,7 +492,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			if(JudgeUtils.equals(rechargeOrderDO.getBusType(),PwmConstants.BUS_TYPE_RECHARGE_OFL)){
 			    try {
                     //充值退回通知发送
-                    logger.info("汇款拒绝理由: " + rechargeOrderDO.getRemark());
+                    logger.info("汇款拒绝理由: " + updOrderDO.getRemark());
                     sendMsgCenterInfo(rechargeOrderDO,RECHARGE_OFFLINE_BACK);
                 }catch (Exception e){
 			        logger.error("汇款充值审核失败原因通知失败:" + e.getMessage());
