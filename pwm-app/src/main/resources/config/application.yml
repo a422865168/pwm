@@ -315,12 +315,15 @@ pwm :
     onlineDesc :
        en : online recharge amount $$amount$
        zh : 在线充值 $$amount$
+       kh : បញ្ចូលទឹកប្រាក់តាមអ៊ីនធឺណិត $$amount$
     hallDesc :
        en : hall recharge amount $$amount$
        zh : 营业厅充值 $$amount$
+       kh : បញ្ចូលទឹកប្រាក់ក្នុងការិយាល័យ $$amount$
     remitDesc :
-       en : hall recharge amount $$amount$
+       en : remittance recharge amount $$amount$
        zh : 汇款充值 $$amount$
+       kh : ការបញ្ចូលទឹកប្រាក់ផ្ទេរ $$amount$
   sftp :
     ip : 192.168.1.38
     port : 22
