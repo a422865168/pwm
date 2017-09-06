@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisun.lemon.pwm.dao.IRechargeOrderDao" >
+
+    <resultMap id="BaseResultMap" type="com.hisun.lemon.pwm.entity.RechargeOrderDO" >
+        <id column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="order_tm" property="orderTm" jdbcType="TIMESTAMP" />
+        <result column="ac_tm" property="acTm" jdbcType="DATE" />
+        <result column="tx_type" property="txType" jdbcType="VARCHAR" />
+        <result column="bus_type" property="busType" jdbcType="VARCHAR" />
+        <result column="order_ccy" property="orderCcy" jdbcType="VARCHAR" />
+        <result column="order_amt" property="orderAmt" jdbcType="DECIMAL" />
+        <result column="order_status" property="orderStatus" jdbcType="VARCHAR" />
+        <result column="order_succ_tm" property="orderSuccTm" jdbcType="TIMESTAMP" />
+        <result column="psn_flag" property="psnFlag" jdbcType="VARCHAR" />
+        <result column="order_exp_tm" property="orderExpTm" jdbcType="TIMESTAMP" />
+        <result column="sys_channel" property="sysChannel" jdbcType="VARCHAR" />
+        <result column="ip_address" property="ipAddress" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="ext_order_no" property="extOrderNo" jdbcType="VARCHAR" />
+        <result column="modify_opr" property="modifyOpr" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+        <result column="corp_org" property="crdCorpOrg" jdbcType="VARCHAR" />
+        <result column="fee" property="fee" jdbcType="DECIMAL" />
+        <result column="hall_order_no" property="hallOrderNo" jdbcType="VARCHAR" />
+        <result column="payer_id" property="payerId" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        order_no, order_tm, ac_tm, tx_type, bus_type, order_ccy, order_amt, order_status, 
+        order_succ_tm, psn_flag, order_exp_tm, sys_channel, ip_address, remark,ext_order_no, modify_opr,
+        create_time, modify_time,corp_org,fee,hall_order_no,payer_id
+    </sql>
+
+    <select id="get" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="Base_Column_List" />
+        from pwm_rechange_order
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </select>
+<!-- 
+    <delete id="delete" parameterType="java.lang.String" >
+        delete from pwm_rechange_order
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </delete>
+ -->
+    <insert id="insert" parameterType="com.hisun.lemon.pwm.entity.RechargeOrderDO" >
+        insert into pwm_rechange_order
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null" >
+                order_no,
+            </if>
+            <if test="orderTm != null" >
+                order_tm,
+            </if>
+            <if test="acTm != null" >
+                ac_tm,
+            </if>
+            <if test="txType != null" >
+                tx_type,
+            </if>
+            <if test="busType != null" >
+                bus_type,
+            </if>
+            <if test="orderCcy != null" >
+                order_ccy,
+            </if>
+            <if test="orderAmt != null" >
+                order_amt,
+            </if>
+            <if test="orderStatus != null" >
+                order_status,
+            </if>
+            <if test="orderSuccTm != null" >
+                order_succ_tm,
+            </if>
+            <if test="psnFlag != null" >
+                psn_flag,
+            </if>
+            <if test="orderExpTm != null" >
+                order_exp_tm,
+            </if>
+            <if test="sysChannel != null" >
+                sys_channel,
+            </if>
+            <if test="ipAddress != null" >
+                ip_address,
+            </if>
+            <if test="remark != null" >
+                remark,
+            </if>
+            <if test="modifyOpr != null" >
+                modify_opr,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="modifyTime != null" >
+                modify_time,
+            </if>
+            <if test="extOrderNo != null" >
+                ext_order_no,
+            </if>
+            <if test="crdCorpOrg != null" >
+                corp_org,
+            </if>
+            <if test="fee != null" >
+                fee,
+            </if>
+            <if test="hallOrderNo != null" >
+                hall_order_no,
+            </if>
+            <if test="payerId != null" >
+                payer_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null" >
+                #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="orderTm != null" >
+                #{orderTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="acTm != null" >
+                #{acTm,jdbcType=DATE},
+            </if>
+            <if test="txType != null" >
+                #{txType,jdbcType=VARCHAR},
+            </if>
+            <if test="busType != null" >
+                #{busType,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCcy != null" >
+                #{orderCcy,jdbcType=VARCHAR},
+            </if>
+            <if test="orderAmt != null" >
+                #{orderAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="orderStatus != null" >
+                #{orderStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="orderSuccTm != null" >
+                #{orderSuccTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="psnFlag != null" >
+                #{psnFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="orderExpTm != null" >
+                #{orderExpTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="sysChannel != null" >
+                #{sysChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="ipAddress != null" >
+                #{ipAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyOpr != null" >
+                #{modifyOpr,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null" >
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="extOrderNo != null" >
+                #{extOrderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="crdCorpOrg != null" >
+                #{crdCorpOrg,jdbcType=VARCHAR},
+            </if>
+            <if test="fee != null" >
+                #{fee,jdbcType=DECIMAL},
+            </if>
+            <if test="hallOrderNo != null" >
+                #{hallOrderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="payerId != null" >
+                #{payerId,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.hisun.lemon.pwm.entity.RechargeOrderDO" >
+        update pwm_rechange_order
+        <set >
+            <if test="orderTm != null" >
+                order_tm = #{orderTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="acTm != null" >
+                ac_tm = #{acTm,jdbcType=DATE},
+            </if>
+            <if test="txType != null" >
+                tx_type = #{txType,jdbcType=VARCHAR},
+            </if>
+            <if test="busType != null" >
+                bus_type = #{busType,jdbcType=VARCHAR},
+            </if>
+            <if test="orderCcy != null" >
+                order_ccy = #{orderCcy,jdbcType=VARCHAR},
+            </if>
+            <if test="orderAmt != null" >
+                order_amt = #{orderAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="orderStatus != null" >
+                order_status = #{orderStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="orderSuccTm != null" >
+                order_succ_tm = #{orderSuccTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="psnFlag != null" >
+                psn_flag = #{psnFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="orderExpTm != null" >
+                order_exp_tm = #{orderExpTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="sysChannel != null" >
+                sys_channel = #{sysChannel,jdbcType=VARCHAR},
+            </if>
+            <if test="ipAddress != null" >
+                ip_address = #{ipAddress,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyOpr != null" >
+                modify_opr = #{modifyOpr,jdbcType=VARCHAR},
+            </if>
+            <if test="extOrderNo != null" >
+                ext_order_no = #{extOrderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null" >
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="crdCorpOrg != null" >
+                corp_org = #{crdCorpOrg,jdbcType=VARCHAR},
+            </if>
+            <if test="fee != null" >
+                fee = #{fee,jdbcType=DECIMAL},
+            </if>
+            <if test="hallOrderNo != null" >
+                hall_order_no = #{hallOrderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="payerId != null" >
+                payer_id = #{payerId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </update>
+
+    <select id="getRechargeOrderByExtOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_rechange_order
+        where ext_order_no = #{extOrderNo,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryList" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_rechange_order
+        <where>
+            <if test="acTm != null">
+                <![CDATA[and ac_tm = #{acTm}]]>
+            </if>
+
+
+            <if test="statusList != null">
+                and order_status in
+                <foreach item="item" index="index" collection="statusList"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="getRechargeOrderByHallOrderNo" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_rechange_order
+        where hall_order_no = #{hallOrderNo,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryListOfHall" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_rechange_order
+        <where>
+            <if test="acTm != null">
+                <![CDATA[and ac_tm = #{acTm}]]>
+            </if>
+            <if test="busType != null">
+                and bus_type = #{busType,jdbcType=VARCHAR}
+            </if>
+
+            <if test="statusList != null">
+                and order_status in
+                <foreach item="item" index="index" collection="statusList"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

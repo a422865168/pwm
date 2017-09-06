@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisun.lemon.pwm.dao.IWithdrawCardBindDao" >
+
+    <resultMap id="BaseResultMap" type="com.hisun.lemon.pwm.entity.WithdrawCardBindDO" >
+        <id column="card_id" property="cardId" jdbcType="VARCHAR" />
+        <result column="card_no" property="cardNo" jdbcType="VARCHAR" />
+        <result column="card_no_last" property="cardNoLast" jdbcType="VARCHAR" />
+        <result column="branch_name" property="branchName" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="VARCHAR" />
+        <result column="cap_corg" property="capCorg" jdbcType="VARCHAR" />
+        <result column="card_status" property="cardStatus" jdbcType="CHAR" />
+        <result column="eft_tm" property="eftTm" jdbcType="TIMESTAMP" />
+        <result column="fail_tm" property="failTm" jdbcType="VARCHAR" />
+        <result column="remark" property="remark" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        card_id, card_no, card_no_last, branch_name, user_id, cap_corg, card_status, eft_tm, 
+        fail_tm, remark
+    </sql>
+
+    <select id="get" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="Base_Column_List" />
+        from pwm_withdraw_card
+        where card_id = #{cardId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="query" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_withdraw_card
+        where card_no = #{cardNo,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryCardList" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_withdraw_card
+        where card_status="1" and user_id = #{userId,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="delete" parameterType="java.lang.String" >
+        delete from pwm_withdraw_card
+        where card_id = #{cardId,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.hisun.lemon.pwm.entity.WithdrawCardBindDO" >
+        insert into pwm_withdraw_card
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="cardId != null" >
+                card_id,
+            </if>
+            <if test="cardNo != null" >
+                card_no,
+            </if>
+            <if test="cardNoLast != null" >
+                card_no_last,
+            </if>
+            <if test="branchName != null" >
+                branch_name,
+            </if>
+            <if test="userId != null" >
+                user_id,
+            </if>
+            <if test="capCorg != null" >
+                cap_corg,
+            </if>
+            <if test="cardStatus != null" >
+                card_status,
+            </if>
+            <if test="eftTm != null" >
+                eft_tm,
+            </if>
+            <if test="failTm != null" >
+                fail_tm,
+            </if>
+            <if test="remark != null" >
+                remark,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="modifyTime != null" >
+                modify_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="cardId != null" >
+                #{cardId,jdbcType=VARCHAR},
+            </if>
+            <if test="cardNo != null" >
+                #{cardNo,jdbcType=VARCHAR},
+            </if>
+            <if test="cardNoLast != null" >
+                #{cardNoLast,jdbcType=VARCHAR},
+            </if>
+            <if test="branchName != null" >
+                #{branchName,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null" >
+                #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="capCorg != null" >
+                #{capCorg,jdbcType=VARCHAR},
+            </if>
+            <if test="cardStatus != null" >
+                #{cardStatus,jdbcType=CHAR},
+            </if>
+            <if test="eftTm != null" >
+                #{eftTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="failTm != null" >
+                #{failTm,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null" >
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.hisun.lemon.pwm.entity.WithdrawCardBindDO" >
+        update pwm_withdraw_card
+        <set >
+            <if test="cardNo != null" >
+                card_no = #{cardNo,jdbcType=VARCHAR},
+            </if>
+            <if test="cardNoLast != null" >
+                card_no_last = #{cardNoLast,jdbcType=VARCHAR},
+            </if>
+            <if test="branchName != null" >
+                branch_name = #{branchName,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null" >
+                user_id = #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="capCorg != null" >
+                cap_corg = #{capCorg,jdbcType=VARCHAR},
+            </if>
+            <if test="cardStatus != null" >
+                card_status = #{cardStatus,jdbcType=CHAR},
+            </if>
+            <if test="eftTm != null" >
+                eft_tm = #{eftTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="failTm != null" >
+                fail_tm = #{failTm,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null" >
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null" >
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where card_id = #{cardId,jdbcType=VARCHAR}
+    </update>
+</mapper>

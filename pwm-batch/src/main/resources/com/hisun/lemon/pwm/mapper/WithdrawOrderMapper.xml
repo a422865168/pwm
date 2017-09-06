@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisun.lemon.pwm.dao.IWithdrawOrderDao" >
+
+    <resultMap id="BaseResultMap" type="com.hisun.lemon.pwm.entity.WithdrawOrderDO" >
+        <id column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="order_tm" property="orderTm" jdbcType="TIMESTAMP" />
+        <result column="order_exp_tm" property="orderExpTm" jdbcType="TIMESTAMP" />
+        <result column="ac_tm" property="acTm" jdbcType="DATE" />
+        <result column="order_ccy" property="orderCcy" jdbcType="CHAR" />
+        <result column="order_succ_tm" property="orderSuccTm" jdbcType="TIMESTAMP" />
+        <result column="wc_type" property="wcType" jdbcType="CHAR" />
+        <result column="tx_type" property="txType" jdbcType="VARCHAR" />
+        <result column="bus_type" property="busType" jdbcType="VARCHAR" />
+        <result column="wc_apply_amt" property="wcApplyAmt" jdbcType="DECIMAL" />
+        <result column="wc_act_amt" property="wcActAmt" jdbcType="DECIMAL" />
+        <result column="wc_total_amt" property="wcTotalAmt" jdbcType="DECIMAL" />
+        <result column="fee_amt" property="feeAmt" jdbcType="DECIMAL" />
+        <result column="pay_urge_flg" property="payUrgeFlg" jdbcType="CHAR" />
+        <result column="user_id" property="userId" jdbcType="VARCHAR" />
+        <result column="user_name" property="userName" jdbcType="VARCHAR" />
+        <result column="agr_no" property="agrNo" jdbcType="VARCHAR" />
+        <result column="cap_corg_no" property="capCorgNo" jdbcType="VARCHAR" />
+        <result column="cap_card_no" property="capCardNo" jdbcType="VARCHAR" />
+        <result column="cap_card_type" property="capCardType" jdbcType="CHAR" />
+        <result column="cap_card_name" property="capCardName" jdbcType="VARCHAR" />
+        <result column="wc_remark" property="wcRemark" jdbcType="VARCHAR" />
+        <result column="ntf_mbl" property="ntfMbl" jdbcType="VARCHAR" />
+        <result column="order_status" property="orderStatus" jdbcType="CHAR" />
+        <result column="rsp_order_no" property="rspOrderNo" jdbcType="VARCHAR" />
+        <result column="rsp_succ_tm" property="rspSuccTm" jdbcType="TIMESTAMP" />
+        <result column="bus_cnl" property="busCnl" jdbcType="VARCHAR" />
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        order_no, order_tm, order_exp_tm, ac_tm, order_ccy, order_succ_tm, wc_type, tx_type, 
+        bus_type, wc_apply_amt, wc_act_amt, fee_amt, pay_urge_flg, user_id, user_name, agr_no, 
+        cap_corg_no, cap_card_no, cap_card_type, cap_card_name, wc_remark, ntf_mbl, order_status, 
+        rsp_order_no, rsp_succ_tm, bus_cnl, modify_time, wc_total_amt,
+        create_time
+    </sql>
+
+    <select id="get" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="Base_Column_List" />
+        from pwm_withdraw_order
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="delete" parameterType="java.lang.String" >
+        delete from pwm_withdraw_order
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.hisun.lemon.pwm.entity.WithdrawOrderDO" >
+        insert into pwm_withdraw_order
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null" >
+                order_no,
+            </if>
+            <if test="orderTm != null" >
+                order_tm,
+            </if>
+            <if test="orderExpTm != null" >
+                order_exp_tm,
+            </if>
+            <if test="acTm != null" >
+                ac_tm,
+            </if>
+            <if test="orderCcy != null" >
+                order_ccy,
+            </if>
+            <if test="orderSuccTm != null" >
+                order_succ_tm,
+            </if>
+            <if test="wcType != null" >
+                wc_type,
+            </if>
+            <if test="txType != null" >
+                tx_type,
+            </if>
+            <if test="busType != null" >
+                bus_type,
+            </if>
+            <if test="wcApplyAmt != null" >
+                wc_apply_amt,
+            </if>
+            <if test="wcActAmt != null" >
+                wc_act_amt,
+            </if>
+            <if test="wcTotalAmt != null" >
+                wc_total_amt,
+            </if>
+            <if test="feeAmt != null" >
+                fee_amt,
+            </if>
+            <if test="payUrgeFlg != null" >
+                pay_urge_flg,
+            </if>
+            <if test="userId != null" >
+                user_id,
+            </if>
+            <if test="userName != null" >
+                user_name,
+            </if>
+            <if test="agrNo != null" >
+                agr_no,
+            </if>
+            <if test="capCorgNo != null" >
+                cap_corg_no,
+            </if>
+            <if test="capCardNo != null" >
+                cap_card_no,
+            </if>
+            <if test="capCardType != null" >
+                cap_card_type,
+            </if>
+            <if test="capCardName != null" >
+                cap_card_name,
+            </if>
+            <if test="wcRemark != null" >
+                wc_remark,
+            </if>
+            <if test="ntfMbl != null" >
+                ntf_mbl,
+            </if>
+            <if test="orderStatus != null" >
+                order_status,
+            </if>
+            <if test="rspOrderNo != null" >
+                rsp_order_no,
+            </if>
+            <if test="rspSuccTm != null" >
+                rsp_succ_tm,
+            </if>
+            <if test="busCnl != null" >
+                bus_cnl,
+            </if>
+            <if test="modifyTime != null" >
+                modify_time,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null" >
+                #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="orderTm != null" >
+                #{orderTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orderExpTm != null" >
+                #{orderExpTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="acTm != null" >
+                #{acTm,jdbcType=DATE},
+            </if>
+            <if test="orderCcy != null" >
+                #{orderCcy,jdbcType=CHAR},
+            </if>
+            <if test="orderSuccTm != null" >
+                #{orderSuccTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="wcType != null" >
+                #{wcType,jdbcType=CHAR},
+            </if>
+            <if test="txType != null" >
+                #{txType,jdbcType=VARCHAR},
+            </if>
+            <if test="busType != null" >
+                #{busType,jdbcType=VARCHAR},
+            </if>
+            <if test="wcApplyAmt != null" >
+                #{wcApplyAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="wcActAmt != null" >
+                #{wcActAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="wcTotalAmt != null" >
+                #{wcTotalAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="feeAmt != null" >
+                #{feeAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="payUrgeFlg != null" >
+                #{payUrgeFlg,jdbcType=CHAR},
+            </if>
+            <if test="userId != null" >
+                #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="userName != null" >
+                #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="agrNo != null" >
+                #{agrNo,jdbcType=VARCHAR},
+            </if>
+            <if test="capCorgNo != null" >
+                #{capCorgNo,jdbcType=VARCHAR},
+            </if>
+            <if test="capCardNo != null" >
+                #{capCardNo,jdbcType=VARCHAR},
+            </if>
+            <if test="capCardType != null" >
+                #{capCardType,jdbcType=CHAR},
+            </if>
+            <if test="capCardName != null" >
+                #{capCardName,jdbcType=VARCHAR},
+            </if>
+            <if test="wcRemark != null" >
+                #{wcRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="ntfMbl != null" >
+                #{ntfMbl,jdbcType=VARCHAR},
+            </if>
+            <if test="orderStatus != null" >
+                #{orderStatus,jdbcType=CHAR},
+            </if>
+            <if test="rspOrderNo != null" >
+                #{rspOrderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="rspSuccTm != null" >
+                #{rspSuccTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="busCnl != null" >
+                #{busCnl,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null" >
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.hisun.lemon.pwm.entity.WithdrawOrderDO" >
+        update pwm_withdraw_order
+        <set >
+            <if test="orderTm != null" >
+                order_tm = #{orderTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="orderExpTm != null" >
+                order_exp_tm = #{orderExpTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="acTm != null" >
+                ac_tm = #{acTm,jdbcType=DATE},
+            </if>
+            <if test="orderCcy != null" >
+                order_ccy = #{orderCcy,jdbcType=CHAR},
+            </if>
+            <if test="orderSuccTm != null" >
+                order_succ_tm = #{orderSuccTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="wcType != null" >
+                wc_type = #{wcType,jdbcType=CHAR},
+            </if>
+            <if test="txType != null" >
+                tx_type = #{txType,jdbcType=VARCHAR},
+            </if>
+            <if test="busType != null" >
+                bus_type = #{busType,jdbcType=VARCHAR},
+            </if>
+            <if test="wcApplyAmt != null" >
+                wc_apply_amt = #{wcApplyAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="wcActAmt != null" >
+                wc_act_amt = #{wcActAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="wcTotalAmt != null" >
+                wc_total_amt = #{wcTotalAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="feeAmt != null" >
+                fee_amt = #{feeAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="payUrgeFlg != null" >
+                pay_urge_flg = #{payUrgeFlg,jdbcType=CHAR},
+            </if>
+            <if test="userId != null" >
+                user_id = #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="userName != null" >
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="agrNo != null" >
+                agr_no = #{agrNo,jdbcType=VARCHAR},
+            </if>
+            <if test="capCorgNo != null" >
+                cap_corg_no = #{capCorgNo,jdbcType=VARCHAR},
+            </if>
+            <if test="capCardNo != null" >
+                cap_card_no = #{capCardNo,jdbcType=VARCHAR},
+            </if>
+            <if test="capCardType != null" >
+                cap_card_type = #{capCardType,jdbcType=CHAR},
+            </if>
+            <if test="capCardName != null" >
+                cap_card_name = #{capCardName,jdbcType=VARCHAR},
+            </if>
+            <if test="wcRemark != null" >
+                wc_remark = #{wcRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="ntfMbl != null" >
+                ntf_mbl = #{ntfMbl,jdbcType=VARCHAR},
+            </if>
+            <if test="orderStatus != null" >
+                order_status = #{orderStatus,jdbcType=CHAR},
+            </if>
+            <if test="rspOrderNo != null" >
+                rsp_order_no = #{rspOrderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="rspSuccTm != null" >
+                rsp_succ_tm = #{rspSuccTm,jdbcType=TIMESTAMP},
+            </if>
+            <if test="busCnl != null" >
+                bus_cnl = #{busCnl,jdbcType=VARCHAR},
+            </if>
+            <if test="modifyTime != null" >
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </update>
+
+    <select id="queryList" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_withdraw_order
+        <where>
+            <if test="acTm != null">
+                <![CDATA[and ac_tm = #{acTm}]]>
+            </if>
+
+
+            <if test="statusList != null">
+                and order_status in
+                <foreach item="item" index="index" collection="statusList"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>

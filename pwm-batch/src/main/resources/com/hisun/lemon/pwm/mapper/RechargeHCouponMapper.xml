@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hisun.lemon.pwm.dao.IRechargeHCouponDao" >
+    <resultMap id="BaseResultMap" type="com.hisun.lemon.pwm.entity.RechargeHCouponDO" >
+        <id column="order_no" property="orderNo" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="VARCHAR" />
+        <result column="order_amt" property="orderAmt" jdbcType="DECIMAL" />
+        <result column="order_ccy" property="orderCcy" jdbcType="VARCHAR" />
+        <result column="order_status" property="orderStatus" jdbcType="VARCHAR" />
+        <result column="bus_type" property="busType" jdbcType="VARCHAR" />
+        <result column="tx_type" property="txType" jdbcType="VARCHAR" />
+        <result column="h_coupon_amt" property="hCouponAmt" jdbcType="DECIMAL" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+        <result column="ac_tm" property="acTm" jdbcType="DATE" />
+        <result column="tx_tm" property="txTm" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        order_no, user_id, order_amt, order_ccy, order_status, bus_type, tx_type, h_coupon_amt, 
+        create_time, modify_time, ac_tm, tx_tm
+    </sql>
+
+    <select id="get" resultMap="BaseResultMap" parameterType="java.lang.String" >
+        select 
+        <include refid="Base_Column_List" />
+        from pwm_rechange_hcoupon
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="delete" parameterType="java.lang.String" >
+        delete from pwm_rechange_hcoupon
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </delete>
+
+    <insert id="insert" parameterType="com.hisun.lemon.pwm.entity.RechargeHCouponDO" >
+        insert into pwm_rechange_hcoupon
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null" >
+                order_no,
+            </if>
+            <if test="userId != null" >
+                user_id,
+            </if>
+            <if test="orderAmt != null" >
+                order_amt,
+            </if>
+            <if test="orderCcy != null" >
+                order_ccy,
+            </if>
+            <if test="orderStatus != null" >
+                order_status,
+            </if>
+            <if test="busType != null" >
+                bus_type,
+            </if>
+            <if test="txType != null" >
+                tx_type,
+            </if>
+            <if test="hCouponAmt != null" >
+                h_coupon_amt,
+            </if>
+            <if test="createTime != null" >
+                create_time,
+            </if>
+            <if test="modifyTime != null" >
+                modify_time,
+            </if>
+            <if test="acTm != null" >
+                ac_tm,
+            </if>
+            <if test="txTm != null" >
+                tx_tm,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="orderNo != null" >
+                #{orderNo,jdbcType=VARCHAR},
+            </if>
+            <if test="userId != null" >
+                #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderAmt != null" >
+                #{orderAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="orderCcy != null" >
+                #{orderCcy,jdbcType=VARCHAR},
+            </if>
+            <if test="orderStatus != null" >
+                #{orderStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="busType != null" >
+                #{busType,jdbcType=VARCHAR},
+            </if>
+            <if test="txType != null" >
+                #{txType,jdbcType=VARCHAR},
+            </if>
+            <if test="hCouponAmt != null" >
+                #{hCouponAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null" >
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="modifyTime != null" >
+                #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="acTm != null" >
+                #{acTm,jdbcType=DATE},
+            </if>
+            <if test="txTm != null" >
+                #{txTm,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="com.hisun.lemon.pwm.entity.RechargeHCouponDO" >
+        update pwm_rechange_hcoupon
+        <set >
+            <if test="userId != null" >
+                user_id = #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="orderAmt != null" >
+                order_amt = #{orderAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="orderCcy != null" >
+                order_ccy = #{orderCcy,jdbcType=VARCHAR},
+            </if>
+            <if test="orderStatus != null" >
+                order_status = #{orderStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="busType != null" >
+                bus_type = #{busType,jdbcType=VARCHAR},
+            </if>
+            <if test="txType != null" >
+                tx_type = #{txType,jdbcType=VARCHAR},
+            </if>
+            <if test="hCouponAmt != null" >
+                h_coupon_amt = #{hCouponAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="modifyTime != null" >
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="acTm != null" >
+                ac_tm = #{acTm,jdbcType=DATE},
+            </if>
+            <if test="txTm != null" >
+                tx_tm = #{txTm,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where order_no = #{orderNo,jdbcType=VARCHAR}
+    </update>
+
+    <select id="queryList" resultMap="BaseResultMap" parameterType="java.util.Map" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_rechange_hcoupon
+        <where>
+            <if test="acTm != null">
+                <![CDATA[and ac_tm = #{acTm}]]>
+            </if>
+
+
+            <if test="statusList != null">
+                and order_status in
+                <foreach item="item" index="index" collection="statusList"
+                         open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>
