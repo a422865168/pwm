@@ -320,6 +320,8 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30015','zh','查询汇款银行账户未找到结果!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30016','zh','获取营业厅对账文件失败!',now(),now());
+insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
+values ('PWM30017','zh','支付密码错误超过5次!',now(),now());
 -------------------------
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM40001','zh','调用营销接口返回接口异常!',now(),now());
