@@ -137,7 +137,10 @@ lemon :
         loginPassword : druid123
   idgen :
     #每次从reids申请Id的数量
-    delta : 500
+    delta :
+       default : 500
+       MSGID_ : 1000
+       REQUESTID_ : 1000
     #在redis里Id key 的前缀，prefix+"."+ applicationName,申请ID key作为hash key.
     prefix : IDGEN
     #ID sequence 最大值，默认值无穷大，配置方式是在max-value 下配置key 及长度 
