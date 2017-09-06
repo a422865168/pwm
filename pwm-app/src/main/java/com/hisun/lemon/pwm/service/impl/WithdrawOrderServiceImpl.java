@@ -175,7 +175,6 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 			LemonException.throwBusinessException("PWM30002");
 		}
 
-		//查询支付密码错误次数是否超过5次
 		//查询用户支付密码，校验支付密码，错误则抛异常
         CheckPayPwdDTO checkPayPwdDTO =new CheckPayPwdDTO();
         checkPayPwdDTO.setUserId(withdrawDTO.getUserId());
@@ -188,6 +187,13 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		if(JudgeUtils.equals("URM30005", genericRspDTO.getMsgCd())){
 			LemonException.throwBusinessException("PWM30004");
 		}
+        //查询支付密码错误次数是否超过5次
+        if(JudgeUtils.equals("URM30011", genericRspDTO.getMsgCd())){
+            LemonException.throwBusinessException("PWM30017");
+        }
+        if(!JudgeUtils.equals("URM00000", genericRspDTO.getMsgCd())){
+            LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+        }
 
 		//初始化提现订单数据
 		WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
