@@ -81,9 +81,13 @@ spring :
           enable : true
           #binder topic
           destination : ${spring.application.name}
+          producer :
+            deliveryMode : PERSISTENT
         output6 :
           enable : true
           destination : BIL
+          producer :
+            deliveryMode : PERSISTENT
 
 ribbon :
   #retry next Server times
