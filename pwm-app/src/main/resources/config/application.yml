@@ -81,6 +81,9 @@ spring :
           enable : true
           #binder topic
           destination : ${spring.application.name}
+        output3 :
+          enable : true
+          destination : TFM
         output6 :
           enable : true
           destination : BIL

@@ -5,12 +5,16 @@ import java.util.*;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.bil.dto.CreateUserBillDTO;
+import com.hisun.lemon.bil.dto.UpdateUserBillDTO;
 import com.hisun.lemon.cmm.client.CmmServerClient;
 import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
 import com.hisun.lemon.csh.client.CshRefundClient;
 import com.hisun.lemon.csh.dto.refund.RefundOrderDTO;
 import com.hisun.lemon.csh.dto.refund.RefundOrderRspDTO;
 import com.hisun.lemon.pwm.dto.*;
+import com.hisun.lemon.pwm.mq.BillSyncHandler;
+import com.hisun.lemon.pwm.mq.PaymentHandler;
 import com.hisun.lemon.rsm.client.RiskCheckClient;
 import com.hisun.lemon.rsm.dto.req.checkstatus.RiskCheckUserStatusReqDTO;
 import org.slf4j.Logger;
@@ -40,7 +44,6 @@ import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.csh.dto.cashier.DirectPaymentDTO;
 import com.hisun.lemon.csh.dto.cashier.InitCashierDTO;
 import com.hisun.lemon.csh.dto.order.OrderDTO;
-import com.hisun.lemon.csh.dto.payment.HallRechargeOrderDTO;
 import com.hisun.lemon.csh.dto.payment.OfflinePaymentDTO;
 import com.hisun.lemon.csh.dto.payment.OfflinePaymentResultDTO;
 import com.hisun.lemon.csh.dto.payment.PaymentResultDTO;
@@ -75,30 +78,48 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	private static final Logger logger = LoggerFactory.getLogger(RechargeOrderServiceImpl.class);
 	@Resource
 	RechargeOrderTransactionalService service;
+
 	@Resource
 	CshOrderClient cshOrderClient;
+
 	@Resource
 	private AcmComponent acmComponent;
+
 	@Resource
 	UserBasicInfClient userBasicInfClient;
+
 	@Resource
 	TfmServerClient fmServerClient;
+
 	@Resource
 	MarketActivityClient mkmClient;
+
 	@Resource
 	private AccountManagementClient accountManagementClient;
+
 	@Resource
 	private RouteClient routeClient;
+
 	@Resource
 	protected AccountingTreatmentClient accountingTreatmentClient;
+
 	@Resource
 	protected DistributedLocker locker;
+
     @Resource
     private CmmServerClient cmmServerClient;
+
 	@Resource
 	private CshRefundClient cshRefundClient;
+
     @Resource
     private RiskCheckClient riskCheckClient;
+
+	@Resource
+	protected PaymentHandler paymentHandler;
+
+	@Resource
+	BillSyncHandler billSyncHandler;
 	/**
 	 * 查询账户信息
 	 */
@@ -616,7 +637,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
 		BigDecimal orderAmt = bussinessBody.getAmount();
 		//充值请求校验
-		checkHallRequestBeforeHandler(dto,bussinessBody.getStatus());
+		checkHallRequestBeforeHandler(dto);
 
 		//手续费校验
 		BigDecimal applyFee = bussinessBody.getFee();
@@ -709,6 +730,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			LemonException.throwBusinessException(e.getMsgCd());
 		}
 
+		//登记用户手续费
+		if(rechargeOrderDO.getFee().compareTo(BigDecimal.ZERO)>0){
+			paymentHandler.registUserFee(rechargeOrderDO);
+		}
+
 		//更新充值订单
 		RechargeOrderDO updOrderDO = new RechargeOrderDO();
 		updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
@@ -724,6 +750,28 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
         }catch (Exception e){
 		    logger.error("充值成功，推送充值消息失败:" + e.getMessage());
         }
+
+		String language=LemonUtils.getLocale().getLanguage();
+		if(StringUtils.isBlank(language)){
+			language="en";
+		}
+		String descFormat=LemonUtils.getProperty("pwm.recharge.hallDesc."+language);
+		String desc=descFormat.replace("$amount$",String.valueOf(rechargeOrderDO.getOrderAmt()));
+
+		//同步更新订单数据
+		updOrderDO = syncOrderData(rechargeOrderDO,updOrderDO);
+
+        //同步账单
+		CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
+		BeanUtils.copyProperties(createUserBillDTO, updOrderDO);
+		createUserBillDTO.setTxTm(rechargeOrderDO.getOrderTm());
+		createUserBillDTO.setPayerId(rechargeOrderDO.getPayerId());
+		createUserBillDTO.setOrderAmt(rechargeOrderDO.getOrderAmt());
+		createUserBillDTO.setFee(rechargeOrderDO.getFee());
+		createUserBillDTO.setGoodsInfo(desc);
+		createUserBillDTO.setCrdPayType("3");
+		createUserBillDTO.setCrdPayAmt(updOrderDO.getOrderAmt());
+		billSyncHandler.createBill(createUserBillDTO);
 		//返回
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(orderAmt);
@@ -739,7 +787,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	public HallRechargeResultDTO hallRechargeRevocation(HallRechargeApplyDTO dto) {
 		HallRechargeApplyDTO.BussinessBody busBody= dto.getBody();
 		//充值冲正请求校验
-		checkHallRequestBeforeHandler(dto,busBody.getStatus());
+		checkHallRequestBeforeHandler(dto);
 		RechargeOrderDO rechargeOrderDO = this.service.getRechargeOrderByHallOrderNo(busBody.getHallOrderNo());
 		//查询充值订单和收银订单状态
 		if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_S)){
@@ -801,6 +849,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		service.updateOrder(updOrderDO);
 
+		//同步账单数据
+		UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
+		BeanUtils.copyProperties(updateUserBillDTO, updOrderDO);
+		billSyncHandler.updateBill(updateUserBillDTO);
 		//返回处理结果
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(updOrderDO.getOrderAmt());
@@ -1549,9 +1601,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	/**
 	 * 营业厅请求处理前校验
 	 * @param dto 请求对象
-	 * @param oprType 营业厅操作状态(A:充值|C:撤销)
 	 */
-	private void checkHallRequestBeforeHandler(HallRechargeApplyDTO dto, String oprType){
+	private void checkHallRequestBeforeHandler(HallRechargeApplyDTO dto){
         HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
         if(JudgeUtils.isNull(bussinessBody)){
             throw new LemonException("PWM10053");
@@ -1585,4 +1636,24 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
         }
 
     }
+
+    private RechargeOrderDO syncOrderData(RechargeOrderDO oriOrder,RechargeOrderDO updateOrder){
+		if(JudgeUtils.isNull(updateOrder.getOrderAmt())){
+			updateOrder.setOrderAmt(oriOrder.getOrderAmt());
+		}
+		updateOrder.setOrderStatus(oriOrder.getOrderStatus());
+		if(JudgeUtils.isNull(updateOrder.getAcTm())){
+			updateOrder.setAcTm(updateOrder.getAcTm());
+		}
+		if(JudgeUtils.isNull(updateOrder.getPayerId())){
+			updateOrder.setPayerId(oriOrder.getPayerId());
+		}
+		if(JudgeUtils.isNull(updateOrder.getFee())){
+			updateOrder.setFee(oriOrder.getFee());
+		}
+		if(JudgeUtils.isNull(updateOrder.getBusType())){
+			updateOrder.setBusType(oriOrder.getBusType());
+		}
+		return updateOrder;
+	}
 }
