@@ -41,13 +41,21 @@ public class PwmConstants {
 	 * 业务类型：充值--企业网银充值
 	 */
 	public static final String BUS_TYPE_RECHARGE_BNB ="0104";
-	
+	/**
+	 * 业务类型：充值短款撤单退款
+	 */
+	public static final String BUS_TYPE_RECHARGE_SHORTAMT_REFUND ="0601";
 	
 	/**
 	 * 交易类型：提现
 	 */
 	public static final String TX_TYPE_WITHDRAW="04";
-	
+
+	/**
+	 * 交易类型：退款
+	 */
+	public static final String TX_TYPE_RECHARGE_REFUND="06";
+
 	/**
 	 * 业务类型：提现--个人提现
 	 */

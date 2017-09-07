@@ -116,4 +116,10 @@ public interface IRechargeOrderService {
      * @param genericDTO
      */
     public void hallRechargeMatchHandler(GenericDTO<HallRechargeMatchDTO> genericDTO);
+
+    /**
+     * 充值撤单处理
+     * @param genericDTO
+     */
+    public void rechargeRevoke(GenericDTO<RechargeRevokeDTO> genericDTO);
 }

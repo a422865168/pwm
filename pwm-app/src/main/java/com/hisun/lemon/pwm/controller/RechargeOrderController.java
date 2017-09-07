@@ -169,4 +169,12 @@ public class RechargeOrderController {
 		service.hallRechargeMatchHandler(genericDTO);
 		return GenericRspDTO.newSuccessInstance();
 	}
+
+	@ApiOperation(value = "充值撤单处理", notes = "充值撤单处理")
+	@ApiResponse(code = 200, message = "充值撤单处理结果")
+	@GetMapping(value = "/chk/error/revoke")
+	public GenericRspDTO<NoBody> rechargeRevoke(@Validated @RequestBody GenericDTO<RechargeRevokeDTO> genericDTO) {
+		service.rechargeRevoke(genericDTO);
+		return GenericRspDTO.newSuccessInstance();
+	}
 }

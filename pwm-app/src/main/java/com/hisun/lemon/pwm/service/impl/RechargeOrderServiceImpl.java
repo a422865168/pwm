@@ -7,6 +7,9 @@ import javax.annotation.Resource;
 
 import com.hisun.lemon.cmm.client.CmmServerClient;
 import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
+import com.hisun.lemon.csh.client.CshRefundClient;
+import com.hisun.lemon.csh.dto.refund.RefundOrderDTO;
+import com.hisun.lemon.csh.dto.refund.RefundOrderRspDTO;
 import com.hisun.lemon.pwm.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +95,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	protected DistributedLocker locker;
     @Resource
     private CmmServerClient cmmServerClient;
+	@Resource
+	private CshRefundClient cshRefundClient;
 	
 	/**
 	 * 查询账户信息
@@ -1262,6 +1267,48 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			LemonException.throwBusinessException(accountingTreatment.getMsgCd());
 		}
 		logger.info("营业厅对平金额账务处理成功，总金额：" + hallRechargeMatchDTO.getTotalAmt());
+	}
+
+	@Override
+	public void rechargeRevoke(GenericDTO<RechargeRevokeDTO> genericDTO){
+
+		RechargeRevokeDTO rechargeRevokeDTO = genericDTO.getBody();
+		if(JudgeUtils.isNull(rechargeRevokeDTO)){
+			throw new LemonException("PWM20035");
+		}
+		String chkSubType = rechargeRevokeDTO.getChkSubType();
+		if(!(JudgeUtils.equals(chkSubType,"0404") || JudgeUtils.equals(chkSubType,"0405"))){
+			throw new LemonException("PWM20036");
+		}
+		String rechargeOrderNo = rechargeRevokeDTO.getOrderNo();
+		RechargeOrderDO rechargeOrderDO = this.service.getRechangeOrderDao().get(rechargeOrderNo);
+		RefundOrderDTO refundOrderDTO = new RefundOrderDTO();
+		refundOrderDTO.setBusRdfOrdNo(rechargeOrderDO.getOrderNo());
+		refundOrderDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_SHORTAMT_REFUND);
+		//查询收银订单信息
+		GenericRspDTO<OrderDTO> genericRspDTO = cshOrderClient.query(rechargeOrderNo);
+		if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
+			LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+		}
+		OrderDTO orderDTO = genericRspDTO.getBody();
+		refundOrderDTO.setGoodInfo(orderDTO.getGoodsInfo());
+		refundOrderDTO.setOrderCcy(rechargeOrderDO.getOrderCcy());
+		refundOrderDTO.setOrginOrderNo(rechargeOrderDO.getExtOrderNo());
+		refundOrderDTO.setRefundUserId(rechargeOrderDO.getPayerId());
+		refundOrderDTO.setTxType(PwmConstants.TX_TYPE_RECHARGE_REFUND);
+		//退款总金额
+		refundOrderDTO.setRfdAmt(rechargeOrderDO.getOrderAmt().add(rechargeOrderDO.getFee()));
+		GenericDTO genericRefundOrder = new GenericDTO();
+		genericRefundOrder.setBody(refundOrderDTO);
+		GenericRspDTO<RefundOrderRspDTO> genericRefundOrderRsp = cshRefundClient.createBill(genericRefundOrder);
+		if(JudgeUtils.isNotSuccess(genericRefundOrderRsp.getMsgCd())){
+			LemonException.throwBusinessException(genericRefundOrderRsp.getMsgCd());
+		}
+		//更新充值订单
+		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_C);
+		rechargeOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+		rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+		this.service.updateOrder(rechargeOrderDO);
 	}
 
 	private String md5Str(HallRechargeApplyDTO.BussinessBody busBody, String key) {

@@ -25,7 +25,7 @@ public class HallRechargeErrorFundDTO {
     @Length(max = 32)
     private  String chkErrId;
 
-    @ApiModelProperty(name = "fundType", value = "处理类型：(长款:L|短款:S)")
+    @ApiModelProperty(name = "fundType", value = "处理类型：(补单:L|撤单:S)")
     @NotEmpty
     @Length(max = 1)
     private  String fundType;
