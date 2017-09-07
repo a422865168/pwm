@@ -11,6 +11,8 @@ import com.hisun.lemon.csh.client.CshRefundClient;
 import com.hisun.lemon.csh.dto.refund.RefundOrderDTO;
 import com.hisun.lemon.csh.dto.refund.RefundOrderRspDTO;
 import com.hisun.lemon.pwm.dto.*;
+import com.hisun.lemon.rsm.client.RiskCheckClient;
+import com.hisun.lemon.rsm.dto.req.checkstatus.RiskCheckUserStatusReqDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -39,8 +41,6 @@ import com.hisun.lemon.csh.dto.cashier.DirectPaymentDTO;
 import com.hisun.lemon.csh.dto.cashier.InitCashierDTO;
 import com.hisun.lemon.csh.dto.order.OrderDTO;
 import com.hisun.lemon.csh.dto.payment.HallRechargeOrderDTO;
-import com.hisun.lemon.csh.dto.payment.HallRechargePaymentDTO;
-import com.hisun.lemon.csh.dto.payment.HallRechargePaymentResultDTO;
 import com.hisun.lemon.csh.dto.payment.OfflinePaymentDTO;
 import com.hisun.lemon.csh.dto.payment.OfflinePaymentResultDTO;
 import com.hisun.lemon.csh.dto.payment.PaymentResultDTO;
@@ -66,7 +66,7 @@ import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
 import com.hisun.lemon.tfm.dto.TradeRateRspDTO;
 import com.hisun.lemon.urm.client.UserBasicInfClient;
 import com.hisun.lemon.urm.dto.UserBasicInfDTO;
-
+import com.hisun.lemon.rsm.Constants;
 @Service
 public class RechargeOrderServiceImpl implements IRechargeOrderService {
     public static final int RECHARGE_SUCCESS=1;
@@ -97,7 +97,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
     private CmmServerClient cmmServerClient;
 	@Resource
 	private CshRefundClient cshRefundClient;
-	
+    @Resource
+    private RiskCheckClient riskCheckClient;
 	/**
 	 * 查询账户信息
 	 */
@@ -613,23 +614,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	@Override
 	public HallRechargeResultDTO hallRechargePay(HallRechargeApplyDTO dto) {
 		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
-
-		//签名校验
-		signCheck(dto);
-		// 解析校验,状态
-		if (!JudgeUtils.equals(bussinessBody.getStatus(), PwmConstants.RECHARGE_OPR_A)) {
-			throw new LemonException("PWM10037");
-		}
-
-		//重复下单校验
-		RechargeOrderDO oriRechargeOrderDO = this.service.getRechargeOrderByHallOrderNo(bussinessBody.getHallOrderNo());
-		if(JudgeUtils.isNotNull(oriRechargeOrderDO)){
-			throw new LemonException("PWM20021");
-		}
+		BigDecimal orderAmt = bussinessBody.getAmount();
+		//充值请求校验
+		checkHallRequestBeforeHandler(dto,bussinessBody.getStatus());
 
 		//手续费校验
 		BigDecimal applyFee = bussinessBody.getFee();
-		BigDecimal orderAmt = bussinessBody.getAmount();
 		BigDecimal fee = caculateHallRechargeFee(orderAmt);
 		if(!JudgeUtils.equals(applyFee,fee)){
 			throw new LemonException("PWM30006");
@@ -748,26 +738,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	@Override
 	public HallRechargeResultDTO hallRechargeRevocation(HallRechargeApplyDTO dto) {
 		HallRechargeApplyDTO.BussinessBody busBody= dto.getBody();
-		//签名校验
-		signCheck(dto);
-		//充值原订单校验
-		String oriHallOrder = busBody.getHallOrderNo();
-		if(!JudgeUtils.equals(busBody.getStatus(),PwmConstants.RECHARGE_OPR_C)) {
-			throw new LemonException("PWM10037");
-		}
-		RechargeOrderDO rechargeOrderDO = this.service.getRechargeOrderByHallOrderNo(oriHallOrder);
-		if(JudgeUtils.isNull(rechargeOrderDO)) {
-			throw new LemonException("PWM20010");
-		}
-
-		GenericRspDTO<OrderDTO> orderDTORsp = cshOrderClient.query(rechargeOrderDO.getOrderNo());
-		OrderDTO orderDto = orderDTORsp.getBody();
-		if(JudgeUtils.isNotSuccess(orderDTORsp.getMsgCd())){
-			LemonException.throwBusinessException(orderDTORsp.getMsgCd());
-	}
+		//充值冲正请求校验
+		checkHallRequestBeforeHandler(dto,busBody.getStatus());
+		RechargeOrderDO rechargeOrderDO = this.service.getRechargeOrderByHallOrderNo(busBody.getHallOrderNo());
 		//查询充值订单和收银订单状态
-		if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_S)
-				&& JudgeUtils.equals(orderDto.getOrderStatus(),CshConstants.ORD_STS_S)){
+		if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_S)){
 			//个人账户信息
 			String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 			String balAcNo=acmComponent.getAcmAcNo(busBody.getPayerId(), balCapType);
@@ -812,23 +787,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			acmComponent.requestAc(cshItemReqDTO,cnlRechargeHallReqDTO);
 		}
 
-		//更新收银订单状态
-		HallRechargeOrderDTO hallRechargeOrderDTO = new HallRechargeOrderDTO();
-		hallRechargeOrderDTO.setPayerId(busBody.getPayerId());
-		if(JudgeUtils.isNotNull(busBody.getFee())){
-			hallRechargeOrderDTO.setFee(busBody.getFee());
-		}
-		hallRechargeOrderDTO.setOrderAmt(rechargeOrderDO.getOrderAmt());
-		hallRechargeOrderDTO.setOrderNo(rechargeOrderDO.getOrderNo());
-		hallRechargeOrderDTO.setOrderStatus(PwmConstants.RECHARGE_ORD_C);
-
-		GenericDTO<HallRechargeOrderDTO> genericHallRechargeOrderDTO = new GenericDTO<>();
-		genericHallRechargeOrderDTO.setBody(hallRechargeOrderDTO);
-		GenericRspDTO<NoBody> cashierOrderUpdateResult = cshOrderClient.hallRevocationOrderUpdate(genericHallRechargeOrderDTO);
-		if(!JudgeUtils.isSuccess(cashierOrderUpdateResult.getMsgCd())) {
-			LemonException.throwBusinessException(cashierOrderUpdateResult.getMsgCd());
-		}
-
 		//更新订单状态
 		RechargeOrderDO updOrderDO = new RechargeOrderDO();
 		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
@@ -847,7 +805,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(updOrderDO.getOrderAmt());
 		hallRechargeResultDTO.setStatus(updOrderDO.getOrderStatus());
-		hallRechargeResultDTO.setFee(busBody.getFee());
+		hallRechargeResultDTO.setFee(rechargeOrderDO.getFee());
 		hallRechargeResultDTO.setHallOrderNo(updOrderDO.getHallOrderNo());
 		hallRechargeResultDTO.setOrderNo(updOrderDO.getOrderNo());
 		return hallRechargeResultDTO;
@@ -1566,6 +1524,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
         logger.info("充值消息推动成功");
     }
 
+    /**
+     * 计算营业厅充值手续费
+     * @param orderAmt 充值订单金额
+     * @return
+     */
     private BigDecimal caculateHallRechargeFee(BigDecimal orderAmt){
     	if(JudgeUtils.isNull(orderAmt)){
     		throw new LemonException("PWM10006");
@@ -1582,4 +1545,44 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		BigDecimal tradeFee = tradeRateRspDTO.getRate();
 		return orderAmt.multiply(tradeFee).setScale(2,BigDecimal.ROUND_HALF_UP);
 	}
+
+	/**
+	 * 营业厅请求处理前校验
+	 * @param dto 请求对象
+	 * @param oprType 营业厅操作状态(A:充值|C:撤销)
+	 */
+	private void checkHallRequestBeforeHandler(HallRechargeApplyDTO dto, String oprType){
+        HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
+        if(JudgeUtils.isNull(bussinessBody)){
+            throw new LemonException("PWM10053");
+        }
+        RiskCheckUserStatusReqDTO riskCheckUserStatusReqDTO = new RiskCheckUserStatusReqDTO();
+        riskCheckUserStatusReqDTO.setIdTyp(Constants.ID_TYP_USER_NO);
+        riskCheckUserStatusReqDTO.setId(bussinessBody.getPayerId());
+        riskCheckUserStatusReqDTO.setTxTyp(PwmConstants.TX_TYPE_RECHANGE);
+        //用户状态检查
+        GenericRspDTO<NoBody> checkStatus = riskCheckClient.checkUserStatus(riskCheckUserStatusReqDTO);
+        if(JudgeUtils.isNotSuccess(checkStatus.getMsgCd())){
+            LemonException.throwBusinessException(checkStatus.getMsgCd());
+        }
+        //签名校验
+        signCheck(dto);
+
+        //充值操作状态校验
+		RechargeOrderDO oriRechargeOrderDO = this.service.getRechargeOrderByHallOrderNo(bussinessBody.getHallOrderNo());
+        String operationType = bussinessBody.getStatus();
+        if(JudgeUtils.equals(operationType,PwmConstants.RECHARGE_OPR_A)){
+			//重复下单校验
+			if(JudgeUtils.isNotNull(oriRechargeOrderDO)){
+				throw new LemonException("PWM20021");
+			}
+        }else if(JudgeUtils.equals(operationType,PwmConstants.RECHARGE_OPR_C)){
+			if(JudgeUtils.isNull(oriRechargeOrderDO)) {
+				throw new LemonException("PWM20010");
+			}
+        }else {
+            throw new LemonException("PWM10037");
+        }
+
+    }
 }
