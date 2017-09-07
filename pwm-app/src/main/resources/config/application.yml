@@ -83,6 +83,9 @@ spring :
           destination : ${spring.application.name}
           producer :
             deliveryMode : PERSISTENT
+        output3 :
+          enable : true
+          destination : TFM
         output6 :
           enable : true
           destination : BIL
