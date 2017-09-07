@@ -77,8 +77,9 @@ public class HallRechargeApplyDTO {
 		private String status;
 
 		@ApiModelProperty(name = "fee", value = "营业厅充值操作手续费")
+		@NotNull(message="PWM10052")
 		@Min(value=0, message="PWM10016")
-		private Double fee;
+		private BigDecimal fee;
 
 		@ApiModelProperty(name = "ccy", value = "营业厅充值币种")
         @NotNull(message="PWM10017")
@@ -133,20 +134,20 @@ public class HallRechargeApplyDTO {
 			this.ccy = ccy;
 		}
 
-		public Double getFee() {
-			return fee;
-		}
-
-		public void setFee(Double fee) {
-			this.fee = fee;
-		}
-
 		public String getPsnFlag() {
 			return psnFlag;
 		}
 
 		public void setPsnFlag(String psnFlag) {
 			this.psnFlag = psnFlag;
+		}
+
+		public BigDecimal getFee() {
+			return fee;
+		}
+
+		public void setFee(BigDecimal fee) {
+			this.fee = fee;
 		}
 	}
 
