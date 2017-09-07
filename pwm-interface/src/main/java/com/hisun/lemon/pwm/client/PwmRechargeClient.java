@@ -3,6 +3,8 @@ package com.hisun.lemon.pwm.client;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.dto.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -54,11 +56,16 @@ public interface PwmRechargeClient {
 	@PostMapping("/pwm/recharge/hall/error/handler")
 	public GenericRspDTO<NoBody> hallRechargeErrorHandler(@Validated @RequestBody GenericDTO<HallRechargeErrorFundDTO> genericResultDTO);
 
-	/**
-	 * 营业厅对平金额处理
-	 * @param genericDTO
-	 * @return
-	 */
+
+	@PatchMapping("/pwm/recharge/chk/error/redo")
+	public GenericRspDTO<NoBody> errRepeatHandle(@Validated @RequestBody GenericDTO<String> genericDTO);
+
+
 	@PostMapping("/pwm/recharge/hall/match")
 	public GenericRspDTO<NoBody> hallRechargeMatchHandler(@Validated @RequestBody GenericDTO<HallRechargeMatchDTO> genericDTO);
+
+
+	@PatchMapping("/pwm/recharge/chk/error/hcoupon/redo")
+	public GenericRspDTO<NoBody> errHcouponRepeatHandle(@Validated @RequestBody GenericDTO<String> genericDTO);
+
 }
