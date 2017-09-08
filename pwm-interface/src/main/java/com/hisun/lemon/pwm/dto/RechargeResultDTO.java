@@ -46,13 +46,16 @@ public class RechargeResultDTO {
 	 */
 	@ApiModelProperty(name = "orderCcy", value = "币种")
 	@Length(max=4)
-    private String orderCcy;
+	private String orderCcy;
 	/**
 	 * 订单金额
 	 */
 	@ApiModelProperty(name = "amount", value = "订单金额")
     @Min(value=0, message="PWM10006")
     private BigDecimal amount;
+
+	@ApiModelProperty(name = "fee", value = "充值手续费")
+	private BigDecimal fee;
 
 	/**
 	 * 收银订单号
@@ -143,5 +146,13 @@ public class RechargeResultDTO {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public BigDecimal getFee() {
+		return fee;
+	}
+
+	public void setFee(BigDecimal fee) {
+		this.fee = fee;
 	}
 }
