@@ -1641,7 +1641,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isNull(updateOrder.getOrderAmt())){
 			updateOrder.setOrderAmt(oriOrder.getOrderAmt());
 		}
-		updateOrder.setOrderStatus(oriOrder.getOrderStatus());
 		if(JudgeUtils.isNull(updateOrder.getAcTm())){
 			updateOrder.setAcTm(updateOrder.getAcTm());
 		}
@@ -1653,6 +1652,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 		if(JudgeUtils.isNull(updateOrder.getBusType())){
 			updateOrder.setBusType(oriOrder.getBusType());
+		}
+		if(JudgeUtils.isNull(updateOrder.getTxType())){
+			updateOrder.setTxType(oriOrder.getTxType());
 		}
 		return updateOrder;
 	}
