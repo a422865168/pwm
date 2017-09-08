@@ -122,7 +122,7 @@ public class RechargeOrderController {
 
 	@ApiOperation(value = "上传汇款凭证进行汇款支付", notes = "接收线下汇款凭证进行汇款支付处理")
 	@ApiResponse(code = 200, message = "线下汇款充值上传汇款凭证结果")
-	@PatchMapping(value = "/offline/pay")
+	@PostMapping(value = "/offline/pay")
 	public GenericRspDTO<OfflineRechargeResultDTO> offlineRemittanceUpload(@Validated @RequestBody GenericDTO<RemittanceUploadDTO> genericDTO) {
 		OfflineRechargeResultDTO resultDTO = service.offlineRemittanceUpload(genericDTO);
 		return GenericRspDTO.newSuccessInstance(resultDTO);
