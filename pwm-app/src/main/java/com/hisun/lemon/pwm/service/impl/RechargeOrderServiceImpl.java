@@ -1,6 +1,7 @@
 package com.hisun.lemon.pwm.service.impl;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.*;
 
 import javax.annotation.Resource;
@@ -352,91 +353,122 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	public void handleHCouponResult(GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO) {
 		RechargeHCouponResultDTO rechargSeaDTO = rechargeHCouponDTO.getBody();
 		RechargeHCouponDO rechargeSeaDO = this.service.getHCoupon(rechargSeaDTO.getOrderNo());
-		// 原订单不存在
-		if (JudgeUtils.isNull(rechargeSeaDO)) {
-			throw new LemonException("PWM20008");
-		}
-		// 订单已经成功
-		if (StringUtils.equals(rechargeSeaDO.getOrderStatus(), PwmConstants.RECHARGE_ORD_S)) {
-			return;
-		}
-		// 订单失败
-		if (!StringUtils.equals(rechargSeaDTO.getOrderStatus(), PwmConstants.RECHARGE_ORD_S)) {
-			RechargeHCouponDO updateSeaDTO = new RechargeHCouponDO();
-			updateSeaDTO.setOrderCcy(rechargSeaDTO.getOrderCcy());
-			updateSeaDTO.setOrderNo(rechargSeaDTO.getOrderNo());
-			updateSeaDTO.setAcTm(rechargeHCouponDTO.getAccDate());
-			updateSeaDTO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
-			this.service.updateSeaOrder(updateSeaDTO);
-			return;
-		}
 
-		// 比较金额
-		BigDecimal amount = rechargSeaDTO.getOrderAmt();
-		if (rechargeSeaDO.getOrderAmt().compareTo(amount) != 0) {
-			throw new LemonException("PWM20009");
-		}
+		handleHCouponSuccess(rechargSeaDTO.getOrderNo(),rechargSeaDTO.getOrderCcy(),rechargeHCouponDTO.getAccDate(),
+				rechargSeaDTO.getOrderAmt(),rechargSeaDTO.getOrderStatus(),rechargeSeaDO );
+	}
 
-		// 账务处理
-		AccountingReqDTO userAccountReqDTO = null; // xx用户海币账户
-		AccountingReqDTO cshItemReqDTO = null; // 暂收收银台账务对象
-		BigDecimal orderAmt=rechargeSeaDO.getOrderAmt();
-		//流水号
-		//String payJrnNo=LemonUtils.getRequestId();
-		String acmJrnNo = IdGenUtils.generateIdWithDate(PwmConstants.R_SEA_GEN_PRE, 14);
-		acmJrnNo=rechargeSeaDO.getBusType()+acmJrnNo;
-		// 查询用户帐号
-		String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
-		//查询用户账号
-		String userId=rechargeSeaDO.getUserId();
-		String balAcNo = acmComponent.getAcmAcNo(userId, balCapType);
-		//借：其他应付款-暂收-收银台         100
-		cshItemReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), acmJrnNo, rechargeSeaDO.getTxType(),
-                ACMConstants.ACCOUNTING_NOMARL, orderAmt, balAcNo, ACMConstants.ITM_AC_TYP, balCapType,
-                ACMConstants.AC_D_FLG, PwmConstants.AC_ITEM_CSH_PAY, null, null, null,
-                null, "PWM海币充值");
-                
-		userAccountReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(),acmJrnNo, rechargeSeaDO.getTxType(),
-                ACMConstants.ACCOUNTING_NOMARL,orderAmt, null, ACMConstants.ITM_AC_TYP, balCapType,
-                ACMConstants.AC_C_FLG, PwmConstants.AC_ITEM_HCOUPONE, PwmConstants.AC_ITEM_HCOUPONE, null, null,
-                null, "PWM海币充值");
-		acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);	
-		// 账务更新成功  调用海币充值接口
-		logger.info("调用营销======"+rechargeSeaDO.getOrderNo());
-		RechargeMkmToolReqDTO mkmReqDTO=new RechargeMkmToolReqDTO();
-		mkmReqDTO.setSeq(rechargeSeaDO.getOrderNo());
-		mkmReqDTO.setType("00");
-		mkmReqDTO.setMkTool("02");
-		mkmReqDTO.setUserId(userId);
-		String mblNo=accountManagementClient.queryAcNo(userId).getBody();
-		String mobile=mblNo;
-		mkmReqDTO.setMobile(mobile);
-		BigDecimal hCouponAmt=rechargeSeaDO.gethCouponAmt();
-		Integer count=hCouponAmt.intValue();
-		mkmReqDTO.setRechargeTm(rechargeSeaDO.getTxTm());
-		mkmReqDTO.setCount(count);
-		GenericDTO<RechargeMkmToolReqDTO> rechangeDTO=new GenericDTO<RechargeMkmToolReqDTO>();
-		rechangeDTO.setBody(mkmReqDTO);
-		GenericRspDTO<RechargeMkmToolResDTO> mkmRsp=mkmClient.getSeaCyy(rechangeDTO);
-		if (JudgeUtils.isSuccess(mkmRsp.getMsgCd())) {
-			RechargeMkmToolResDTO rechargeMkmToolResDTO=mkmRsp.getBody();
-			if(JudgeUtils.isNotNull(rechargeMkmToolResDTO) && StringUtils.equals(rechargeMkmToolResDTO.getResult(), "1")){
-				RechargeHCouponDO update=new RechargeHCouponDO();
-			    update.setAcTm(rechargeHCouponDTO.getAccDate());
-			    update.sethCouponAmt(hCouponAmt);
-			    update.setOrderAmt(rechargSeaDTO.getOrderAmt());
-				update.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
-				update.setOrderCcy(rechargSeaDTO.getOrderCcy());
-				update.setOrderNo(rechargSeaDTO.getOrderNo());
-				service.updateSeaOrder(update);
-			}else{
-				logger.error("营销返回失败");
-				throw new LemonException("PWM40001");
-			}
-		}else{
-			throw new LemonException(mkmRsp.getMsgCd());
+	@Override
+	public void repeatHCouponHandle(String orderNo){
+		RechargeHCouponDO rechargeSeaDO = this.service.getHCoupon(orderNo);
+		handleHCouponSuccess(orderNo,null,LemonUtils.getAccDate(),
+				rechargeSeaDO.getOrderAmt(),PwmConstants.RECHARGE_ORD_S,rechargeSeaDO);
+	}
+
+	private void handleHCouponSuccess(String orderNo,String ccy,LocalDate acDt, BigDecimal amount,String status,RechargeHCouponDO rechargeSeaDO){
+		try{
+			locker.lock(
+					"PWM.RESULT_H."+orderNo,
+					18,
+					16,
+					()->{
+
+						// 原订单不存在
+						if (JudgeUtils.isNull(rechargeSeaDO)) {
+							throw new LemonException("PWM20008");
+						}
+						// 订单已经成功
+						if (StringUtils.equals(rechargeSeaDO.getOrderStatus(), PwmConstants.RECHARGE_ORD_S)) {
+							return null;
+						}
+						// 订单失败
+						if (!StringUtils.equals(status, PwmConstants.RECHARGE_ORD_S)) {
+							RechargeHCouponDO updateSeaDTO = new RechargeHCouponDO();
+							if(StringUtils.isNoneBlank(ccy)){
+								updateSeaDTO.setOrderCcy(ccy);
+							}
+
+							updateSeaDTO.setOrderNo(orderNo);
+							updateSeaDTO.setAcTm(acDt);
+							updateSeaDTO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
+							this.service.updateSeaOrder(updateSeaDTO);
+							return null;
+						}
+
+						// 比较金额
+						if (rechargeSeaDO.getOrderAmt().compareTo(amount) != 0) {
+							throw new LemonException("PWM20009");
+						}
+
+						// 账务处理
+						AccountingReqDTO userAccountReqDTO = null; // xx用户海币账户
+						AccountingReqDTO cshItemReqDTO = null; // 暂收收银台账务对象
+						BigDecimal orderAmt=rechargeSeaDO.getOrderAmt();
+						//流水号
+						//String payJrnNo=LemonUtils.getRequestId();
+						String acmJrnNo = IdGenUtils.generateIdWithDate(PwmConstants.R_SEA_GEN_PRE, 14);
+						acmJrnNo=rechargeSeaDO.getBusType()+acmJrnNo;
+						// 查询用户帐号
+						String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
+						//查询用户账号
+						String userId=rechargeSeaDO.getUserId();
+						String balAcNo = acmComponent.getAcmAcNo(userId, balCapType);
+						//借：其他应付款-暂收-收银台         100
+						cshItemReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(), acmJrnNo, rechargeSeaDO.getTxType(),
+								ACMConstants.ACCOUNTING_NOMARL, orderAmt, balAcNo, ACMConstants.ITM_AC_TYP, balCapType,
+								ACMConstants.AC_D_FLG, PwmConstants.AC_ITEM_CSH_PAY, null, null, null,
+								null, "PWM海币充值");
+
+						userAccountReqDTO = acmComponent.createAccountingReqDTO(rechargeSeaDO.getOrderNo(),acmJrnNo, rechargeSeaDO.getTxType(),
+								ACMConstants.ACCOUNTING_NOMARL,orderAmt, null, ACMConstants.ITM_AC_TYP, balCapType,
+								ACMConstants.AC_C_FLG, PwmConstants.AC_ITEM_HCOUPONE, PwmConstants.AC_ITEM_HCOUPONE, null, null,
+								null, "PWM海币充值");
+						acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
+						// 账务更新成功  调用海币充值接口
+						logger.info("调用营销======"+rechargeSeaDO.getOrderNo());
+						RechargeMkmToolReqDTO mkmReqDTO=new RechargeMkmToolReqDTO();
+						mkmReqDTO.setSeq(rechargeSeaDO.getOrderNo());
+						mkmReqDTO.setType("00");
+						mkmReqDTO.setMkTool("02");
+						mkmReqDTO.setUserId(userId);
+						String mblNo=accountManagementClient.queryAcNo(userId).getBody();
+						String mobile=mblNo;
+						mkmReqDTO.setMobile(mobile);
+						BigDecimal hCouponAmt=rechargeSeaDO.gethCouponAmt();
+						Integer count=hCouponAmt.intValue();
+						mkmReqDTO.setRechargeTm(rechargeSeaDO.getTxTm());
+						mkmReqDTO.setCount(count);
+						GenericDTO<RechargeMkmToolReqDTO> rechangeDTO=new GenericDTO<RechargeMkmToolReqDTO>();
+						rechangeDTO.setBody(mkmReqDTO);
+						GenericRspDTO<RechargeMkmToolResDTO> mkmRsp=mkmClient.getSeaCyy(rechangeDTO);
+						if (JudgeUtils.isSuccess(mkmRsp.getMsgCd())) {
+							RechargeMkmToolResDTO rechargeMkmToolResDTO=mkmRsp.getBody();
+							if(JudgeUtils.isNotNull(rechargeMkmToolResDTO) && StringUtils.equals(rechargeMkmToolResDTO.getResult(), "1")){
+								RechargeHCouponDO update=new RechargeHCouponDO();
+								update.setAcTm(acDt);
+								update.sethCouponAmt(hCouponAmt);
+								update.setOrderAmt(amount);
+								update.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
+								if(StringUtils.isNoneBlank(ccy)){
+									update.setOrderCcy(ccy);
+								}
+								update.setOrderNo(orderNo);
+								service.updateSeaOrder(update);
+							}else{
+								logger.error("营销返回失败 {}",orderNo);
+								throw new LemonException("PWM40001");
+							}
+						}else{
+							throw new LemonException(mkmRsp.getMsgCd());
+						}
+						return null;
+					}
+			);
+		}catch (Exception e){
+			LemonException.create(e);
 		}
 	}
+
 
 	@Override
 	public GenericRspDTO createOrder(RechargeDTO rechargeDTO) {
@@ -496,101 +528,132 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	@Override
 	public void handleResult(GenericDTO resultDto) {
 		RechargeResultDTO rechargeResultDTO = (RechargeResultDTO) resultDto.getBody();
-
 		String orderNo = rechargeResultDTO.getOrderNo();
-
-		RechargeOrderDO rechargeOrderDO = service.getRechangeOrderDao().get(orderNo);
-
-		// 未找到订单
-		if (rechargeOrderDO == null) {
-			throw new LemonException("PWM20002");
-		}
-		// 判断返回状态
-		if (!StringUtils.equals(rechargeResultDTO.getStatus(), PwmConstants.RECHARGE_ORD_S)) {
-			RechargeOrderDO updOrderDO = new RechargeOrderDO();
-			updOrderDO.setExtOrderNo(rechargeResultDTO.getExtOrderNo());
-			updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
-			updOrderDO.setOrderCcy(rechargeResultDTO.getOrderCcy());
-			updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-			updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
-			updOrderDO.setOrderNo(orderNo);
-			//若是汇款充值，此处为审核失败原因
-			updOrderDO.setRemark(rechargeResultDTO.getRemark());
-			if(JudgeUtils.equals(rechargeOrderDO.getBusType(),PwmConstants.BUS_TYPE_RECHARGE_OFL)){
-			    try {
-                    //充值退回通知发送
-                    logger.info("汇款拒绝理由: " + updOrderDO.getRemark());
-                    sendMsgCenterInfo(rechargeOrderDO,RECHARGE_OFFLINE_BACK);
-                }catch (Exception e){
-			        logger.error("汇款充值审核失败原因通知失败:" + e.getMessage());
-                }
-            }
-			service.updateOrder(updOrderDO);
-			return;
+		handleSuccess(rechargeResultDTO.getStatus(),rechargeResultDTO.getOrderCcy(),rechargeResultDTO.getAmount(),
+				orderNo,rechargeResultDTO.getExtOrderNo(),rechargeResultDTO.getRemark(), rechargeResultDTO.getBusType(),
+				rechargeResultDTO.getPayerId(),resultDto.getAccDate());
+	}
+	@Override
+	public void repeatResultHandle(String orderNo){
+		GenericRspDTO<OrderDTO> genDto=cshOrderClient.query(orderNo);
+		OrderDTO orderDTO=genDto.getBody();
+		if(JudgeUtils.isSuccess(genDto.getMsgCd())){
+			handleSuccess(PwmConstants.RECHARGE_ORD_S,null,orderDTO.getOrderAmt(),
+					orderNo,orderDTO.getBusOrderNo(),null, orderDTO.getBusType(),
+					orderDTO.getPayerId(),LemonUtils.getAccDate());
+		}else{
+			LemonException.throwBusinessException(genDto.getMsgCd());
 		}
 
-		// 比较金额
-		BigDecimal amount = rechargeResultDTO.getAmount();
-		if (rechargeOrderDO.getOrderAmt().compareTo(amount) != 0) {
-			throw new LemonException("PWM20003");
+	}
+
+	private  void handleSuccess(String status,String ccy,BigDecimal amount,
+								String orderNo,String extOrderNo,String remark,String busType,String payerId,
+								LocalDate acDt){
+		try{
+			RechargeOrderDO rechargeOrderDO = service.getRechangeOrderDao().get(orderNo);
+			locker.lock(
+					"PWM.RESULT_RG."+orderNo,
+					19,17,
+					()->{
+						// 未找到订单
+						if (rechargeOrderDO == null) {
+							throw new LemonException("PWM20002");
+						}
+						// 判断返回状态
+						if (!StringUtils.equals(status, PwmConstants.RECHARGE_ORD_S)) {
+							RechargeOrderDO updOrderDO = new RechargeOrderDO();
+							updOrderDO.setExtOrderNo(extOrderNo);
+							updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
+							if(StringUtils.isNoneBlank(ccy)){
+								updOrderDO.setOrderCcy(ccy);
+							}
+							updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+							updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+							updOrderDO.setOrderNo(orderNo);
+							//若是汇款充值，此处为审核失败原因
+							updOrderDO.setRemark(remark);
+							if(JudgeUtils.equals(rechargeOrderDO.getBusType(),PwmConstants.BUS_TYPE_RECHARGE_OFL)){
+								try {
+									//充值退回通知发送
+									logger.info("汇款拒绝理由: " + updOrderDO.getRemark());
+									sendMsgCenterInfo(rechargeOrderDO,RECHARGE_OFFLINE_BACK);
+								}catch (Exception e){
+									logger.error("汇款充值审核失败原因通知失败:" + e.getMessage());
+								}
+							}
+							service.updateOrder(updOrderDO);
+							return null;
+						}
+
+						// 比较金额
+						if (rechargeOrderDO.getOrderAmt().compareTo(amount) != 0) {
+							throw new LemonException("PWM20003");
+						}
+
+						// 账务处理,根据不同业务进行不同处理
+						AccountingReqDTO userAccountReqDTO=null;     //用户现金账户账务对象
+						AccountingReqDTO cshItemReqDTO=null;         //暂收收银台账务对象
+
+						//账号资金属性：1 现金 8 待结算
+						String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
+						//现金账户
+						String balAcNo=acmComponent.getAcmAcNo(payerId, balCapType);
+
+						if(JudgeUtils.isBlank(balAcNo)){
+							throw new LemonException("PWM20022");
+						}
+						switch (busType) {
+							//个人快捷支付账户充值
+							case PwmConstants.BUS_TYPE_RECHARGE_QP:
+								String tmpJrnNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_QP + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
+								// 借：其他应付款-暂收-收银台
+								cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
+										ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
+										CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
+
+								// 贷：其他应付款-支付账户-xx用户现金账户
+								userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
+										ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+										CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "快捷充值$"+rechargeOrderDO.getOrderAmt());
+								acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
+								break;
+							case PwmConstants.BUS_TYPE_RECHARGE_OFL:
+								String acmJrnNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_OFL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
+								// 借：其他应付款-暂收-收银台
+								cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
+										ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
+										CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
+
+								// 贷：其他应付款-支付账户-xx用户现金账户
+								userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
+										ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+										CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "汇款充值$"+rechargeOrderDO.getOrderAmt());
+								acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
+								break;
+							default:
+								break;
+						}
+
+						// 更新订单
+						RechargeOrderDO updOrderDO = new RechargeOrderDO();
+						updOrderDO.setAcTm(acDt);
+						updOrderDO.setExtOrderNo(extOrderNo);
+						updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
+						updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+						if(StringUtils.isNoneBlank(ccy)){
+							updOrderDO.setOrderCcy(ccy);
+						}
+
+						updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+						updOrderDO.setOrderNo(orderNo);
+						service.updateOrder(updOrderDO);
+						return null;
+					}
+			);
+		}catch (Exception e){
+			LemonException.create(e);
 		}
-
-		// 账务处理,根据不同业务进行不同处理
-		String busType = rechargeResultDTO.getBusType();
-		AccountingReqDTO userAccountReqDTO=null;     //用户现金账户账务对象
-		AccountingReqDTO cshItemReqDTO=null;         //暂收收银台账务对象
-
-		//账号资金属性：1 现金 8 待结算
-		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
-		String payerId = rechargeResultDTO.getPayerId();
-		//现金账户
-		String balAcNo=acmComponent.getAcmAcNo(payerId, balCapType);
-
-		if(JudgeUtils.isBlank(balAcNo)){
-			throw new LemonException("PWM20022");
-		}
-		switch (busType) {
-			//个人快捷支付账户充值
-			case PwmConstants.BUS_TYPE_RECHARGE_QP:
-				String tmpJrnNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_QP + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
-				// 借：其他应付款-暂收-收银台
-				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
-						CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
-
-				// 贷：其他应付款-支付账户-xx用户现金账户
-				userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
-						CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "快捷充值$"+rechargeOrderDO.getOrderAmt());
-				acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
-				break;
-			case PwmConstants.BUS_TYPE_RECHARGE_OFL:
-				String acmJrnNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_OFL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
-				// 借：其他应付款-暂收-收银台
-				cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
-						CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
-
-				// 贷：其他应付款-支付账户-xx用户现金账户
-				userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
-						ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
-						CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "汇款充值$"+rechargeOrderDO.getOrderAmt());
-				acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
-				break;
-			default:
-				break;
-		}
-
-		// 更新订单
-		RechargeOrderDO updOrderDO = new RechargeOrderDO();
-		updOrderDO.setAcTm(resultDto.getAccDate());
-		updOrderDO.setExtOrderNo(rechargeResultDTO.getExtOrderNo());
-		updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
-		updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
-		updOrderDO.setOrderCcy(rechargeResultDTO.getOrderCcy());
-		updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-		updOrderDO.setOrderNo(orderNo);
-		service.updateOrder(updOrderDO);
 	}
 
 	@Override
