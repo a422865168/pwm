@@ -535,7 +535,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		String orderNo = rechargeResultDTO.getOrderNo();
 		handleSuccess(rechargeResultDTO.getStatus(),rechargeResultDTO.getOrderCcy(),rechargeResultDTO.getAmount(),
 				orderNo,rechargeResultDTO.getExtOrderNo(),rechargeResultDTO.getRemark(), rechargeResultDTO.getBusType(),
-				rechargeResultDTO.getPayerId(),resultDto.getAccDate());
+				rechargeResultDTO.getPayerId(),rechargeResultDTO.getFee(),resultDto.getAccDate());
 	}
 	@Override
 	public void repeatResultHandle(String orderNo){
@@ -544,7 +544,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isSuccess(genDto.getMsgCd())){
 			handleSuccess(PwmConstants.RECHARGE_ORD_S,null,orderDTO.getOrderAmt(),
 					orderNo,orderDTO.getBusOrderNo(),null, orderDTO.getBusType(),
-					orderDTO.getPayerId(),LemonUtils.getAccDate());
+					orderDTO.getPayerId(),orderDTO.getFee(),LemonUtils.getAccDate());
 		}else{
 			LemonException.throwBusinessException(genDto.getMsgCd());
 		}
@@ -552,7 +552,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	}
 
 	private  void handleSuccess(String status,String ccy,BigDecimal amount,
-								String orderNo,String extOrderNo,String remark,String busType,String payerId,
+								String orderNo,String extOrderNo,String remark,String busType,String payerId,BigDecimal fee,
 								LocalDate acDt){
 		try{
 			RechargeOrderDO rechargeOrderDO = service.getRechangeOrderDao().get(orderNo);
@@ -575,6 +575,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 							updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 							updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 							updOrderDO.setOrderNo(orderNo);
+                            updOrderDO.setFee(fee);
 							//若是汇款充值，此处为审核失败原因
 							updOrderDO.setRemark(remark);
 							if(JudgeUtils.equals(rechargeOrderDO.getBusType(),PwmConstants.BUS_TYPE_RECHARGE_OFL)){
@@ -645,6 +646,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 						updOrderDO.setExtOrderNo(extOrderNo);
 						updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
 						updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+                        updOrderDO.setFee(fee);
 						if(StringUtils.isNoneBlank(ccy)){
 							updOrderDO.setOrderCcy(ccy);
 						}
