@@ -73,8 +73,12 @@ import com.hisun.lemon.urm.dto.UserBasicInfDTO;
 import com.hisun.lemon.rsm.Constants;
 @Service
 public class RechargeOrderServiceImpl implements IRechargeOrderService {
+    //短信推送
     public static final int RECHARGE_SUCCESS=1;
     public static final int RECHARGE_OFFLINE_BACK=2;
+    //账单同步
+    public static final int CREATE_BIL=1;
+    public static final int UPD_BIL=2;
 
 	private static final Logger logger = LoggerFactory.getLogger(RechargeOrderServiceImpl.class);
 	@Resource
@@ -709,37 +713,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM30006");
 		}
 
-		String ymd = DateTimeUtils.getCurrentDateStr();
-		String orderNo = PwmConstants.BUS_TYPE_RECHARGE_HALL + ymd + IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
 		// 生成充值订单
-		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
-		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
-		rechargeOrderDO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
-		rechargeOrderDO.setExtOrderNo("");
-		rechargeOrderDO.setOrderAmt(orderAmt);
-		rechargeOrderDO.setOrderCcy(bussinessBody.getCcy());
-		rechargeOrderDO.setOrderExpTm(DateTimeUtils.getCurrentLocalDateTime().plusMinutes(15));
-		rechargeOrderDO.setOrderNo(orderNo);
-		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
-		rechargeOrderDO.setOrderStatus(bussinessBody.getStatus());
-		rechargeOrderDO.setIpAddress("");
-		rechargeOrderDO.setModifyOpr("");
-		rechargeOrderDO.setOrderSuccTm(null);
-		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
-		rechargeOrderDO.setPsnFlag(bussinessBody.getPsnFlag());
-		rechargeOrderDO.setSysChannel(PwmConstants.ORD_SYSCHANNEL_HALL);
-		rechargeOrderDO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
-		rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-		rechargeOrderDO.setRemark("");
-		rechargeOrderDO.setPayerId(bussinessBody.getPayerId());
-		rechargeOrderDO.setHallOrderNo(bussinessBody.getHallOrderNo());
-		rechargeOrderDO.setFee(fee);
-		this.service.initOrder(rechargeOrderDO);
+		RechargeOrderDO rechargeOrderDO = createHallRechargeOrder(bussinessBody);
 
-		//个人账户
+		//个人账户查询
 		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 		String balAcNo=acmComponent.getAcmAcNo(bussinessBody.getPayerId(), balCapType);
-//		BigDecimal addAcAmt = orderAmt.subtract(hallPayResult.getFee()).setScale(2);
 		if(JudgeUtils.isBlank(balAcNo)){
 			throw new LemonException("PWM20022");
 		}
@@ -784,12 +763,16 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			acmComponent.requestAc(userAccountReqDTO,cnlRechargeHallReqDTO);
 		}catch (LemonException e){
 			//更新失败订单
-			RechargeOrderDO updatOrderDO = new RechargeOrderDO();
-			updatOrderDO.setOrderNo(orderNo);
-			updatOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-			updatOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
-			updatOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
-			this.service.updateOrder(updatOrderDO);
+			RechargeOrderDO updateOrderDO = new RechargeOrderDO();
+            updateOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
+            updateOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+            updateOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
+            updateOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+			this.service.updateOrder(updateOrderDO);
+
+			updateOrderDO = syncOrderData(rechargeOrderDO,updateOrderDO);
+			//同步账单
+            synchronizeRechargeBil(updateOrderDO,CREATE_BIL);
 			LemonException.throwBusinessException(e.getMsgCd());
 		}
 
@@ -799,14 +782,14 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 
 		//更新充值订单
-		RechargeOrderDO updOrderDO = new RechargeOrderDO();
-		updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
-		updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
-		updOrderDO.setOrderCcy(rechargeOrderDO.getOrderCcy());
-		updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-		updOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
-		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
-		service.updateOrder(updOrderDO);
+		RechargeOrderDO updateOrderDO = new RechargeOrderDO();
+        updateOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
+        updateOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+        updateOrderDO.setOrderCcy(rechargeOrderDO.getOrderCcy());
+        updateOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+        updateOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
+        updateOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+		service.updateOrder(updateOrderDO);
 		try{
             //调用平台短信能力通知充值到账
             sendMsgCenterInfo(rechargeOrderDO,RECHARGE_SUCCESS);
@@ -814,27 +797,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		    logger.error("充值成功，推送充值消息失败:" + e.getMessage());
         }
 
-		String language=LemonUtils.getLocale().getLanguage();
-		if(StringUtils.isBlank(language)){
-			language="en";
-		}
-		String descFormat=LemonUtils.getProperty("pwm.recharge.hallDesc."+language);
-		String desc=descFormat.replace("$amount$",String.valueOf(rechargeOrderDO.getOrderAmt()));
-
 		//同步更新订单数据
-		updOrderDO = syncOrderData(rechargeOrderDO,updOrderDO);
+        updateOrderDO = syncOrderData(rechargeOrderDO,updateOrderDO);
 
         //同步账单
-		CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
-		BeanUtils.copyProperties(createUserBillDTO, updOrderDO);
-		createUserBillDTO.setTxTm(rechargeOrderDO.getOrderTm());
-		createUserBillDTO.setPayerId(rechargeOrderDO.getPayerId());
-		createUserBillDTO.setOrderAmt(rechargeOrderDO.getOrderAmt());
-		createUserBillDTO.setFee(rechargeOrderDO.getFee());
-		createUserBillDTO.setGoodsInfo(desc);
-		createUserBillDTO.setCrdPayType("3");
-		createUserBillDTO.setCrdPayAmt(updOrderDO.getOrderAmt());
-		billSyncHandler.createBill(createUserBillDTO);
+        synchronizeRechargeBil(updateOrderDO,CREATE_BIL);
 		//返回
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(orderAmt);
@@ -899,30 +866,28 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		}
 
 		//更新订单状态
-		RechargeOrderDO updOrderDO = new RechargeOrderDO();
-		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
-		updOrderDO.setExtOrderNo(rechargeOrderDO.getExtOrderNo());
-		updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_C);
-		updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
-		updOrderDO.setOrderCcy(rechargeOrderDO.getOrderCcy());
-		updOrderDO.setOrderAmt(rechargeOrderDO.getOrderAmt());
-		updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-		updOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
-		updOrderDO.setHallOrderNo(rechargeOrderDO.getHallOrderNo());
-		updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
-		service.updateOrder(updOrderDO);
+		RechargeOrderDO updateOrderDO = new RechargeOrderDO();
+        updateOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+        updateOrderDO.setExtOrderNo(rechargeOrderDO.getExtOrderNo());
+        updateOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_C);
+        updateOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+        updateOrderDO.setOrderCcy(rechargeOrderDO.getOrderCcy());
+        updateOrderDO.setOrderAmt(rechargeOrderDO.getOrderAmt());
+        updateOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+        updateOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
+        updateOrderDO.setHallOrderNo(rechargeOrderDO.getHallOrderNo());
+        updateOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+		service.updateOrder(updateOrderDO);
 
 		//同步账单数据
-		UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
-		BeanUtils.copyProperties(updateUserBillDTO, updOrderDO);
-		billSyncHandler.updateBill(updateUserBillDTO);
+        synchronizeRechargeBil(updateOrderDO,UPD_BIL);
 		//返回处理结果
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
-		hallRechargeResultDTO.setAmount(updOrderDO.getOrderAmt());
-		hallRechargeResultDTO.setStatus(updOrderDO.getOrderStatus());
+		hallRechargeResultDTO.setAmount(updateOrderDO.getOrderAmt());
+		hallRechargeResultDTO.setStatus(updateOrderDO.getOrderStatus());
 		hallRechargeResultDTO.setFee(rechargeOrderDO.getFee());
-		hallRechargeResultDTO.setHallOrderNo(updOrderDO.getHallOrderNo());
-		hallRechargeResultDTO.setOrderNo(updOrderDO.getOrderNo());
+		hallRechargeResultDTO.setHallOrderNo(updateOrderDO.getHallOrderNo());
+		hallRechargeResultDTO.setOrderNo(updateOrderDO.getOrderNo());
 		return hallRechargeResultDTO;
 
 	}
@@ -1640,6 +1605,77 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
     }
 
     /**
+     * 同步账单方法
+     * @param updOrderDO
+     * @param flag 1 创建账单  2 更新账单
+     */
+    public void synchronizeRechargeBil(RechargeOrderDO updOrderDO,int flag){
+        //获取当前语言环境
+        String language=LemonUtils.getLocale().getLanguage();
+        if(StringUtils.isBlank(language)){
+            language="en";
+        }
+        switch (flag){
+            case CREATE_BIL:
+            	//获取国际化账单描述
+                String descFormat=LemonUtils.getProperty("pwm.recharge.hallDesc."+language);
+                String desc=descFormat.replace("$amount$",String.valueOf(updOrderDO.getOrderAmt()));
+
+                CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
+                BeanUtils.copyProperties(createUserBillDTO, updOrderDO);
+				createUserBillDTO.setTxTm(updOrderDO.getOrderTm());
+                createUserBillDTO.setGoodsInfo(desc);
+                createUserBillDTO.setCrdPayType("3");
+                createUserBillDTO.setCrdPayAmt(updOrderDO.getOrderAmt());
+                billSyncHandler.createBill(createUserBillDTO);
+                break;
+            case UPD_BIL:
+                UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
+                BeanUtils.copyProperties(updateUserBillDTO, updOrderDO);
+                billSyncHandler.updateBill(updateUserBillDTO);
+                break;
+            default:
+                break;
+        }
+    }
+
+	/**
+	 * 创建营业厅充值订单
+	 * @param busBody
+	 * @return
+	 */
+	public RechargeOrderDO createHallRechargeOrder(HallRechargeApplyDTO.BussinessBody busBody){
+		String ymd = DateTimeUtils.getCurrentDateStr();
+		String orderNo = PwmConstants.BUS_TYPE_RECHARGE_HALL + ymd + IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
+		// 生成充值订单
+		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
+		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+		rechargeOrderDO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
+		rechargeOrderDO.setExtOrderNo("");
+		rechargeOrderDO.setOrderAmt(busBody.getAmount());
+		rechargeOrderDO.setOrderCcy(busBody.getCcy());
+		rechargeOrderDO.setOrderExpTm(DateTimeUtils.getCurrentLocalDateTime().plusMinutes(15));
+		rechargeOrderDO.setOrderNo(orderNo);
+		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
+		rechargeOrderDO.setOrderStatus(busBody.getStatus());
+		rechargeOrderDO.setIpAddress("");
+		rechargeOrderDO.setModifyOpr("");
+		rechargeOrderDO.setOrderSuccTm(null);
+		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
+		rechargeOrderDO.setPsnFlag(busBody.getPsnFlag());
+		rechargeOrderDO.setSysChannel(PwmConstants.ORD_SYSCHANNEL_HALL);
+		rechargeOrderDO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
+		rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+		rechargeOrderDO.setRemark("");
+		rechargeOrderDO.setPayerId(busBody.getPayerId());
+		rechargeOrderDO.setHallOrderNo(busBody.getHallOrderNo());
+		rechargeOrderDO.setFee(busBody.getFee());
+		this.service.initOrder(rechargeOrderDO);
+
+		return rechargeOrderDO;
+	}
+
+    /**
      * 计算营业厅充值手续费
      * @param orderAmt 充值订单金额
      * @return
@@ -1700,6 +1736,12 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
     }
 
+	/**
+	 * 同步原订单和更新订单数据
+	 * @param oriOrder 原订单
+	 * @param updateOrder 更新后订单
+	 * @return
+	 */
     private RechargeOrderDO syncOrderData(RechargeOrderDO oriOrder,RechargeOrderDO updateOrder){
 		if(JudgeUtils.isNull(updateOrder.getOrderAmt())){
 			updateOrder.setOrderAmt(oriOrder.getOrderAmt());
@@ -1719,6 +1761,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		if(JudgeUtils.isNull(updateOrder.getTxType())){
 			updateOrder.setTxType(oriOrder.getTxType());
 		}
+		if(JudgeUtils.isNull(updateOrder.getOrderTm())){
+		    updateOrder.setOrderTm(oriOrder.getOrderTm());
+        }
+
 		return updateOrder;
 	}
 }
