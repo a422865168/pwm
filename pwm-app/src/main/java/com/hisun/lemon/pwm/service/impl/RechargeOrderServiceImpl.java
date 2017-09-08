@@ -1372,7 +1372,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			}
 		}else if(JudgeUtils.equals(handleType,PwmConstants.HALL_CHK_SHORT_AMT)){
 			//撤单订单状态检查
-			if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_F)){
+			if(!JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_S)){
 				throw new LemonException("PWM20030");
 			}
 		}else{
