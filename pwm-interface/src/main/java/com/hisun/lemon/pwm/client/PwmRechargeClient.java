@@ -57,15 +57,38 @@ public interface PwmRechargeClient {
 	public GenericRspDTO<NoBody> hallRechargeErrorHandler(@Validated @RequestBody GenericDTO<HallRechargeErrorFundDTO> genericResultDTO);
 
 
+	/**
+	 *
+	 * @param genericDTO
+	 * @return
+	 */
 	@PatchMapping("/pwm/recharge/chk/error/redo")
 	public GenericRspDTO<NoBody> errRepeatHandle(@Validated @RequestBody GenericDTO<String> genericDTO);
 
 
+	/**
+	 * 营业厅充值对平金额处理
+	 * @param genericDTO
+	 * @return
+	 */
 	@PostMapping("/pwm/recharge/hall/match")
 	public GenericRspDTO<NoBody> hallRechargeMatchHandler(@Validated @RequestBody GenericDTO<HallRechargeMatchDTO> genericDTO);
 
 
+	/**
+	 * 充值补单
+	 * @param genericDTO
+	 * @return
+	 */
 	@PatchMapping("/pwm/recharge/chk/error/hcoupon/redo")
 	public GenericRspDTO<NoBody> errHcouponRepeatHandle(@Validated @RequestBody GenericDTO<String> genericDTO);
+
+	/**
+	 * 充值撤单处理
+	 * @param genericDTO
+	 * @return
+	 */
+	@PostMapping(value = "/pwm/recharge/chk/error/revoke")
+	public GenericRspDTO<NoBody> rechargeRevoke(@Validated @RequestBody GenericDTO<RechargeRevokeDTO> genericDTO);
 
 }

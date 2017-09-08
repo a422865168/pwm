@@ -90,6 +90,11 @@ public class PwmConstants {
 	public static final String RECHARGE_ORD_C ="C";
 
 	/**
+	 * 充值订单状态：已退款
+	 */
+	public static final String RECHARGE_ORD_R ="R";
+
+	/**
 	 * 提现订单状态W1：系统受理中
 	 */
 	public static final String WITHDRAW_ORD_W1="W1";

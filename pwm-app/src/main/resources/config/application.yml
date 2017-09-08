@@ -341,4 +341,4 @@ pwm :
     remotePath : /home/payment/data/pwm/
     localPath : /home/payment/data/localchk/pwm/
     #营业厅指定对账文件目录地址
-    hallRemotePath: /home/payment/data/pwm/
+    hallRemotePath: /home/payment/data/pwm/hall/

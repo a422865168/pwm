@@ -1091,7 +1091,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	@Override
 	public void longAmtHandle(HallRechargeErrorFundDTO hallRechargeErrorFundDTO) {
 		String rechargeOrderNo = hallRechargeErrorFundDTO.getOrderNo();
-		logger.error("营业厅充值订单" + rechargeOrderNo + "长款补单");
+		logger.error("营业厅充值订单" + rechargeOrderNo + "长款补单处理....");
 		try {
 			locker.lock("PWM_LOCK.HALL.LONGAMT." + rechargeOrderNo, 18, 22, () -> {
 				//差错处理前校验
@@ -1144,7 +1144,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	@Override
 	public void shortAmtHandle(HallRechargeErrorFundDTO hallRechargeErrorFundDTO){
 		String rechargeOrderNo = hallRechargeErrorFundDTO.getOrderNo();
-		logger.info("营业厅充值订单" + rechargeOrderNo + "短款撤单");
+		logger.info("营业厅充值订单" + rechargeOrderNo + "短款撤单处理.....");
 		try {
 			locker.lock("PWM_LOCK.HALL.SHORTAMT." + rechargeOrderNo, 18, 22, () -> {
 				//差错处理前校验
@@ -1178,7 +1178,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					LemonException.throwBusinessException(accountingTreatment.getMsgCd());
 				}
 				//更新充值订单状态
-				rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_F);
+				rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_C);
 				rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 				rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 				this.service.updateOrder(rechargeOrderDO);
@@ -1199,8 +1199,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		final String hall_userName = LemonUtils.getProperty("pwm.recharge.hall-sftp.name");
 		final String hall_passd = LemonUtils.getProperty("pwm.recharge.hall-sftp.password");
 		final String connectTimeout = LemonUtils.getProperty("pwm.recharge.hall-sftp.connectTimeout");
-		final String hallRemotePath = LemonUtils.getProperty("pwm.chk.hallRemotePath");
-		final String localPath = LemonUtils.getProperty("pwm.chk.localPath");
+		//营业厅对账文件存放地址
+		final String hallRemotePath = LemonUtils.getProperty("pwm.chk.remotePath");
+		//服平台务器对账文件存放地址
+		final String localPath = LemonUtils.getProperty("pwm.chk.hallRemotePath");
 		logger.info("从营业厅ip>>"+ hall_server + ",端口号>> " + hall_port + ",目录>>" +
 				hallRemotePath +", " + "获取对账文件名>>" + fileName);
 
@@ -1271,34 +1273,44 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM20036");
 		}
 		String rechargeOrderNo = rechargeRevokeDTO.getOrderNo();
-		RechargeOrderDO rechargeOrderDO = this.service.getRechangeOrderDao().get(rechargeOrderNo);
-		RefundOrderDTO refundOrderDTO = new RefundOrderDTO();
-		refundOrderDTO.setBusRdfOrdNo(rechargeOrderDO.getOrderNo());
-		refundOrderDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_SHORTAMT_REFUND);
-		//查询收银订单信息
-		GenericRspDTO<OrderDTO> genericRspDTO = cshOrderClient.query(rechargeOrderNo);
-		if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
-			LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+		logger.info("充值订单号：" + rechargeOrderNo + "撤单处理开始....");
+		try {
+			locker.lock("PWM_LOCK.RECHARGE.REVOKE." + rechargeOrderNo, 18, 22, () -> {
+				RechargeOrderDO rechargeOrderDO = this.service.getRechangeOrderDao().get(rechargeOrderNo);
+				RefundOrderDTO refundOrderDTO = new RefundOrderDTO();
+				refundOrderDTO.setBusRdfOrdNo(rechargeOrderDO.getOrderNo());
+				refundOrderDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_SHORTAMT_REFUND);
+				//查询收银订单信息
+				GenericRspDTO<OrderDTO> genericRspDTO = cshOrderClient.query(rechargeOrderNo);
+				if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
+					LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+				}
+				OrderDTO orderDTO = genericRspDTO.getBody();
+				refundOrderDTO.setGoodInfo(orderDTO.getGoodsInfo());
+				refundOrderDTO.setOrderCcy(rechargeOrderDO.getOrderCcy());
+				refundOrderDTO.setOrginOrderNo(rechargeOrderDO.getExtOrderNo());
+				refundOrderDTO.setRefundUserId(rechargeOrderDO.getPayerId());
+				refundOrderDTO.setTxType(PwmConstants.TX_TYPE_RECHARGE_REFUND);
+				//退款总金额
+				refundOrderDTO.setRfdAmt(rechargeOrderDO.getOrderAmt().add(rechargeOrderDO.getFee()));
+				GenericDTO genericRefundOrder = new GenericDTO();
+				genericRefundOrder.setBody(refundOrderDTO);
+				GenericRspDTO<RefundOrderRspDTO> genericRefundOrderRsp = cshRefundClient.createBill(genericRefundOrder);
+				if(JudgeUtils.isNotSuccess(genericRefundOrderRsp.getMsgCd())){
+					LemonException.throwBusinessException(genericRefundOrderRsp.getMsgCd());
+				}
+				//更新充值订单为已退款
+				rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_R);
+				rechargeOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+				rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+				this.service.updateOrder(rechargeOrderDO);
+				logger.info("充值订单号:" + rechargeOrderNo + "撤单成功!");
+				return null;
+			});
+		} catch (Exception e) {
+			LemonException.throwBusinessException("PWM20028");
 		}
-		OrderDTO orderDTO = genericRspDTO.getBody();
-		refundOrderDTO.setGoodInfo(orderDTO.getGoodsInfo());
-		refundOrderDTO.setOrderCcy(rechargeOrderDO.getOrderCcy());
-		refundOrderDTO.setOrginOrderNo(rechargeOrderDO.getExtOrderNo());
-		refundOrderDTO.setRefundUserId(rechargeOrderDO.getPayerId());
-		refundOrderDTO.setTxType(PwmConstants.TX_TYPE_RECHARGE_REFUND);
-		//退款总金额
-		refundOrderDTO.setRfdAmt(rechargeOrderDO.getOrderAmt().add(rechargeOrderDO.getFee()));
-		GenericDTO genericRefundOrder = new GenericDTO();
-		genericRefundOrder.setBody(refundOrderDTO);
-		GenericRspDTO<RefundOrderRspDTO> genericRefundOrderRsp = cshRefundClient.createBill(genericRefundOrder);
-		if(JudgeUtils.isNotSuccess(genericRefundOrderRsp.getMsgCd())){
-			LemonException.throwBusinessException(genericRefundOrderRsp.getMsgCd());
-		}
-		//更新充值订单
-		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_C);
-		rechargeOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
-		rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-		this.service.updateOrder(rechargeOrderDO);
+
 	}
 
 	private String md5Str(HallRechargeApplyDTO.BussinessBody busBody, String key) {
