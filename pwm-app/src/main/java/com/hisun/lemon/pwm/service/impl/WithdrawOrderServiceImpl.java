@@ -278,8 +278,11 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
             language="en";
         }
         String descFormat=LemonUtils.getProperty("pwm.withdraw."+withdrawOrderDO.getCapCorgNo()+"Desc."+language);
-        String desc=descFormat.replace("$last$",withdrawCardBindDO.getCardNoLast());
-        desc=desc.replace("$amount$",String.valueOf(withdrawOrderDO.getWcApplyAmt()));
+        String desc ="";
+        if(JudgeUtils.isNotBlank(descFormat)) {
+            desc = descFormat.replace("$last$", withdrawCardBindDO.getCardNoLast());
+            desc = desc.replace("$amount$", String.valueOf(withdrawOrderDO.getWcApplyAmt()));
+        }
 
 		//同步账单数据
         CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
