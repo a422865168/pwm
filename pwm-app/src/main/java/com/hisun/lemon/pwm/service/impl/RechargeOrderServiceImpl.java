@@ -1293,8 +1293,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				refundOrderDTO.setOrginOrderNo(rechargeOrderDO.getExtOrderNo());
 				refundOrderDTO.setRefundUserId(rechargeOrderDO.getPayerId());
 				refundOrderDTO.setTxType(PwmConstants.TX_TYPE_RECHARGE_REFUND);
-				//退款总金额
-				refundOrderDTO.setRfdAmt(rechargeOrderDO.getOrderAmt().add(rechargeOrderDO.getFee()));
+				//退款金额为订单金额
+				refundOrderDTO.setRfdAmt(rechargeOrderDO.getOrderAmt());
 				GenericDTO genericRefundOrder = new GenericDTO();
 				genericRefundOrder.setBody(refundOrderDTO);
 				GenericRspDTO<RefundOrderRspDTO> genericRefundOrderRsp = cshRefundClient.createBill(genericRefundOrder);
