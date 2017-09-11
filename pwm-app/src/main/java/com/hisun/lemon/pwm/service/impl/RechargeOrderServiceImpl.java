@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
@@ -696,7 +697,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 		if(JudgeUtils.isNotBlank(key)){
 			//判断是否是通过手机号查询,手机号格式 国家编码+手机号
-			boolean isPhone = PhoneNumberUtils.isValidNumber(key);
+			//boolean isPhone = PhoneNumberUtils.isValidNumber(key);
+            boolean isPhone = Pattern.matches("^[+](\\d){1,3}-(\\d)+", key);
 			if(isPhone){
 				genericUserBasicInfDTO = userBasicInfClient.queryUserByLoginId(key);
 			}else{
@@ -1787,11 +1789,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//国际化配置文件中key值
 		String key = "";
 		try{
-			String txType = "";
 			if(JudgeUtils.isNull(busType)){
 				return null;
 			}
-			txType = busType.length() <= 2 ? busType : busType.substring(2);
+            String txType = busType.length() <= 2 ? busType : busType.substring(2);
 			if(JudgeUtils.equals(txType,PwmConstants.TX_TYPE_HCOUPON)){
 				key="view.orderinfo."+busType;
 			}else if(JudgeUtils.equals(txType,PwmConstants.TX_TYPE_RECHANGE)) {
