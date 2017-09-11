@@ -302,13 +302,6 @@ security :
     password : lemon123
 
 pwm :
-  withdraw :
-    ICBCDesc :
-       en : withdraw $$amount$ to ICBC($last$)
-       zh : 提现到工商银行（$last$）$$amount$
-    BEADesc :
-       en : withdraw $$amount$ to BEA($last$)
-       zh : 提现到东南亚银行（$last$）$$amount$
   recharge :
     #营业厅充值签名KEY值
     HALLKEY : PWM123456789002

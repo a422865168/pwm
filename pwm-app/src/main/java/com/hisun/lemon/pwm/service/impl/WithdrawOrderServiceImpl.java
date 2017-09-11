@@ -23,6 +23,7 @@ import com.hisun.lemon.cpo.enums.CorpBusTyp;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
+import com.hisun.lemon.framework.i18n.LocaleMessageSource;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.jcommon.encrypt.EncryptionUtils;
@@ -93,6 +94,9 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
     @Resource
     private CmmServerClient cmmServerClient;
+
+    @Resource
+    LocaleMessageSource localeMessageSource;
 
     @Resource
     BillSyncHandler billSyncHandler;
@@ -273,16 +277,8 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 
         //国际化订单信息
         WithdrawCardBindDO withdrawCardBindDO = withdrawCardBindDao.query(withdrawOrderDO.getCapCardNo());
-        String language=LemonUtils.getLocale().getLanguage();
-        if(StringUtils.isBlank(language)){
-            language="en";
-        }
-        String descFormat=LemonUtils.getProperty("pwm.withdraw."+withdrawOrderDO.getCapCorgNo()+"Desc."+language);
-        String desc ="";
-        if(JudgeUtils.isNotBlank(descFormat)) {
-            desc = descFormat.replace("$last$", withdrawCardBindDO.getCardNoLast());
-            desc = desc.replace("$amount$", String.valueOf(withdrawOrderDO.getWcApplyAmt()));
-        }
+        Object[] args=new Object[]{withdrawCardBindDO.getCardNoLast(), withdrawOrderDO.getWcApplyAmt()};
+        String desc=getViewOrderInfo(withdrawOrderDO.getCapCorgNo(),args);
 
 		//同步账单数据
         CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
@@ -553,5 +549,21 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         messageReq.setReplaceFieldMap(map);
         messageReqDTO.setBody(messageReq);
         GenericRspDTO<NoBody> rspDto = cmmServerClient.messageSend(messageReqDTO);
+    }
+
+    /**
+     * 国际化商品描述信息
+     * @param capCorg
+     * @param args
+     * @return
+     */
+    public String getViewOrderInfo(String capCorg,Object[] args){
+        try{
+            String key="view.withdraw."+capCorg;
+            return localeMessageSource.getMessage(key,args);
+        }catch (Exception e){
+
+        }
+        return  null;
     }
 }
