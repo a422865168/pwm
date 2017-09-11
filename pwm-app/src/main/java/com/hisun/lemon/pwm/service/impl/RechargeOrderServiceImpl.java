@@ -2,22 +2,14 @@ package com.hisun.lemon.pwm.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
-import com.hisun.lemon.bil.dto.CreateUserBillDTO;
-import com.hisun.lemon.bil.dto.UpdateUserBillDTO;
-import com.hisun.lemon.cmm.client.CmmServerClient;
-import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
-import com.hisun.lemon.csh.client.CshRefundClient;
-import com.hisun.lemon.csh.dto.refund.RefundOrderDTO;
-import com.hisun.lemon.csh.dto.refund.RefundOrderRspDTO;
-import com.hisun.lemon.pwm.dto.*;
-import com.hisun.lemon.pwm.mq.BillSyncHandler;
-import com.hisun.lemon.pwm.mq.PaymentHandler;
-import com.hisun.lemon.rsm.client.RiskCheckClient;
-import com.hisun.lemon.rsm.dto.req.checkstatus.RiskCheckUserStatusReqDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -30,6 +22,10 @@ import com.hisun.lemon.acm.client.AccountingTreatmentClient;
 import com.hisun.lemon.acm.constants.ACMConstants;
 import com.hisun.lemon.acm.constants.CapTypEnum;
 import com.hisun.lemon.acm.dto.AccountingReqDTO;
+import com.hisun.lemon.bil.dto.CreateUserBillDTO;
+import com.hisun.lemon.bil.dto.UpdateUserBillDTO;
+import com.hisun.lemon.cmm.client.CmmServerClient;
+import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
@@ -40,6 +36,7 @@ import com.hisun.lemon.cpi.dto.RouteRspDTO;
 import com.hisun.lemon.cpi.enums.CorpBusSubTyp;
 import com.hisun.lemon.cpi.enums.CorpBusTyp;
 import com.hisun.lemon.csh.client.CshOrderClient;
+import com.hisun.lemon.csh.client.CshRefundClient;
 import com.hisun.lemon.csh.constants.CshConstants;
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.csh.dto.cashier.DirectPaymentDTO;
@@ -48,9 +45,12 @@ import com.hisun.lemon.csh.dto.order.OrderDTO;
 import com.hisun.lemon.csh.dto.payment.OfflinePaymentDTO;
 import com.hisun.lemon.csh.dto.payment.OfflinePaymentResultDTO;
 import com.hisun.lemon.csh.dto.payment.PaymentResultDTO;
+import com.hisun.lemon.csh.dto.refund.RefundOrderDTO;
+import com.hisun.lemon.csh.dto.refund.RefundOrderRspDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
+import com.hisun.lemon.framework.i18n.LocaleMessageSource;
 import com.hisun.lemon.framework.lock.DistributedLocker;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
@@ -61,16 +61,36 @@ import com.hisun.lemon.mkm.req.dto.RechargeMkmToolReqDTO;
 import com.hisun.lemon.mkm.res.dto.RechargeMkmToolResDTO;
 import com.hisun.lemon.pwm.component.AcmComponent;
 import com.hisun.lemon.pwm.constants.PwmConstants;
+import com.hisun.lemon.pwm.dto.HallOrderQueryResultDTO;
+import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
 import com.hisun.lemon.pwm.dto.HallRechargeErrorFundDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeMatchDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
+import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
+import com.hisun.lemon.pwm.dto.RechargeDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
+import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
+import com.hisun.lemon.pwm.dto.RechargeReqHCouponDTO;
+import com.hisun.lemon.pwm.dto.RechargeResultDTO;
+import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
+import com.hisun.lemon.pwm.dto.RechargeRspHCouponDTO;
+import com.hisun.lemon.pwm.dto.RemittanceUploadDTO;
+import com.hisun.lemon.pwm.dto.UserInfoRspDTO;
 import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
+import com.hisun.lemon.pwm.mq.BillSyncHandler;
+import com.hisun.lemon.pwm.mq.PaymentHandler;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
+import com.hisun.lemon.rsm.Constants;
+import com.hisun.lemon.rsm.client.RiskCheckClient;
+import com.hisun.lemon.rsm.dto.req.checkstatus.RiskCheckUserStatusReqDTO;
 import com.hisun.lemon.tfm.client.TfmServerClient;
 import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
 import com.hisun.lemon.tfm.dto.TradeRateRspDTO;
 import com.hisun.lemon.urm.client.UserBasicInfClient;
 import com.hisun.lemon.urm.dto.UserBasicInfDTO;
-import com.hisun.lemon.rsm.Constants;
 @Service
 public class RechargeOrderServiceImpl implements IRechargeOrderService {
     //短信推送
@@ -125,6 +145,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 
 	@Resource
 	BillSyncHandler billSyncHandler;
+	@Resource
+	LocaleMessageSource localeMessageSource;
+	
+	
 	/**
 	 * 查询账户信息
 	 */
@@ -204,7 +228,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		directPaymentDTO.setPayeeId(rechargeDO.getUserId());
 		directPaymentDTO.setAppCnl(LemonUtils.getApplicationName());
 		directPaymentDTO.setBusPaytype(PwmConstants.BUS_PAY_TYPE);
-		//directPaymentDTO.setGoodsDesc("海币充值");
+		Object[] args=new Object[]{hCouponAmt};
+		String descStr=getViewOrderInfo(PwmConstants.BUS_TYPE_HCOUPON,args);
+		directPaymentDTO.setGoodsDesc(descStr);
+		
 		directPaymentDTO.sethCouponAmt(0);
 		directPaymentDTO.setCashAmt(rechargeDO.getOrderAmt());
 		logger.info("订单：" + rechargeDO.getOrderNo() + " 请求收银台");
@@ -320,6 +347,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeDO.sethCouponAmt(hCouponAmt);
 		rechargeDO.setOrderNo(orderNo);
 		rechargeDO.setOrderAmt(amount);
+		Object[] args=new Object[]{hCouponAmt};
+		String descStr=getViewOrderInfo(PwmConstants.BUS_TYPE_HCOUPON,args);
 		// 交易时间
 		rechargeDO.setTxTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeDO.setTxType(rechargeDTO.getTxType());
@@ -339,7 +368,9 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 		initCashierDTO.setTxType(rechargeDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDO.getOrderAmt());
-		//initCashierDTO.setGoodsDesc("海币充值");
+		Object[] arg=new Object[]{hCouponAmt};
+		String descStrs=getViewOrderInfo(PwmConstants.BUS_TYPE_HCOUPON,arg);
+		initCashierDTO.setGoodsDesc(descStrs);
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		GenericRspDTO<CashierViewDTO> rspDTO = new GenericRspDTO<CashierViewDTO>();
@@ -1755,5 +1786,22 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
         }
 
 		return updateOrder;
+	}
+    
+    
+    /**
+	 * 国际化商品描述信息
+	 * @param busType
+	 * @param args
+	 * @return
+	 */
+	public String getViewOrderInfo(String busType,Object[] args){
+		try{
+			String key="view.orderinfo."+busType;
+			return localeMessageSource.getMessage(key,args);
+		}catch (Exception e){
+
+		}
+		return  null;
 	}
 }
