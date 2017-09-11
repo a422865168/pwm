@@ -545,15 +545,11 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	  	initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
 		initCashierDTO.setEffTm(rechargeOrderDO.getOrderExpTm());
+		//快捷充值订单信息国际化
+		Object[] args=new Object[]{rechargeOrderDO.getOrderAmt()};
+		String descStr=getViewOrderInfo(rechargeOrderDO.getBusType(),args);
 
-		String language=LemonUtils.getLocale().getLanguage();
-		if(StringUtils.isBlank(language)){
-			language="en";
-		}
-		String descFormat=LemonUtils.getProperty("pwm.recharge.onlineDesc."+language);
-		String desc=descFormat.replace("$amount$",String.valueOf(rechargeOrderDO.getOrderAmt()));
-
-		initCashierDTO.setGoodsDesc(desc);
+		initCashierDTO.setGoodsDesc(descStr);
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		logger.info("订单：" + rechargeOrderDO.getOrderNo()+" 请求收银台");
@@ -970,13 +966,10 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		initCashierDTO.setOrderCcy(PwmConstants.HALL_PAY_CCY);
 		initCashierDTO.setPayerName("");
 		initCashierDTO.setCrdCorpOrg(rechargeOrderDO.getCrdCorpOrg());
-		String language=LemonUtils.getLocale().getLanguage();
-		if(StringUtils.isBlank(language)){
-			language="en";
-		}
-		String descFormat=LemonUtils.getProperty("pwm.recharge.remitDesc."+language);
-		String desc=descFormat.replace("$amount$",String.valueOf(rechargeOrderDO.getOrderAmt()));
-		initCashierDTO.setGoodsDesc(desc);
+		//线下汇款订单信息国际化
+		Object[] args=new Object[]{rechargeOrderDO.getOrderAmt()};
+		String descStr=getViewOrderInfo(rechargeOrderDO.getBusType(),args);
+		initCashierDTO.setGoodsDesc(descStr);
 
 		GenericDTO<InitCashierDTO> genericCashierDTO = new GenericDTO<>();
 		genericCashierDTO.setBody(initCashierDTO);
@@ -1630,21 +1623,16 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
      * @param flag 1 创建账单  2 更新账单
      */
     public void synchronizeRechargeBil(RechargeOrderDO updOrderDO,int flag){
-        //获取当前语言环境
-        String language=LemonUtils.getLocale().getLanguage();
-        if(StringUtils.isBlank(language)){
-            language="en";
-        }
         switch (flag){
             case CREATE_BIL:
             	//获取国际化账单描述
-                String descFormat=LemonUtils.getProperty("pwm.recharge.hallDesc."+language);
-                String desc=descFormat.replace("$amount$",String.valueOf(updOrderDO.getOrderAmt()));
+				Object[] args=new Object[]{updOrderDO.getOrderAmt()};
+				String descStr=getViewOrderInfo(updOrderDO.getBusType(),args);
 
                 CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
                 BeanUtils.copyProperties(createUserBillDTO, updOrderDO);
 				createUserBillDTO.setTxTm(updOrderDO.getOrderTm());
-                createUserBillDTO.setGoodsInfo(desc);
+                createUserBillDTO.setGoodsInfo(descStr);
                 createUserBillDTO.setCrdPayType("3");
                 createUserBillDTO.setCrdPayAmt(updOrderDO.getOrderAmt());
                 billSyncHandler.createBill(createUserBillDTO);
@@ -1796,12 +1784,26 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 	 * @return
 	 */
 	public String getViewOrderInfo(String busType,Object[] args){
+		//国际化配置文件中key值
+		String key = "";
 		try{
-			String key="view.orderinfo."+busType;
+			String txType = "";
+			if(JudgeUtils.isNull(busType)){
+				return null;
+			}
+			txType = busType.length() <= 2 ? busType : busType.substring(2);
+			if(JudgeUtils.equals(txType,PwmConstants.TX_TYPE_HCOUPON)){
+				key="view.orderinfo."+busType;
+			}else if(JudgeUtils.equals(txType,PwmConstants.TX_TYPE_RECHANGE)) {
+				key="view.rechargeinfo."+busType;
+			}else{
+
+			}
 			return localeMessageSource.getMessage(key,args);
 		}catch (Exception e){
-
+			logger.error("获取国际化配置文件key="+key+"失败!");
 		}
 		return  null;
 	}
+
 }
