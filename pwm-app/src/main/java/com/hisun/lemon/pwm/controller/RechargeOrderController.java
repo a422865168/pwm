@@ -8,6 +8,7 @@ import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.JudgeUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.dto.*;
+import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -181,8 +182,13 @@ public class RechargeOrderController {
 	@ApiOperation(value = "充值补单", notes = "充值补单")
 	@ApiResponse(code = 200, message = "充值补单")
 	@PatchMapping(value = "/chk/error/redo")
-	public GenericRspDTO<NoBody> errRepeatHandle(@Validated @RequestBody GenericDTO<String> genericDTO) {
-		service.repeatResultHandle(genericDTO.getBody());
+	public GenericRspDTO<NoBody> errRepeatHandle(@Validated @RequestBody GenericDTO<RechargeRedoDTO> genericDTO) {
+		RechargeRedoDTO rechargeRedoDTO = genericDTO.getBody();
+		if(JudgeUtils.isNull(rechargeRedoDTO)){
+			LemonException.throwBusinessException("PWM20037");
+		}
+		String orderNo = rechargeRedoDTO.getOrderNo();
+		service.repeatResultHandle(orderNo);
 		return GenericRspDTO.newSuccessInstance();
 	}
 }

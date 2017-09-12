@@ -58,12 +58,12 @@ public interface PwmRechargeClient {
 
 
 	/**
-	 *
+	 * 充值补单
 	 * @param genericDTO
 	 * @return
 	 */
 	@PatchMapping("/pwm/recharge/chk/error/redo")
-	public GenericRspDTO<NoBody> errRepeatHandle(@Validated @RequestBody GenericDTO<String> genericDTO);
+	public GenericRspDTO<NoBody> errRepeatHandle(@Validated @RequestBody GenericDTO<RechargeRedoDTO> genericDTO);
 
 
 	/**
@@ -73,15 +73,6 @@ public interface PwmRechargeClient {
 	 */
 	@PostMapping("/pwm/recharge/hall/match")
 	public GenericRspDTO<NoBody> hallRechargeMatchHandler(@Validated @RequestBody GenericDTO<HallRechargeMatchDTO> genericDTO);
-
-
-	/**
-	 * 充值补单
-	 * @param genericDTO
-	 * @return
-	 */
-	@PatchMapping("/pwm/recharge/chk/error/hcoupon/redo")
-	public GenericRspDTO<NoBody> errHcouponRepeatHandle(@Validated @RequestBody GenericDTO<String> genericDTO);
 
 	/**
 	 * 充值撤单处理
