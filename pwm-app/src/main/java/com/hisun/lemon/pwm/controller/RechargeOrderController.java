@@ -185,12 +185,4 @@ public class RechargeOrderController {
 		service.repeatResultHandle(genericDTO.getBody());
 		return GenericRspDTO.newSuccessInstance();
 	}
-
-	@ApiOperation(value = "充海币补单", notes = "充海币补单")
-	@ApiResponse(code = 200, message = "充海币补单")
-	@PatchMapping(value = "/chk/error/hcoupon/redo")
-	public GenericRspDTO<NoBody> errHcouponRepeatHandle(@Validated @RequestBody GenericDTO<String> genericDTO) {
-		service.repeatHCouponHandle(genericDTO.getBody());
-		return GenericRspDTO.newSuccessInstance();
-	}
 }

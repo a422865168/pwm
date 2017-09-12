@@ -124,11 +124,6 @@ public interface IRechargeOrderService {
     public void rechargeRevoke(GenericDTO<RechargeRevokeDTO> genericDTO);
 
     /**
-     * 充海币长款补单
-     * @param orderNo
-     */
-    public void repeatHCouponHandle(String orderNo);
-    /**
      * 充值长款补单
      * @param orderNo
      */

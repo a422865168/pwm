@@ -394,13 +394,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				rechargSeaDTO.getOrderAmt(),rechargSeaDTO.getOrderStatus(),rechargeSeaDO );
 	}
 
-	@Override
-	public void repeatHCouponHandle(String orderNo){
-		RechargeHCouponDO rechargeSeaDO = this.service.getHCoupon(orderNo);
-		handleHCouponSuccess(orderNo,null,LemonUtils.getAccDate(),
-				rechargeSeaDO.getOrderAmt(),PwmConstants.RECHARGE_ORD_S,rechargeSeaDO);
-	}
-
 	private void handleHCouponSuccess(String orderNo,String ccy,LocalDate acDt, BigDecimal amount,String status,RechargeHCouponDO rechargeSeaDO){
 		try{
 			locker.lock(
@@ -570,13 +563,18 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		GenericRspDTO<OrderDTO> genDto=cshOrderClient.query(orderNo);
 		OrderDTO orderDTO=genDto.getBody();
 		if(JudgeUtils.isSuccess(genDto.getMsgCd())){
-			handleSuccess(PwmConstants.RECHARGE_ORD_S,null,orderDTO.getOrderAmt(),
-					orderNo,orderDTO.getBusOrderNo(),null, orderDTO.getBusType(),
-					orderDTO.getPayerId(),orderDTO.getFee(),LemonUtils.getAccDate());
+			if(StringUtils.equals(orderDTO.getBusType(),PwmConstants.BUS_TYPE_HCOUPON)){
+				RechargeHCouponDO rechargeSeaDO = this.service.getHCoupon(orderNo);
+				handleHCouponSuccess(orderNo,null,LemonUtils.getAccDate(),
+						rechargeSeaDO.getOrderAmt(),PwmConstants.RECHARGE_ORD_S,rechargeSeaDO);
+			}else{
+				handleSuccess(PwmConstants.RECHARGE_ORD_S,null,orderDTO.getOrderAmt(),
+						orderNo,orderDTO.getBusOrderNo(),null, orderDTO.getBusType(),
+						orderDTO.getPayerId(),orderDTO.getFee(),LemonUtils.getAccDate());
+			}
 		}else{
 			LemonException.throwBusinessException(genDto.getMsgCd());
 		}
-
 	}
 
 	private  void handleSuccess(String status,String ccy,BigDecimal amount,
