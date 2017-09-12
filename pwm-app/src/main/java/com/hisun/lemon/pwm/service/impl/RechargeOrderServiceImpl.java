@@ -56,7 +56,6 @@ import com.hisun.lemon.framework.lock.DistributedLocker;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.jcommon.file.FileSftpUtils;
-import com.hisun.lemon.jcommon.phonenumber.PhoneNumberUtils;
 import com.hisun.lemon.mkm.client.MarketActivityClient;
 import com.hisun.lemon.mkm.req.dto.RechargeMkmToolReqDTO;
 import com.hisun.lemon.mkm.res.dto.RechargeMkmToolResDTO;
@@ -348,8 +347,6 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		rechargeDO.sethCouponAmt(hCouponAmt);
 		rechargeDO.setOrderNo(orderNo);
 		rechargeDO.setOrderAmt(amount);
-		Object[] args=new Object[]{hCouponAmt};
-		String descStr=getViewOrderInfo(PwmConstants.BUS_TYPE_HCOUPON,args);
 		// 交易时间
 		rechargeDO.setTxTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeDO.setTxType(rechargeDTO.getTxType());
@@ -1790,7 +1787,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			if(JudgeUtils.isNull(busType)){
 				return null;
 			}
-            String txType = busType.length() <= 2 ? busType : busType.substring(2);
+            String txType =busType.substring(0, 2);
 			if(JudgeUtils.equals(txType,PwmConstants.TX_TYPE_HCOUPON)){
 				key="view.orderinfo."+busType;
 			}else if(JudgeUtils.equals(txType,PwmConstants.TX_TYPE_RECHANGE)) {
