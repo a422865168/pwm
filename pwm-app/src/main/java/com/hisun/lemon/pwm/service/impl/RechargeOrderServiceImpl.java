@@ -11,8 +11,10 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.pwm.constants.OfflineBilExtConstants;
 import com.hisun.lemon.tfm.dto.TradeFeeCaculateReqDTO;
 import com.hisun.lemon.tfm.dto.TradeFeeCaculateRspDTO;
+import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -89,8 +91,6 @@ import com.hisun.lemon.rsm.Constants;
 import com.hisun.lemon.rsm.client.RiskCheckClient;
 import com.hisun.lemon.rsm.dto.req.checkstatus.RiskCheckUserStatusReqDTO;
 import com.hisun.lemon.tfm.client.TfmServerClient;
-import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
-import com.hisun.lemon.tfm.dto.TradeRateRspDTO;
 import com.hisun.lemon.urm.client.UserBasicInfClient;
 import com.hisun.lemon.urm.dto.UserBasicInfDTO;
 @Service
@@ -996,6 +996,14 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		String descStr=getViewOrderInfo(rechargeOrderDO.getBusType(),args);
 		initCashierDTO.setGoodsDesc(descStr);
 
+		//汇款人信息填充
+		Map<String,Map<Object,Object>> extMap = new HashMap<>();
+		Map<Object,Object> dataMap = new HashedMap();
+		dataMap.put(OfflineBilExtConstants.CRD_CORP_ORG,offlineRechargeApplyDTO.getCrdCorpOrg());
+		dataMap.put(OfflineBilExtConstants.PAYEE_COMPANY,offlineRechargeApplyDTO.getRemark());
+		dataMap.put(OfflineBilExtConstants.BANK_ACCOUNT_NO,offlineRechargeApplyDTO.getBankCrdNo());
+		extMap.put(PwmConstants.BUS_TYPE_RECHARGE_OFL,dataMap);
+		initCashierDTO.setExtMap(extMap);
 		GenericDTO<InitCashierDTO> genericCashierDTO = new GenericDTO<>();
 		genericCashierDTO.setBody(initCashierDTO);
 		GenericRspDTO<CashierViewDTO> genericCashierViewDTO = cshOrderClient.initCashier(genericCashierDTO);
