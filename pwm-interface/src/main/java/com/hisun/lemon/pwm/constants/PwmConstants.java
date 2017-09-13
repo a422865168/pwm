@@ -175,6 +175,12 @@ public class PwmConstants {
 	 * 银行存款-备付金账户-XX银行
 	 */
 	public static final String AC_ITEM_DEP_ACC_BNK="1002010001";
+
+	/**
+	 * 内部科目
+	 * 手续费收入-支付账户-充值
+	 */
+	public static final String AC_ITEM_RECHARGE_FEE="6021010005";
 	
 	/**
 	 * 海币换算美元比率

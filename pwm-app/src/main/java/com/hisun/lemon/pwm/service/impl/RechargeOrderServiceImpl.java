@@ -622,12 +622,14 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 						// 账务处理,根据不同业务进行不同处理
 						AccountingReqDTO userAccountReqDTO=null;     //用户现金账户账务对象
 						AccountingReqDTO cshItemReqDTO=null;         //暂收收银台账务对象
+						AccountingReqDTO rechargeFeeReqDTO=null;     //充值手续费账务对象
 
 						//账号资金属性：1 现金 8 待结算
 						String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 						//现金账户
 						String balAcNo=acmComponent.getAcmAcNo(payerId, balCapType);
-
+						//总金额
+						BigDecimal rechargeTotalAmt = rechargeOrderDO.getOrderAmt().add(fee);
 						if(JudgeUtils.isBlank(balAcNo)){
 							throw new LemonException("PWM20022");
 						}
@@ -637,27 +639,43 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 								String tmpJrnNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_QP + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
 								// 借：其他应付款-暂收-收银台
 								cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
-										ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
+										ACMConstants.ACCOUNTING_NOMARL, rechargeTotalAmt, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
 										CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
 
 								// 贷：其他应付款-支付账户-xx用户现金账户
 								userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
 										ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
 										CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "快捷充值$"+rechargeOrderDO.getOrderAmt());
-								acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO);
+								//如果充值手续费大于0那么做手续费账务
+								if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
+									//贷：手续费收入-支付账户-充值
+									rechargeFeeReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
+											ACMConstants.ACCOUNTING_NOMARL, fee, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+											PwmConstants.AC_ITEM_RECHARGE_FEE, null, null, null, null, "快捷充值手续费$"+fee);
+								}
+								acmComponent.requestAc(cshItemReqDTO,userAccountReqDTO,rechargeFeeReqDTO);
 								break;
 							case PwmConstants.BUS_TYPE_RECHARGE_OFL:
 								String acmJrnNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_OFL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
 								// 借：其他应付款-暂收-收银台
 								cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
-										ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
+										ACMConstants.ACCOUNTING_NOMARL, rechargeTotalAmt, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
 										CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
 
 								// 贷：其他应付款-支付账户-xx用户现金账户
 								userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
 										ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
 										CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "汇款充值$"+rechargeOrderDO.getOrderAmt());
-								acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO);
+
+								//如果充值手续费大于0那么做手续费账务
+								if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
+									//贷：手续费收入-支付账户-充值
+									rechargeFeeReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
+											ACMConstants.ACCOUNTING_NOMARL, fee, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+											PwmConstants.AC_ITEM_RECHARGE_FEE, null, null, null, null, "汇款充值手续费$"+fee);
+								}
+
+								acmComponent.requestAc(userAccountReqDTO,cshItemReqDTO,rechargeFeeReqDTO);
 								break;
 							default:
 								break;
@@ -735,6 +753,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//手续费校验
 		BigDecimal applyFee = bussinessBody.getFee();
 		BigDecimal fee = caculateHallRechargeFee(orderAmt);
+		BigDecimal rechargeTotalAmt = orderAmt.add(fee);
 		if(!JudgeUtils.equals(applyFee,fee)){
 			throw new LemonException("PWM30006");
 		}
@@ -749,14 +768,14 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			throw new LemonException("PWM20022");
 		}
 		String tmpJrnNo = LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_HALL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
-
+		AccountingReqDTO rechargeFeeReqDTO=null;//充值手续费账务处理
 		//借：应收账款-渠道充值-营业厅
 		AccountingReqDTO cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
 				rechargeOrderDO.getOrderNo(),
 				tmpJrnNo,
 				PwmConstants.TX_TYPE_RECHANGE,
 				ACMConstants.ACCOUNTING_NOMARL,
-				orderAmt,
+				rechargeTotalAmt,
 				balAcNo,
 				ACMConstants.ITM_AC_TYP,
 				balCapType,
@@ -785,8 +804,15 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 				null,
 				"营业厅充值$"+rechargeOrderDO.getOrderAmt());
 
+		//如果充值手续费大于0那么做手续费账务
+		if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
+			//贷：手续费收入-支付账户-充值
+			rechargeFeeReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
+					ACMConstants.ACCOUNTING_NOMARL, fee, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+					PwmConstants.AC_ITEM_RECHARGE_FEE, null, null, null, null, "营业厅充值手续费$"+fee);
+		}
 		try{
-			acmComponent.requestAc(userAccountReqDTO,cnlRechargeHallReqDTO);
+			acmComponent.requestAc(userAccountReqDTO,cnlRechargeHallReqDTO,rechargeFeeReqDTO);
 		}catch (LemonException e){
 			//更新失败订单
 			RechargeOrderDO updateOrderDO = new RechargeOrderDO();
