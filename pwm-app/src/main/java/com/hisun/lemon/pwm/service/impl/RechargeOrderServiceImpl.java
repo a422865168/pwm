@@ -1038,6 +1038,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		offlineRechargeResultDTO.setOrderNo(rechargeOrderDO.getOrderNo());
 		offlineRechargeResultDTO.setOrderTm(DateTimeUtils.getCurrentLocalTime());
 		offlineRechargeResultDTO.setCashierOrderNo(cashierViewDTO.getOrderNo());
+        offlineRechargeResultDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_OFL);
 		if(JudgeUtils.isNotNull(userBasicInfDTO)){
 			offlineRechargeResultDTO.setMblNo(userBasicInfDTO.getMblNo());
 		}

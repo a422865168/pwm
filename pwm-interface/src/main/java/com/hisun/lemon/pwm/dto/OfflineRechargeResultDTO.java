@@ -89,6 +89,9 @@ public class OfflineRechargeResultDTO {
 	@ApiModelProperty(name = "mblNo", value = "用户手机号")
 	private String mblNo;
 
+	@ApiModelProperty(name = "busType", value = "业务类型")
+	private String busType;
+
 
 	public BigDecimal getAmount() {
 		return amount;
@@ -176,5 +179,13 @@ public class OfflineRechargeResultDTO {
 
 	public void setMblNo(String mblNo) {
 		this.mblNo = mblNo;
+	}
+
+	public String getBusType() {
+		return busType;
+	}
+
+	public void setBusType(String busType) {
+		this.busType = busType;
 	}
 }
