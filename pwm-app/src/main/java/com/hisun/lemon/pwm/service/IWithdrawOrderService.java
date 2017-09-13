@@ -31,7 +31,7 @@ public interface IWithdrawOrderService {
      * 查询交易费率
      * @param withdrawRateDTO
      */
-    public GenericRspDTO<WithdrawResultDTO> queryRate(WithdrawRateDTO withdrawRateDTO);
+    public GenericRspDTO<WithdrawRateResultDTO> queryRate(WithdrawRateDTO withdrawRateDTO);
 
     /**
      * 查询提现银行

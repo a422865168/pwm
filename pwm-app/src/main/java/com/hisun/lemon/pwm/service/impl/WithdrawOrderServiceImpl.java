@@ -388,7 +388,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
      * @return
      */
     @Override
-    public GenericRspDTO<WithdrawResultDTO> queryRate(WithdrawRateDTO withdrawRateDTO) {
+    public GenericRspDTO<WithdrawRateResultDTO> queryRate(WithdrawRateDTO withdrawRateDTO) {
 
         TradeRateReqDTO tradeRateReqDTO = new TradeRateReqDTO();
         BeanUtils.copyProperties(tradeRateReqDTO, withdrawRateDTO);
