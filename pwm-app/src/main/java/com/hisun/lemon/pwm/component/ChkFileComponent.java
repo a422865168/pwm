@@ -106,7 +106,9 @@ public class ChkFileComponent {
 			BaseDO rec=(BaseDO)datas.get(i);
 			if(rec instanceof RechargeOrderDO){
 				contextBuilder.append(recToLine((RechargeOrderDO)rec));
-			}else{
+			}else if(rec instanceof WithdrawOrderDO){
+                contextBuilder.append(recToWithdrawLine((WithdrawOrderDO)rec));
+            }else{
 				if(rec instanceof RechargeHCouponDO){
 					contextBuilder.append(recToHLine((RechargeHCouponDO)rec));
 				}
@@ -215,6 +217,21 @@ public class ChkFileComponent {
 		lineBuilder.append("|");
 		lineBuilder.append(rec.getOrderStatus());
 		lineBuilder.append("|");
+		lineBuilder.append(rec.getAcTm());
+		lineBuilder.append("\n");
+		return lineBuilder;
+	}
+
+	private StringBuilder recToWithdrawLine(WithdrawOrderDO rec){
+		StringBuilder lineBuilder=new StringBuilder();
+		lineBuilder.append(rec.getOrderNo());
+		lineBuilder.append("|");
+		lineBuilder.append(rec.getWcApplyAmt());
+		lineBuilder.append("|");
+		lineBuilder.append(rec.getOrderStatus());
+		lineBuilder.append("|");
+        lineBuilder.append(rec.getRspOrderNo());
+        lineBuilder.append("|");
 		lineBuilder.append(rec.getAcTm());
 		lineBuilder.append("\n");
 		return lineBuilder;

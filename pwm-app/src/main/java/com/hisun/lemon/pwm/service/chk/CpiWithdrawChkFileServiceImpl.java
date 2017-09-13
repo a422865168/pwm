@@ -17,8 +17,8 @@ public class CpiWithdrawChkFileServiceImpl extends AbstractChkFileService {
         this.chkOrderStatus=new String[]{
                 PwmConstants.WITHDRAW_ORD_S1
         };
-        appCnl="CPI";
-        this.lockName="PWM_CPI_CHK_FILE_LOCK";
+        appCnl="CPO";
+        this.lockName="PWM_CPO_CHK_FILE_LOCK";
     }
 
     @Transactional(readOnly = true)
