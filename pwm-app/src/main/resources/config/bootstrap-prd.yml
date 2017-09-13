@@ -1,0 +1,13 @@
+spring :
+  application :
+    name : PWM
+    
+server :
+  port : 9018
+  
+eureka :
+  client :
+    serviceUrl :
+      defaultZone : http://172.22.181.72:9002/eureka/,http://172.22.181.73:9002/eureka/
+  instance :
+    preferIpAddress : true

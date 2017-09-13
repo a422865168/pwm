@@ -284,6 +284,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
         CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
         BeanUtils.copyProperties(createUserBillDTO, withdrawOrderDO);
         createUserBillDTO.setTxTm(withdrawOrderDO.getOrderTm());
+        createUserBillDTO.setOrderChannel(withdrawOrderDO.getBusCnl());
         createUserBillDTO.setPayerId(withdrawOrderDO.getUserId());
         createUserBillDTO.setOrderAmt(withdrawOrderDO.getWcApplyAmt());
         createUserBillDTO.setFee(withdrawOrderDO.getFeeAmt());
@@ -387,7 +388,7 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
      * @return
      */
     @Override
-    public GenericRspDTO<WithdrawResultDTO> queryRate(WithdrawRateDTO withdrawRateDTO) {
+    public GenericRspDTO<WithdrawRateResultDTO> queryRate(WithdrawRateDTO withdrawRateDTO) {
 
         TradeRateReqDTO tradeRateReqDTO = new TradeRateReqDTO();
         BeanUtils.copyProperties(tradeRateReqDTO, withdrawRateDTO);
