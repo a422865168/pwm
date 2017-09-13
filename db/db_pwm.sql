@@ -296,7 +296,7 @@ values ('PWM20037','zh','充值长款补单请求数据为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30001','zh','该用户为黑名单!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM30002','zh','提现余额加手续费大于用户账户余额!',now(),now());
+values ('PWM30002','zh','提现金额加手续费大于用户账户余额!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM30003','zh','支付密码错误次数超过5次!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
