@@ -756,7 +756,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		BigDecimal applyFee = bussinessBody.getFee();
 		BigDecimal fee = caculateHallRechargeFee(orderAmt);
 		BigDecimal rechargeTotalAmt = orderAmt.add(fee);
-		if(!JudgeUtils.equals(applyFee,fee)){
+		if(applyFee.compareTo(fee) != 0){
 			throw new LemonException("PWM30006");
 		}
 
@@ -879,6 +879,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 			String balAcNo=acmComponent.getAcmAcNo(busBody.getPayerId(), balCapType);
 			String tmpJrnNo =  LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_HALL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
+			AccountingReqDTO rechargeFeeReqDTO = null;
 			//营业厅撤销账务处理
 			//借：其他应付款-支付账户-现金账户
 			AccountingReqDTO cshItemReqDTO=acmComponent.createAccountingReqDTO(
@@ -898,13 +899,23 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					null,
 					"营业厅撤销$"+rechargeOrderDO.getOrderAmt());
 
+			BigDecimal fee = rechargeOrderDO.getFee();
+			BigDecimal totalAmt = rechargeOrderDO.getOrderAmt().add(fee);
+			//如果充值手续费大于0那么做手续费账务
+			if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
+				//借：手续费收入-支付账户-充值
+				rechargeFeeReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
+						ACMConstants.ACCOUNTING_NOMARL, fee, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
+						PwmConstants.AC_ITEM_RECHARGE_FEE, null, null, null, null, "营业厅冲正手续费$"+fee);
+			}
+
 			//贷：应收账款-渠道充值-营业厅
 			AccountingReqDTO cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
 					rechargeOrderDO.getOrderNo(),
 					tmpJrnNo,
 					rechargeOrderDO.getTxType(),
 					ACMConstants.ACCOUNTING_NOMARL,
-					rechargeOrderDO.getOrderAmt(),
+					totalAmt,
 					null,
 					ACMConstants.ITM_AC_TYP,
 					balCapType,
@@ -916,7 +927,7 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 					null,
 					null);
 
-			acmComponent.requestAc(cshItemReqDTO,cnlRechargeHallReqDTO);
+			acmComponent.requestAc(cshItemReqDTO,cnlRechargeHallReqDTO,rechargeFeeReqDTO);
 		}
 
 		//更新订单状态
