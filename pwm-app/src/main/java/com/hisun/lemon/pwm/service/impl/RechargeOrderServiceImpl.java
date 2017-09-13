@@ -11,6 +11,8 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.tfm.dto.TradeFeeCaculateReqDTO;
+import com.hisun.lemon.tfm.dto.TradeFeeCaculateRspDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
@@ -1715,17 +1717,24 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
     	if(JudgeUtils.isNull(orderAmt)){
     		throw new LemonException("PWM10006");
 		}
-		TradeRateReqDTO tradeFeeReqDTO = new TradeRateReqDTO();
-		tradeFeeReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
-		tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
-		GenericDTO<TradeRateReqDTO> genericTradeRateReqDTO = new GenericDTO<>();
-		genericTradeRateReqDTO.setBody(tradeFeeReqDTO);
+        TradeFeeCaculateReqDTO tradeFeeCaculateReqDTO = new TradeFeeCaculateReqDTO();
+        tradeFeeCaculateReqDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
+        tradeFeeCaculateReqDTO.setCcy(PwmConstants.HALL_PAY_CCY);
+        tradeFeeCaculateReqDTO.setTradeAmt(orderAmt);
 
-		GenericRspDTO<TradeRateRspDTO> genericTradeFeeRspDTO = fmServerClient.tradeRate(genericTradeRateReqDTO);
-		TradeRateRspDTO tradeRateRspDTO = genericTradeFeeRspDTO.getBody();
-		//费率
-		BigDecimal tradeFee = tradeRateRspDTO.getRate();
-		return orderAmt.multiply(tradeFee).setScale(2,BigDecimal.ROUND_HALF_UP);
+		GenericDTO<TradeFeeCaculateReqDTO> genericTradeFeeCaculateReqDTO = new GenericDTO<>();
+        genericTradeFeeCaculateReqDTO.setBody(tradeFeeCaculateReqDTO);
+
+        GenericRspDTO<TradeFeeCaculateRspDTO> tradeFeeCaculateResult = fmServerClient.tradeFeeCaculate(genericTradeFeeCaculateReqDTO);
+
+        if(JudgeUtils.isNotSuccess(tradeFeeCaculateResult.getMsgCd())){
+            LemonException.throwBusinessException(tradeFeeCaculateResult.getMsgCd());
+        }
+        TradeFeeCaculateRspDTO tradeFeeCaculateRspDTO = tradeFeeCaculateResult.getBody();
+        if(JudgeUtils.isNotNull(tradeFeeCaculateRspDTO)){
+            return tradeFeeCaculateRspDTO.getTradeFee();
+        }
+        return null;
 	}
 
 	/**
