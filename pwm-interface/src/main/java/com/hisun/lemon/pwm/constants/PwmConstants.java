@@ -323,5 +323,15 @@ public class PwmConstants {
 	 * 对账差错处理结果：失败(F)
 	 */
 	public static final String CHK_ERR_FAIL="F";
-	
+
+	/**
+	 * 手续费类型：IN内扣
+	 */
+	public static final String FEE_IN="IN";
+
+	/**
+	 * 手续费类型：EX外扣
+	 */
+	public static final String FEE_EX="EX";
+
 }
