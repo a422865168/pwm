@@ -133,6 +133,9 @@ public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
 		if(JudgeUtils.equals("RSM30002", genericRspDTO.getMsgCd())){
 			LemonException.throwBusinessException("PWM30001");
 		}
+        if(!JudgeUtils.equals("RSM00000", genericRspDTO.getMsgCd())){
+            LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+        }
 
         //填充查询手续费数据
         TradeFeeReqDTO tradeFeeReqDTO = new TradeFeeReqDTO();
