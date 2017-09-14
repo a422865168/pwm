@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.service.impl;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.framework.service.BaseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,7 @@ import com.hisun.lemon.pwm.entity.RechargeOrderDO;
  */
 @Transactional
 @Service
-public class RechargeOrderTransactionalService {
+public class RechargeOrderTransactionalService extends BaseService {
 
 	@Resource
 	private IRechargeOrderDao rechangeOrderDao;

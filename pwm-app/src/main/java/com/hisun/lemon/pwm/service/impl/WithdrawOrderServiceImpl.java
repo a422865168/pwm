@@ -24,6 +24,7 @@ import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.framework.i18n.LocaleMessageSource;
+import com.hisun.lemon.framework.service.BaseService;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.jcommon.encrypt.EncryptionUtils;
@@ -62,7 +63,7 @@ import java.util.Map;
 
 @Transactional
 @Service("withdrawOrderService")
-public class WithdrawOrderServiceImpl implements IWithdrawOrderService {
+public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOrderService {
     private static final Logger logger = LoggerFactory.getLogger(WithdrawOrderServiceImpl.class);
 
 	@Resource

@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.controller;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.framework.controller.BaseController;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.pwm.dto.*;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ import java.util.List;
 @Api(value = "处理提现")
 @RestController
 @RequestMapping(value = "/pwm/withdraw")
-public class WithdrawOrderController {
+public class WithdrawOrderController  extends BaseController {
 	private static final Logger logger = LoggerFactory.getLogger(WithdrawOrderController.class);
 
 	@Resource
