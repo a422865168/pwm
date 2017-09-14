@@ -58,4 +58,11 @@ public interface IWithdrawOrderService {
      * @return
      */
     public GenericRspDTO delCard(GenericDTO<WithdrawCardDelDTO> genericWithdrawCardDelDTO);
+
+    /**
+     * 提现差错处理
+     * @param genericWithdrawErrorHandleDTO
+     * @return
+     */
+    public GenericRspDTO withdrawErrorHandler(GenericDTO<WithdrawErrorHandleDTO> genericWithdrawErrorHandleDTO);
 }

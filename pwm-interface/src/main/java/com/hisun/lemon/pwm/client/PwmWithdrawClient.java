@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.client;
 
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.pwm.dto.WithdrawDTO;
+import com.hisun.lemon.pwm.dto.WithdrawErrorHandleDTO;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,4 +27,7 @@ public interface PwmWithdrawClient {
 
     @PatchMapping("/pwm/withdraw/result")
     public GenericRspDTO completeOrder(@Validated @RequestBody GenericDTO<WithdrawResultDTO> withdrawResultDTO);
+
+    @PostMapping("/pwm/withdraw/chk/error/handle")
+    public GenericRspDTO withdrawErrorHandler(@Validated @RequestBody GenericDTO<WithdrawErrorHandleDTO> genericWithdrawErrorHandleDTO);
 }

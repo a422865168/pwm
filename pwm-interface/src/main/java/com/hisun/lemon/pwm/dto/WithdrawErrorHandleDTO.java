@@ -20,20 +20,10 @@ public class WithdrawErrorHandleDTO {
     @Length(max = 28)
     private  String orderNo;
 
-    @ApiModelProperty(name = "chkOrderNo", value = "对账差错处理主键")
+    @ApiModelProperty(name = "chkBusSubTyp", value = "对账业务子类型")
     @NotEmpty
-    @Length(max = 32)
-    private  String chkErrId;
-
-    @ApiModelProperty(name = "orderStatus", value = "处理状态：(成功:S1|失败:F1)")
-    @NotEmpty
-    private String orderStatus;
-
-    @ApiModelProperty(name = "chkOrdDt", value = "对账处理时间")
-    private LocalDate chkOrdDt;
-
-    @ApiModelProperty(name = "remark", value = "备注信息")
-    private String remark;
+    @Length(max = 4)
+    private  String chkBusSubTyp;
 
     public String getOrderNo() {
         return orderNo;
@@ -43,35 +33,11 @@ public class WithdrawErrorHandleDTO {
         this.orderNo = orderNo;
     }
 
-    public String getOrderStatus() {
-        return orderStatus;
+    public String getChkBusSubTyp() {
+        return chkBusSubTyp;
     }
 
-    public void setOrderStatus(String orderStatus) {
-        this.orderStatus = orderStatus;
-    }
-
-    public LocalDate getChkOrdDt() {
-        return chkOrdDt;
-    }
-
-    public void setChkOrdDt(LocalDate chkOrdDt) {
-        this.chkOrdDt = chkOrdDt;
-    }
-
-    public String getChkErrId() {
-        return chkErrId;
-    }
-
-    public void setChkErrId(String chkErrId) {
-        this.chkErrId = chkErrId;
-    }
-
-    public String getRemark() {
-        return remark;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public void setChkBusSubTyp(String chkBusSubTyp) {
+        this.chkBusSubTyp = chkBusSubTyp;
     }
 }
