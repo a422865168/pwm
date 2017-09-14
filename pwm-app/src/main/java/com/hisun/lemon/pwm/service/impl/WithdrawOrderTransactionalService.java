@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.service.impl;
 
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.JudgeUtils;
+import com.hisun.lemon.framework.service.BaseService;
 import com.hisun.lemon.pwm.dao.IWithdrawCardBindDao;
 import com.hisun.lemon.pwm.dao.IWithdrawOrderDao;
 import com.hisun.lemon.pwm.entity.WithdrawCardBindDO;
@@ -20,7 +21,7 @@ import javax.annotation.Resource;
  */
 @Transactional
 @Service
-public class WithdrawOrderTransactionalService {
+public class WithdrawOrderTransactionalService extends BaseService {
 
     @Resource
     private IWithdrawOrderDao withdrawOrderDao;

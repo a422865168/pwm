@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.service.chk;
 
 import com.hisun.lemon.framework.data.BaseDO;
 import com.hisun.lemon.framework.lock.DistributedLocker;
+import com.hisun.lemon.framework.service.BaseService;
 import com.hisun.lemon.pwm.component.ChkFileComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,7 @@ import java.util.concurrent.Callable;
  * @time 下午2:54:28
  *
  */
-public abstract class AbstractChkFileService implements Callable {
+public abstract class AbstractChkFileService extends BaseService implements Callable {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractChkFileService.class);
 
     @Resource

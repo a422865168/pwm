@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.JudgeUtils;
+import com.hisun.lemon.framework.controller.BaseController;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.dto.*;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
@@ -34,7 +35,7 @@ import io.swagger.annotations.ApiResponse;
 @Api(value = "处理充值")
 @RestController
 @RequestMapping(value = "/pwm/recharge")
-public class RechargeOrderController {
+public class RechargeOrderController extends BaseController{
 
 	@Resource
 	IRechargeOrderService service;

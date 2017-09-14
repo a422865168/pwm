@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.framework.service.BaseService;
 import com.hisun.lemon.pwm.constants.OfflineBilExtConstants;
 import com.hisun.lemon.tfm.dto.TradeFeeCaculateReqDTO;
 import com.hisun.lemon.tfm.dto.TradeFeeCaculateRspDTO;
@@ -94,7 +95,7 @@ import com.hisun.lemon.tfm.client.TfmServerClient;
 import com.hisun.lemon.urm.client.UserBasicInfClient;
 import com.hisun.lemon.urm.dto.UserBasicInfDTO;
 @Service
-public class RechargeOrderServiceImpl implements IRechargeOrderService {
+public class RechargeOrderServiceImpl extends BaseService implements IRechargeOrderService {
     //短信推送
     public static final int RECHARGE_SUCCESS=1;
     public static final int RECHARGE_OFFLINE_BACK=2;
