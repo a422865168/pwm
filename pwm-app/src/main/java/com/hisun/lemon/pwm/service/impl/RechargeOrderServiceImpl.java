@@ -547,7 +547,19 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		logger.info("订单：" + rechargeOrderDO.getOrderNo()+" 请求收银台");
-		return cshOrderClient.initCashier(genericDTO);
+		GenericRspDTO<CashierViewDTO> genericCashierViewRspDTO = cshOrderClient.initCashier(genericDTO);
+		if(JudgeUtils.isNotSuccess(genericCashierViewRspDTO.getMsgCd())){
+			LemonException.throwBusinessException(genericCashierViewRspDTO.getMsgCd());
+		}
+		CashierViewDTO cashierViewDTO = genericCashierViewRspDTO.getBody();
+		//更新充值订单信息
+		RechargeOrderDO updateDO = new RechargeOrderDO();
+		updateDO.setOrderNo(rechargeOrderDO.getOrderNo());
+		updateDO.setFee(cashierViewDTO.getFeeAmt());
+		updateDO.setFeeFlag(cashierViewDTO.getFeeFlag());
+		updateDO.setExtOrderNo(cashierViewDTO.getOrderNo());
+		service.updateOrder(updateDO);
+		return genericCashierViewRspDTO;
 	}
 
 	@Override
@@ -1030,6 +1042,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			LemonException.throwBusinessException(genericCashierViewDTO.getMsgCd());
 		}
 		//更新充值订单的收银业务订单号
+		rechargeOrderDO.setFeeFlag(cashierViewDTO.getFeeFlag());
 		rechargeOrderDO.setExtOrderNo(cashierViewDTO.getOrderNo());
 		rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 		this.service.updateOrder(rechargeOrderDO);

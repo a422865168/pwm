@@ -88,6 +88,11 @@ public class RechargeOrderDO extends BaseDO {
      * @Fields crdCorpOrg  资金机构
      */
     private String crdCorpOrg;
+
+    /**
+     * @Fields feeFlag  手续费类型  IN 内扣 EX 外扣
+     */
+    private String feeFlag;
   
 
     public String getOrderNo() {
@@ -249,5 +254,13 @@ public class RechargeOrderDO extends BaseDO {
 
     public void setPayerId(String payerId) {
         this.payerId = payerId;
+    }
+
+    public String getFeeFlag() {
+        return feeFlag;
+    }
+
+    public void setFeeFlag(String feeFlag) {
+        this.feeFlag = feeFlag;
     }
 }

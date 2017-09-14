@@ -23,6 +23,7 @@
         <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
         <result column="corp_org" property="crdCorpOrg" jdbcType="VARCHAR" />
         <result column="fee" property="fee" jdbcType="DECIMAL" />
+        <result column="fee_flag" property="feeFlag" jdbcType="VARCHAR" />
         <result column="hall_order_no" property="hallOrderNo" jdbcType="VARCHAR" />
         <result column="payer_id" property="payerId" jdbcType="VARCHAR" />
     </resultMap>
@@ -30,7 +31,7 @@
     <sql id="Base_Column_List" >
         order_no, order_tm, ac_tm, tx_type, bus_type, order_ccy, order_amt, order_status, 
         order_succ_tm, psn_flag, order_exp_tm, sys_channel, ip_address, remark,ext_order_no, modify_opr,
-        create_time, modify_time,corp_org,fee,hall_order_no,payer_id
+        create_time, modify_time,corp_org,fee,hall_order_no,payer_id,fee_flag
     </sql>
 
     <select id="get" resultMap="BaseResultMap" parameterType="java.lang.String" >
@@ -114,6 +115,9 @@
             <if test="payerId != null" >
                 payer_id,
             </if>
+            <if test="feeFlag != null" >
+                fee_flag,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="orderNo != null" >
@@ -182,6 +186,9 @@
             <if test="payerId != null" >
                 #{payerId,jdbcType=VARCHAR},
             </if>
+            <if test="feeFlag != null" >
+                #{feeFlag,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
 
@@ -247,6 +254,9 @@
             </if>
             <if test="payerId != null" >
                 payer_id = #{payerId,jdbcType=VARCHAR},
+            </if>
+            <if test="feeFlag != null" >
+                fee_flag = #{feeFlag,jdbcType=VARCHAR},
             </if>
         </set>
         where order_no = #{orderNo,jdbcType=VARCHAR}
