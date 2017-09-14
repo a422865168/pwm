@@ -26,7 +26,7 @@ public class CpiWithdrawChkFileServiceImpl extends AbstractChkFileService {
         //获取对账日期
         LocalDate chkDate=chkFileComponent.getChkDate();
         //对账文件名
-        String  chkFileName=chkFileComponent.getChkFileName(appCnl,chkDate);
+        String chkFileName=chkFileComponent.getChkFileName(appCnl,chkDate);
         //标志文件名
         String flagName=chkFileName+".flag";
         if(chkFileComponent.isStart(appCnl,flagName)){
@@ -39,6 +39,30 @@ public class CpiWithdrawChkFileServiceImpl extends AbstractChkFileService {
         //读取数据
         List<WithdrawOrderDO> orders=chkFileComponent.queryWithdraws(chkDate,chkOrderStatus);
 
+        //生成文件
+        chkFileComponent.writeToFile(appCnl,orders,chkFileName);
+        logger.info("生成对账文件"+flagName+"完成，开始上传至SFTP");
+
+        //上传服务器
+        chkFileComponent.upload(appCnl, chkFileName, flagName);
+        logger.info("对账文件"+flagName+"上传至SFTP完成");
+
+        //生成失败的对账文件
+        appCnl = appCnl+"_F1";
+        String chkFileName_F1=chkFileComponent.getChkFileName(appCnl,chkDate);
+        flagName=chkFileName_F1+".flag";
+        if(chkFileComponent.isStart(appCnl,flagName)){
+            logger.info("对账文件标志文件" +flagName+"已经存在,不重复生成对账文件");
+            return;
+        }
+        logger.info("开始生成对账文件：" +flagName);
+        //生成标志文件
+        chkFileComponent.createFlagFile(appCnl,flagName);
+        //读取数据
+        this.chkOrderStatus=new String[]{
+                PwmConstants.WITHDRAW_ORD_F1
+        };
+        orders=chkFileComponent.queryWithdraws(chkDate,chkOrderStatus);
 
         //生成文件
         chkFileComponent.writeToFile(appCnl,orders,chkFileName);
