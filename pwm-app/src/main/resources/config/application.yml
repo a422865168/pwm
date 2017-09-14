@@ -1,7 +1,7 @@
 spring :
   redis :
     database : 0
-    host : 192.168.1.39
+    host : 192.168.3.39
     port : 6379
     password : Hisunpay2017
     pool : 
@@ -43,7 +43,7 @@ spring :
       provider : org.ehcache.jsr107.EhcacheCachingProvider
   #see rabbitProperties
   rabbitmq :
-    addresses : 192.168.1.38:5672
+    addresses : 192.168.3.38:5672
     virtualHost : /lemon
     username : rabbitmq
     password : Rabbitmq123
@@ -185,7 +185,7 @@ lemon :
   redisson :
     enabled : true
     mode : single
-    address : 192.168.1.39:6379
+    address : 192.168.3.39:6379
     password : Hisunpay2017
     poolSize : 30
     idleSize : 5
@@ -307,13 +307,13 @@ pwm :
     HALLKEY : PWM123456789002
     #营业厅ftp服务器配置
     hall-sftp:
-       ip: 192.168.1.38
+       ip: 192.168.3.38
        port: 22
        name: payment
        password: Hisunpay2017
        connectTimeout: 120000
   sftp :
-    ip : 192.168.1.38
+    ip : 192.168.3.38
     port : 22
     name : payment
     password : Hisunpay2017
