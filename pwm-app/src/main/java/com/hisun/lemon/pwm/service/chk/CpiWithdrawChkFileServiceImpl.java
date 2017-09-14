@@ -50,14 +50,14 @@ public class CpiWithdrawChkFileServiceImpl extends AbstractChkFileService {
         //生成失败的对账文件
         appCnl = appCnl+"_F1";
         String chkFileName_F1=chkFileComponent.getChkFileName(appCnl,chkDate);
-        flagName=chkFileName_F1+".flag";
-        if(chkFileComponent.isStart(appCnl,flagName)){
-            logger.info("对账文件标志文件" +flagName+"已经存在,不重复生成对账文件");
+        String flagName_F1=chkFileName_F1+".flag";
+        if(chkFileComponent.isStart(appCnl,flagName_F1)){
+            logger.info("对账文件标志文件" +flagName_F1+"已经存在,不重复生成对账文件");
             return;
         }
-        logger.info("开始生成对账文件：" +flagName);
+        logger.info("开始生成对账文件：" +flagName_F1);
         //生成标志文件
-        chkFileComponent.createFlagFile(appCnl,flagName);
+        chkFileComponent.createFlagFile(appCnl,flagName_F1);
         //读取数据
         this.chkOrderStatus=new String[]{
                 PwmConstants.WITHDRAW_ORD_F1
@@ -65,11 +65,11 @@ public class CpiWithdrawChkFileServiceImpl extends AbstractChkFileService {
         orders=chkFileComponent.queryWithdraws(chkDate,chkOrderStatus);
 
         //生成文件
-        chkFileComponent.writeToFile(appCnl,orders,chkFileName);
-        logger.info("生成对账文件"+flagName+"完成，开始上传至SFTP");
+        chkFileComponent.writeToFile(appCnl,orders,chkFileName_F1);
+        logger.info("生成对账文件"+flagName_F1+"完成，开始上传至SFTP");
 
         //上传服务器
-        chkFileComponent.upload(appCnl, chkFileName, flagName);
-        logger.info("对账文件"+flagName+"上传至SFTP完成");
+        chkFileComponent.upload(appCnl, chkFileName_F1, flagName_F1);
+        logger.info("对账文件"+flagName_F1+"上传至SFTP完成");
     }
 }
