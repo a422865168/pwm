@@ -19,6 +19,7 @@ dependencies {
     compile("com.hisun:bil-interface")
     compile("com.hisun:jcommon")
     compile("com.hisun:cmm-interface")
+    compile("com.hisun:lemon-framework-lock")
 }
 
 mainClassName = 'com.hisun.lemon.Application'
