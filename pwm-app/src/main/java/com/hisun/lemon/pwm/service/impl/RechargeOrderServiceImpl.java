@@ -643,8 +643,22 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 						String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 						//现金账户
 						String balAcNo=acmComponent.getAcmAcNo(payerId, balCapType);
+						//手续费扣费类型
+						String feeFlag = rechargeOrderDO.getFeeFlag();
 						//总金额
-						BigDecimal rechargeTotalAmt = rechargeOrderDO.getOrderAmt().add(fee);
+						BigDecimal rechargeTotalAmt = rechargeOrderDO.getOrderAmt();
+						//用户账户金额
+						BigDecimal userAmt = rechargeOrderDO.getOrderAmt();
+						if(JudgeUtils.equals(feeFlag,"EX")){
+							//总金额为充值订单金额加上手续费
+							rechargeTotalAmt = rechargeOrderDO.getOrderAmt().add(fee);
+						}else if(JudgeUtils.equals(feeFlag,"IN")){
+							//用户账户金额为充值订单金额减去手续费
+							userAmt = rechargeTotalAmt.subtract(fee);
+						}else{
+
+						}
+
 						if(JudgeUtils.isBlank(balAcNo)){
 							throw new LemonException("PWM20022");
 						}
@@ -659,7 +673,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 								// 贷：其他应付款-支付账户-xx用户现金账户
 								userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
-										ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+										ACMConstants.ACCOUNTING_NOMARL, userAmt, balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
 										CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "快捷充值$"+rechargeOrderDO.getOrderAmt());
 								//如果充值手续费大于0那么做手续费账务
 								if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
@@ -679,7 +693,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 								// 贷：其他应付款-支付账户-xx用户现金账户
 								userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
-										ACMConstants.ACCOUNTING_NOMARL, rechargeOrderDO.getOrderAmt(), balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+										ACMConstants.ACCOUNTING_NOMARL, userAmt, balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
 										CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "汇款充值$"+rechargeOrderDO.getOrderAmt());
 
 								//如果充值手续费大于0那么做手续费账务
@@ -768,14 +782,21 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		//手续费校验
 		BigDecimal applyFee = bussinessBody.getFee();
 		BigDecimal fee = caculateHallRechargeFee(orderAmt);
-		BigDecimal rechargeTotalAmt = orderAmt.add(fee);
 		if(applyFee.compareTo(fee) != 0){
 			throw new LemonException("PWM30006");
 		}
 
+
 		// 生成充值订单
 		RechargeOrderDO rechargeOrderDO = createHallRechargeOrder(bussinessBody);
-
+		BigDecimal rechargeTotalAmt = orderAmt;
+		BigDecimal userAmt = orderAmt;
+		String feeFlag = rechargeOrderDO.getFeeFlag();
+		if(JudgeUtils.equals(feeFlag,PwmConstants.FEE_EX)){
+			rechargeTotalAmt = rechargeTotalAmt.add(fee);
+		}else if(JudgeUtils.equals(feeFlag,PwmConstants.FEE_IN)){
+			userAmt = rechargeTotalAmt.subtract(fee);
+		}
 		//个人账户查询
 		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 		String balAcNo=acmComponent.getAcmAcNo(bussinessBody.getPayerId(), balCapType);
@@ -807,7 +828,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				tmpJrnNo,
 				PwmConstants.TX_TYPE_RECHANGE,
 				ACMConstants.ACCOUNTING_NOMARL,
-				orderAmt,
+				userAmt,
 				balAcNo,
 				ACMConstants.USER_AC_TYP,
 				balCapType,
@@ -1737,6 +1758,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		rechargeOrderDO.setPayerId(busBody.getPayerId());
 		rechargeOrderDO.setHallOrderNo(busBody.getHallOrderNo());
 		rechargeOrderDO.setFee(busBody.getFee());
+		rechargeOrderDO.setFeeFlag(PwmConstants.FEE_IN);
 		this.service.initOrder(rechargeOrderDO);
 
 		return rechargeOrderDO;
