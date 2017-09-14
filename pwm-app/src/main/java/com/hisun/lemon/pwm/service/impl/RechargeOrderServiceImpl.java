@@ -1010,8 +1010,8 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 		//汇款人信息填充
 		Map<String,Map<Object,Object>> extMap = new HashMap<>();
 		Map<Object,Object> dataMap = new HashedMap();
-		dataMap.put(OfflineBilExtConstants.CRD_CORP_ORG,offlineRechargeApplyDTO.getCrdCorpOrg());
-		dataMap.put(OfflineBilExtConstants.PAYEE_COMPANY,offlineRechargeApplyDTO.getRemark());
+		dataMap.put(OfflineBilExtConstants.CRD_CORP_ORG,getViewOrderInfo(rechargeOrderDO.getBusType(),new Object[]{offlineRechargeApplyDTO.getCrdCorpOrg(),"ACCNM"}));
+		dataMap.put(OfflineBilExtConstants.PAYEE_COMPANY,getViewOrderInfo(rechargeOrderDO.getBusType(),new Object[]{offlineRechargeApplyDTO.getCrdCorpOrg(),"REMARK"}));
 		dataMap.put(OfflineBilExtConstants.BANK_ACCOUNT_NO,offlineRechargeApplyDTO.getBankCrdNo());
 		extMap.put(PwmConstants.BUS_TYPE_RECHARGE_OFL,dataMap);
 		initCashierDTO.setExtMap(extMap);
@@ -1842,11 +1842,15 @@ public class RechargeOrderServiceImpl implements IRechargeOrderService {
 			if(JudgeUtils.isNull(busType)){
 				return null;
 			}
-            String txType =busType.substring(0, 2);
-			if(JudgeUtils.equals(txType,PwmConstants.TX_TYPE_HCOUPON)){
+			if(busType.startsWith(PwmConstants.TX_TYPE_HCOUPON)){
 				key="view.orderinfo."+busType;
-			}else if(JudgeUtils.equals(txType,PwmConstants.TX_TYPE_RECHANGE)) {
+			}else if(busType.startsWith(PwmConstants.TX_TYPE_RECHANGE)) {
 				key="view.rechargeinfo."+busType;
+				if(args.length > 1 && JudgeUtils.equals(busType,PwmConstants.BUS_TYPE_RECHARGE_OFL)){
+					final String seperator = ".";
+					key=key+seperator+args[1]+seperator+args[2];
+					return  localeMessageSource.getMessage(key);
+				}
 			}else{
 
 			}
