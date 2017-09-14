@@ -4,6 +4,7 @@ import javax.annotation.Resource;
 
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.pwm.dto.*;
+import io.swagger.annotations.ApiImplicitParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
@@ -35,6 +36,7 @@ public class WithdrawOrderController {
 	 * @param genericWithdrawDTO
 	 */
 	@ApiOperation(value = "申请提现", notes = "生成提现订单")
+	@ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
 	@ApiResponse(code = 200, message = "申请提现")
 	@PostMapping(value = "/order")
 	public GenericRspDTO createOrder(@Validated @RequestBody GenericDTO<WithdrawDTO> genericWithdrawDTO) {
@@ -51,10 +53,12 @@ public class WithdrawOrderController {
 	 * @return
 	 */
 	@ApiOperation(value = "提现结果同步", notes = "接收资金能力的处理结果通知")
+	@ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
 	@ApiResponse(code = 200, message = "申请提现结果")
 	@PatchMapping(value = "/result")
 	public GenericRspDTO completeOrder(@Validated @RequestBody GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO) {
-		WithdrawRspDTO withdrawRspDTO = withdrawOrderService.completeOrder(genericWithdrawResultDTO);
+
+	    WithdrawRspDTO withdrawRspDTO = withdrawOrderService.completeOrder(genericWithdrawResultDTO);
 		return GenericRspDTO.newSuccessInstance(withdrawRspDTO);
 	}
 
@@ -74,6 +78,7 @@ public class WithdrawOrderController {
 	 * 查询可提现银行
 	 */
 	@ApiOperation(value = "查询可提现银行", notes = "查询可提现银行列表")
+    @ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
 	@ApiResponse(code = 200, message = "查询可提现银行结果")
 	@GetMapping(value = "/bank")
 	public GenericRspDTO<List<WithdrawBankRspDTO>> queryWithdrawBank(GenericDTO genericDTO){
@@ -96,6 +101,7 @@ public class WithdrawOrderController {
      * 查询已添加的银行卡
      */
     @ApiOperation(value = "查询可提现银行", notes = "查询可提现银行列表")
+	@ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
     @ApiResponse(code = 200, message = "查询可提现银行结果")
     @GetMapping(value = "/card")
     public GenericRspDTO<List<WithdrawCardQueryDTO>> queryWithdrawCard(GenericDTO genericDTO){
@@ -111,5 +117,15 @@ public class WithdrawOrderController {
 	@PutMapping(value = "/del")
 	public GenericRspDTO<WithdrawCardDelRspDTO> delWithdrawCard(@Validated @RequestBody GenericDTO<WithdrawCardDelDTO> genericWithdrawCardDelDTO){
 		return withdrawOrderService.delCard(genericWithdrawCardDelDTO);
+	}
+
+	/**
+	 * 提现差错处理
+	 */
+	@ApiOperation(value = "提现差错处理", notes = "提现差错处理")
+	@ApiResponse(code = 200, message = "提现差错处理结果")
+	@PostMapping(value = "/chk/error/handle")
+	public GenericRspDTO withdrawErrorHandler(@Validated @RequestBody GenericDTO<WithdrawErrorHandleDTO> genericWithdrawErrorHandleDTO) {
+		return withdrawOrderService.withdrawErrorHandler(genericWithdrawErrorHandleDTO);
 	}
 }
