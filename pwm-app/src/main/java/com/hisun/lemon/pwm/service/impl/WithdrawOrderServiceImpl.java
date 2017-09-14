@@ -582,6 +582,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         //查询订单是否存在
         WithdrawOrderDO queryWithdrawOrderDO = withdrawOrderTransactionalService.query(withdrawErrorHandleDTO.getOrderNo());
         WithdrawOrderDO withdrawOrderDO2 = new WithdrawOrderDO();
+        withdrawOrderDO2.setOrderNo(withdrawErrorHandleDTO.getOrderNo());
         //设置需要修改的订单状态
         //判断订单状态为'S1'，则修改订单成功时间
         if(JudgeUtils.equals("0703",withdrawErrorHandleDTO.getChkBusSubTyp())){
