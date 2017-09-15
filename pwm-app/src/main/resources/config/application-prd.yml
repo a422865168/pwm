@@ -319,7 +319,8 @@ pwm :
     password : seatel
     connectTimeout : 120000
   chk :
-    remotePath : pwm/
+    remotePath : /pwm/
     localPath : /data/pwm/data/chk/
+    hallLocalPath: /data/pwm/data/hall/
     #营业厅指定对账文件目录地址
-    hallRemotePath: /home/payment/data/pwm/hall/
+    hallRemotePath: /data/pwm/data/hall/

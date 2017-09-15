@@ -1306,9 +1306,9 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		final String hall_passd = LemonUtils.getProperty("pwm.recharge.hall-sftp.password");
 		final String connectTimeout = LemonUtils.getProperty("pwm.recharge.hall-sftp.connectTimeout");
 		//营业厅对账文件存放地址
-		final String hallRemotePath = LemonUtils.getProperty("pwm.chk.remotePath");
+		final String hallRemotePath = LemonUtils.getProperty("pwm.chk.hallRemotePath");
 		//服平台务器对账文件存放地址
-		final String localPath = LemonUtils.getProperty("pwm.chk.hallRemotePath");
+		final String localPath = LemonUtils.getProperty("pwm.chk.hallLocalPath");
 		logger.info("从营业厅ip>>"+ hall_server + ",端口号>> " + hall_port + ",目录>>" +
 				hallRemotePath +", " + "获取对账文件名>>" + fileName);
 
