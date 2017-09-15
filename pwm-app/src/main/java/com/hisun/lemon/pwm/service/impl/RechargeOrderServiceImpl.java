@@ -1884,7 +1884,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				key="view.rechargeinfo."+busType;
 				if(args.length > 1 && JudgeUtils.equals(busType,PwmConstants.BUS_TYPE_RECHARGE_OFL)){
 					final String seperator = ".";
-					key=key+seperator+args[1]+seperator+args[2];
+					key=key+seperator+args[0]+seperator+args[1];
 					return  localeMessageSource.getMessage(key);
 				}
 			}else{
