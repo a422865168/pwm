@@ -64,6 +64,10 @@ public class WithdrawDTO {
 	@ApiModelProperty(name = "payPassWord", value = "支付密码")
 	@NotEmpty(message="PWM10034")
 	private String payPassWord;
+	//支付密码随机数
+    @ApiModelProperty(name = "payPassWordRand", value = "支付密码随机数")
+    @NotEmpty(message="PWM10054")
+    private String payPassWordRand;
 	//订单渠道
 	@ApiModelProperty(name = "busCnl", value = "订单渠道(WEB:web站点|APP:APP手机|HALL:营业厅|OTHER:其他渠道)")
 	@NotEmpty(message="PWM10002")
@@ -188,4 +192,12 @@ public class WithdrawDTO {
 	public void setCardUserName(String cardUserName) {
 		this.cardUserName = cardUserName;
 	}
+
+    public String getPayPassWordRand() {
+        return payPassWordRand;
+    }
+
+    public void setPayPassWordRand(String payPassWordRand) {
+        this.payPassWordRand = payPassWordRand;
+    }
 }

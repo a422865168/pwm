@@ -10,6 +10,8 @@ import com.hisun.lemon.acm.dto.UserAccountDTO;
 import com.hisun.lemon.bil.dto.CreateUserBillDTO;
 import com.hisun.lemon.bil.dto.UpdateUserBillDTO;
 import com.hisun.lemon.cmm.client.CmmServerClient;
+import com.hisun.lemon.cmm.dto.CommonEncryptReqDTO;
+import com.hisun.lemon.cmm.dto.CommonEncryptRspDTO;
 import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.BeanUtils;
@@ -187,6 +189,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         CheckPayPwdDTO checkPayPwdDTO =new CheckPayPwdDTO();
         checkPayPwdDTO.setUserId(withdrawDTO.getUserId());
         checkPayPwdDTO.setPayPwd(withdrawDTO.getPayPassWord());
+        checkPayPwdDTO.setPayPwdRandom(withdrawDTO.getPayPassWordRand());
         genericDTO.setBody(checkPayPwdDTO);
         genericRspDTO = userAuthenticationClient.checkPayPwd(genericDTO);
         if(JudgeUtils.isNull(genericRspDTO)){
@@ -437,11 +440,17 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         BeanUtils.copyProperties(withdrawCardBindDO, withdrawCardBindDTO);
         String cardNo = withdrawCardBindDO.getCardNo().trim();
         String cardNoEnc = null;
-        try {
-            //银行卡加密
-            cardNoEnc = EncryptionUtils.encrypt(cardNo);
-        } catch (EncryptException e){
-            return GenericRspDTO.newInstance(e.getMsgCd(), withdrawCardBindDTO);
+        //加密银行卡
+        CommonEncryptReqDTO commonEncryptReqDTO = new CommonEncryptReqDTO();
+        commonEncryptReqDTO.setData(cardNo);
+        commonEncryptReqDTO.setType("encrypt");
+        GenericDTO genericDTO = new GenericDTO();
+        genericDTO.setBody(commonEncryptReqDTO);
+        //银行卡加密
+        GenericRspDTO<CommonEncryptRspDTO> genericRspDTO = cmmServerClient.encrypt(genericDTO);
+        CommonEncryptRspDTO commonEncryptRspDTO = genericRspDTO.getBody();
+        if(JudgeUtils.isNotNull(commonEncryptRspDTO)) {
+            cardNoEnc = commonEncryptRspDTO.getData();
         }
         WithdrawCardBindDO withdrawCardBindDO1 = withdrawCardBindDao.query(cardNoEnc);
         //初始化需要返回的卡信息
@@ -548,7 +557,11 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }else {
             messageReq.setMessageTemplateId(PwmConstants.WITHDRAW_SUCC_TEMPL);
             map.put("amount", withdrawOrderDO.getWcActAmt().toString());
-            map.put("cardNoLast",cardNoLast);
+            if(JudgeUtils.isNotBlank(cardNoLast)) {
+                map.put("cardNoLast", cardNoLast);
+            }else {
+                map.put("cardNoLast", "");
+            }
             map.put("date",DateTimeUtils.formatLocalDate(withdrawOrderDO.getAcTm(), "yyyy-MM-dd"));
         }
         messageReq.setReplaceFieldMap(map);
