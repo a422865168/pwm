@@ -1,9 +1,3 @@
-/*
- * @ClassName WithdrawOrderDO
- * @Description 
- * @version 1.0
- * @Date 2017-07-15 15:25:38
- */
 package com.hisun.lemon.pwm.entity;
 
 import com.hisun.lemon.framework.data.BaseDO;

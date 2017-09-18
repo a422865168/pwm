@@ -1,9 +1,3 @@
-/*
- * @ClassName RechargeHCouponDO
- * @Description 
- * @version 1.0
- * @Date 2017-07-21 17:27:24
- */
 package com.hisun.lemon.pwm.entity;
 
 import java.math.BigDecimal;

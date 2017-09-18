@@ -1,9 +1,3 @@
-/*
- * @ClassName WithdrawCardBindDO
- * @Description 
- * @version 1.0
- * @Date 2017-08-16 10:01:21
- */
 package com.hisun.lemon.pwm.entity;
 
 import com.hisun.lemon.framework.data.BaseDO;

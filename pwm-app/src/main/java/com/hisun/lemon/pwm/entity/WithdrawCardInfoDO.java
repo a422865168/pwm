@@ -7,7 +7,6 @@
 package com.hisun.lemon.pwm.entity;
 
 import com.hisun.lemon.framework.data.BaseDO;
-import java.time.LocalDateTime;
 
 public class WithdrawCardInfoDO extends BaseDO {
     /**
