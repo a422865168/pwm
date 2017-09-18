@@ -94,8 +94,7 @@ public class RechargeOrderTransactionalService extends BaseService {
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS,readOnly = true)
 	public RechargeOrderDO getRechargeOrderByHallOrderNo(String hallOrderNo) {
-		RechargeOrderDO rechargeOrderDO = this.rechangeOrderDao.getRechargeOrderByHallOrderNo(hallOrderNo);
-		return rechargeOrderDO;
+		return this.rechangeOrderDao.getRechargeOrderByHallOrderNo(hallOrderNo);
 	}
 
 	/**

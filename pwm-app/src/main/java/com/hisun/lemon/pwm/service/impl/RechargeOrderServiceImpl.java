@@ -732,7 +732,6 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 		if(JudgeUtils.isNotBlank(key)){
 			//判断是否是通过手机号查询,手机号格式 国家编码+手机号
-			//boolean isPhone = PhoneNumberUtils.isValidNumber(key);
             boolean isPhone = Pattern.matches("^[+](\\d){1,3}-(\\d)+", key);
 			if(isPhone){
 				genericUserBasicInfDTO = userBasicInfClient.queryUserByLoginId(key);
@@ -1288,16 +1287,16 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	@Override
 	public void uploadHallRechargeChkFile(String type,String date,String fileName){
 		//营业厅文件服务器配置
-		final String hall_server = LemonUtils.getProperty("pwm.recharge.hall-sftp.ip");
-		final int hall_port = Integer.valueOf(LemonUtils.getProperty("pwm.recharge.hall-sftp.port"));
-		final String hall_userName = LemonUtils.getProperty("pwm.recharge.hall-sftp.name");
-		final String hall_passd = LemonUtils.getProperty("pwm.recharge.hall-sftp.password");
+		final String hallServer = LemonUtils.getProperty("pwm.recharge.hall-sftp.ip");
+		final int hallPort = Integer.valueOf(LemonUtils.getProperty("pwm.recharge.hall-sftp.port"));
+		final String hallUserName = LemonUtils.getProperty("pwm.recharge.hall-sftp.name");
+		final String hallPassd = LemonUtils.getProperty("pwm.recharge.hall-sftp.password");
 		final String connectTimeout = LemonUtils.getProperty("pwm.recharge.hall-sftp.connectTimeout");
 		//营业厅对账文件存放地址
 		final String hallRemotePath = LemonUtils.getProperty("pwm.chk.hallRemotePath");
 		//服平台务器对账文件存放地址
 		final String localPath = LemonUtils.getProperty("pwm.chk.hallLocalPath");
-		logger.info("从营业厅ip>>"+ hall_server + ",端口号>> " + hall_port + ",目录>>" +
+		logger.info("从营业厅ip>>"+ hallServer + ",端口号>> " + hallPort + ",目录>>" +
 				hallRemotePath +", " + "获取对账文件名>>" + fileName);
 
 		if(JudgeUtils.isNotBlank(fileName) && !fileName.startsWith(".ck")){
@@ -1307,7 +1306,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		if(JudgeUtils.equals(type,PwmConstants.HALL_CHK_TYPE_RC)){
 			try{
 				//将营业厅对账文件生成到服务器指定路径
-				FileSftpUtils.download(hall_server,hall_port,Integer.valueOf(connectTimeout),hallRemotePath,fileName,localPath,hall_userName,hall_passd);
+				FileSftpUtils.download(hallServer,hallPort,Integer.valueOf(connectTimeout),hallRemotePath,fileName,localPath,hallUserName,hallPassd);
 			}catch (Exception e){
 				logger.error("获取营业厅对账文件失败!!");
 				throw new LemonException("PWM30016");
@@ -1545,7 +1544,6 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		}
 		String tmpJrnNo =  IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
 		//订单交易总金额
-//		BigDecimal totalAmt = rechargeOrderDO.getOrderAmt().multiply(rechargeOrderDO.getFee());
 		BigDecimal totalAmt = rechargeOrderDO.getOrderAmt();
 		//贷:应收账款-渠道充值-营业厅
 		AccountingReqDTO cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
