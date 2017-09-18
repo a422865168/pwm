@@ -241,7 +241,11 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         genericDTO.setBody(withdrawReqDTO);
         genericRspDTO = withdrawClient.createOrder(genericDTO);
         if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
-            LemonException.throwLemonException(genericRspDTO.getMsgCd(),genericRspDTO.getMsgInfo());
+            if(JudgeUtils.isNotBlank(genericRspDTO.getMsgInfo())) {
+                LemonException.throwLemonException(genericRspDTO.getMsgCd(), genericRspDTO.getMsgInfo());
+            }else{
+                LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+            }
         }
 
         /**
