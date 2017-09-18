@@ -91,10 +91,10 @@ public interface IRechargeOrderService {
 
     /**
      * 营业厅对账长款处理接口
-     * @param HallRechargeErrorFundDTO
+     * @param hallRechargeErrorFundDTO
      * @return
      */
-    public void longAmtHandle(HallRechargeErrorFundDTO HallRechargeErrorFundDTO);
+    public void longAmtHandle(HallRechargeErrorFundDTO hallRechargeErrorFundDTO);
 
     /**
      * 营业厅对账短款处理接口
