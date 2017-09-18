@@ -98,10 +98,10 @@ public interface IRechargeOrderService {
 
     /**
      * 营业厅对账短款处理接口
-     * @param HallRechargeErrorFundDTO
+     * @param hallRechargeErrorFundDTO
      * @return
      */
-    public void shortAmtHandle(HallRechargeErrorFundDTO HallRechargeErrorFundDTO);
+    public void shortAmtHandle(HallRechargeErrorFundDTO hallRechargeErrorFundDTO);
 
     /**
      * 获取营业厅对账文件
