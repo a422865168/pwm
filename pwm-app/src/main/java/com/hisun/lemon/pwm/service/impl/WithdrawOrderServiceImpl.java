@@ -136,8 +136,8 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		if(JudgeUtils.equals("RSM30002", genericRspDTO.getMsgCd())){
 			LemonException.throwBusinessException("PWM30001");
 		}
-        if(!JudgeUtils.equals("RSM00000", genericRspDTO.getMsgCd())){
-            LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+        if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
+            LemonException.throwLemonException(genericRspDTO.getMsgCd(),genericRspDTO.getMsgInfo());
         }
 
         //填充查询手续费数据
@@ -202,8 +202,8 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         if(JudgeUtils.equals("URM30011", genericRspDTO.getMsgCd())){
             LemonException.throwBusinessException("PWM30017");
         }
-        if(!JudgeUtils.equals("URM00000", genericRspDTO.getMsgCd())){
-            LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+        if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
+            LemonException.throwLemonException(genericRspDTO.getMsgCd(),genericRspDTO.getMsgInfo());
         }
 
 		//初始化提现订单数据
@@ -244,7 +244,8 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         genericDTO.setBody(withdrawReqDTO);
         genericRspDTO = withdrawClient.createOrder(genericDTO);
         if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
-            LemonException.throwBusinessException("PWM40007");
+            //LemonException.throwBusinessException("PWM40007");
+            LemonException.throwLemonException(genericRspDTO.getMsgCd(),genericRspDTO.getMsgInfo());
         }
 
         /**
