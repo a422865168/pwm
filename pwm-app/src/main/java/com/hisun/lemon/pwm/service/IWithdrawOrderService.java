@@ -3,7 +3,6 @@ package com.hisun.lemon.pwm.service;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.pwm.dto.*;
-import com.hisun.lemon.tfm.dto.TradeRateRspDTO;
 
 import java.util.List;
 
