@@ -34,11 +34,10 @@ public class WithdrawOrderControllerTest {
     @Autowired
     private WebApplicationContext context;
 
-    private MockMvc mockMvc;
 
     @Before
     public void setupMockMvc() throws Exception {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
     }
 
     /**

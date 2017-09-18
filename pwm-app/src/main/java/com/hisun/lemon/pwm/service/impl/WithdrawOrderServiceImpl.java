@@ -17,7 +17,6 @@ import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.JudgeUtils;
-import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.cpo.client.WithdrawClient;
 import com.hisun.lemon.cpo.dto.WithdrawReqDTO;
 import com.hisun.lemon.cpo.enums.CorpBusSubTyp;
@@ -29,8 +28,6 @@ import com.hisun.lemon.framework.i18n.LocaleMessageSource;
 import com.hisun.lemon.framework.service.BaseService;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
-import com.hisun.lemon.jcommon.encrypt.EncryptionUtils;
-import com.hisun.lemon.jcommon.exception.EncryptException;
 import com.hisun.lemon.pwm.component.AcmComponent;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.dao.IWithdrawCardBindDao;
@@ -244,7 +241,6 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         genericDTO.setBody(withdrawReqDTO);
         genericRspDTO = withdrawClient.createOrder(genericDTO);
         if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
-            //LemonException.throwBusinessException("PWM40007");
             LemonException.throwLemonException(genericRspDTO.getMsgCd(),genericRspDTO.getMsgInfo());
         }
 
@@ -550,7 +546,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         MessageSendReqDTO messageReq = new MessageSendReqDTO();
         messageReq.setUserId(withdrawOrderDO.getUserId());
         messageReq.setMessageLanguage(language);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         if(JudgeUtils.equals("",cardNoLast)) {
             messageReq.setMessageTemplateId(PwmConstants.WITHDRAW_FAIL_TEMPL);
             map.put("amount",withdrawOrderDO.getWcActAmt().toString());
