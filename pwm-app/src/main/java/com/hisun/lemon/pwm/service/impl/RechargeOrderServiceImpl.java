@@ -277,7 +277,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		mkmReqDTO.setMkTool("02");
 		mkmReqDTO.setUserId(userId);
 		mkmReqDTO.setMobile(mblNo);
-		BigDecimal CouponAmt = rechargeDO.gethCouponAmt();
+		BigDecimal couponAmt = rechargeDO.gethCouponAmt();
 		Integer count = hCouponAmt.intValue();
 		mkmReqDTO.setRechargeTm(rechargeDO.getTxTm());
 		mkmReqDTO.setCount(count);
@@ -290,7 +290,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 					&& StringUtils.equals(rechargeMkmToolResDTO.getResult(), "1")) {
 				RechargeHCouponDO update = new RechargeHCouponDO();
 				update.setAcTm(rechargeHCouponDTO.getAccDate());
-				update.sethCouponAmt(CouponAmt);
+				update.sethCouponAmt(couponAmt);
 				update.setOrderAmt(rechargeDO.getOrderAmt());
 				update.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
 				update.setOrderCcy(rechargeDO.getOrderCcy());
@@ -316,7 +316,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		GenericRspDTO<RechargeRspHCouponDTO> rechargeRspDTO = new GenericRspDTO<RechargeRspHCouponDTO>();
 		RechargeRspHCouponDTO userOut = new RechargeRspHCouponDTO();
 		userOut.setOrderAmount(paymentResultDTO.getOrderAmt());
-		userOut.sethCouponAmt(CouponAmt);
+		userOut.sethCouponAmt(couponAmt);
 		userOut.setOrderSts(PwmConstants.ORD_STS_S);
 		userOut.setOrderNo(paymentResultDTO.getBusOrderNo());
 		return rechargeRspDTO.newSuccessInstance(userOut);
@@ -792,7 +792,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		BigDecimal rechargeTotalAmt = orderAmt;
 		BigDecimal userAmt = orderAmt;
 		String feeFlag = rechargeOrderDO.getFeeFlag();
-		if(JudgeUtils.equals(feeFlag,PwmConstants.FEE_EX)){
+		if(JudgeUtils.equals(feeFlag, PwmConstants.FEE_EX)){
 			rechargeTotalAmt = rechargeTotalAmt.add(fee);
 		}else if(JudgeUtils.equals(feeFlag,PwmConstants.FEE_IN)){
 			userAmt = rechargeTotalAmt.subtract(fee);
@@ -1047,7 +1047,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		dataMap.put(OfflineBilExtConstants.CRD_CORP_ORG,getViewOrderInfo(rechargeOrderDO.getBusType(),new Object[]{offlineRechargeApplyDTO.getCrdCorpOrg(),"ACCNM"}));
 		dataMap.put(OfflineBilExtConstants.PAYEE_COMPANY,getViewOrderInfo(rechargeOrderDO.getBusType(),new Object[]{offlineRechargeApplyDTO.getCrdCorpOrg(),"REMARK"}));
 		dataMap.put(OfflineBilExtConstants.BANK_ACCOUNT_NO,offlineRechargeApplyDTO.getBankCrdNo());
-		extMap.put(PwmConstants.BUS_TYPE_RECHARGE_OFL,dataMap);
+		extMap.put(PwmConstants.BUS_TYPE_RECHARGE_OFL, dataMap);
 		initCashierDTO.setExtMap(extMap);
 		GenericDTO<InitCashierDTO> genericCashierDTO = new GenericDTO<>();
 		genericCashierDTO.setBody(initCashierDTO);
