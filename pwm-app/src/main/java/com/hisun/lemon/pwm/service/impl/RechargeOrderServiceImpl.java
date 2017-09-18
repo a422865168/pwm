@@ -374,8 +374,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		initCashierDTO.setGoodsDesc(descStrs);
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
-		GenericRspDTO<CashierViewDTO> rspDTO = new GenericRspDTO<CashierViewDTO>();
-		rspDTO = cshOrderClient.initCashier(genericDTO);
+		GenericRspDTO<CashierViewDTO> rspDTO = cshOrderClient.initCashier(genericDTO);
 		if (!JudgeUtils.isSuccess(rspDTO.getMsgCd())) {
 			throw new LemonException(rspDTO.getMsgCd());
 		}
