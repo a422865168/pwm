@@ -127,7 +127,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         jrnReqDTO.setTxJrnNo(orderNo);
         jrnReqDTO.setTxOrdNo(orderNo);
         jrnReqDTO.setStlUserId(withdrawDTO.getUserId());
-        jrnReqDTO.setStlUserTyp("02");
+        jrnReqDTO.setStlUserTyp("01");
         genericRspDTO = riskCheckClient.riskControl(jrnReqDTO);
 		if(JudgeUtils.isNull(genericRspDTO)){
 		    LemonException.throwBusinessException("PWM30007");
