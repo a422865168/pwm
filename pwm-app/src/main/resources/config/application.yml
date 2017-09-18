@@ -202,7 +202,7 @@ dataSource :
   lemon :
     type : com.alibaba.druid.pool.DruidDataSource
     driverClassName : com.mysql.cj.jdbc.Driver
-    url : jdbc:mysql://119.23.126.119:3306/lemon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    url : jdbc:mysql://119.23.126.119:3306/lemon?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username : lemon
     password : lemon@123
     initialSize : 5
@@ -230,7 +230,7 @@ dataSource :
   primary :
     type : com.alibaba.druid.pool.DruidDataSource
     driverClassName : com.mysql.cj.jdbc.Driver
-    url : jdbc:mysql://119.23.126.119:3306/seatelpay_pwm?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url : jdbc:mysql://119.23.126.119:3306/seatelpay_pwm?useUnicode=true&characterEncoding=utf-8
     username : pwm
     password : pwm
     initialSize : 5
