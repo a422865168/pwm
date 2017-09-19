@@ -128,8 +128,6 @@ feign :
 #logging configuration
 logging :
   config : classpath:config/logback-spring.xml
-  level :
-    root : DEBUG
 
 #lemon framework configuration
 lemon :

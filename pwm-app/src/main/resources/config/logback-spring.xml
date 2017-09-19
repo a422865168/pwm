@@ -1,5 +1,6 @@
 <configuration>
   <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="appName"/>
+  <springProperty scope="context" name="rootLevel" source="logging.level.root" defaultValue="INFO"/>
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${lemon.log.path}/lemon-${appName}.log</file>
@@ -48,10 +49,10 @@
     </encoder>
   </appender>
 
-  <appender name="FILE-SERVER" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${lemon.log.path}/server-${appName}.log</file>
+  <appender name="FILE-ACCESS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${lemon.log.path}/access-${appName}.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-      <fileNamePattern>${lemon.log.path}/server-${appName}-%d{yyyyMMdd}.%i.log</fileNamePattern>
+      <fileNamePattern>${lemon.log.path}/access-${appName}-%d{yyyyMMdd}.%i.log</fileNamePattern>
       <maxFileSize>20MB</maxFileSize>
     </rollingPolicy>
     <encoder>
@@ -59,19 +60,16 @@
     </encoder>
   </appender>
 
-  <logger name="com.hisun.lemon.framework.springcloud.fegin" level="INFO" additivity="false">
+  <logger name="com.hisun.lemon.framework.springcloud.fegin" level="INFO" additivity="true">
     <appender-ref ref="FILE-CLIENT"/>
-    <appender-ref ref="STDOUT"/>
   </logger>
 
-  <logger name="com.netflix.loadbalancer.LoadBalancerContext" level="DEBUG" additivity="false">
+  <logger name="com.netflix.loadbalancer.LoadBalancerContext" level="DEBUG" additivity="true">
     <appender-ref ref="FILE-CLIENT"/>
-    <appender-ref ref="STDOUT"/>
   </logger>
 
-  <logger name="com.hisun.lemon.framework.aop.ControllerAspect$ReceiveRequestLog" level="INFO" additivity="false">
-    <appender-ref ref="FILE-SERVER"/>
-    <appender-ref ref="STDOUT"/>
+  <logger name="com.hisun.lemon.framework.aop.ControllerAspect$ReceiveRequestLog" level="INFO" additivity="true">
+    <appender-ref ref="FILE-ACCESS"/>
   </logger>
 
   <logger name="org.springframework.amqp.rabbit.listener.BlockingQueueConsumer" level="INFO" additivity="false">
@@ -79,7 +77,7 @@
     <appender-ref ref="STDOUT"/>
   </logger>
 
-  <root level="DEBUG">
+  <root level="${rootLevel}">
     <springProfile name="ci, dev, sit, uat, str, pre, prd">
       <appender-ref ref="FILE"/>
       <appender-ref ref="ERROR-FILE"/>
@@ -88,5 +86,4 @@
       <appender-ref ref="STDOUT"/>
     </springProfile>
   </root>
-
 </configuration>
