@@ -228,6 +228,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		directPaymentDTO.setSysChannel("APP");
 		directPaymentDTO.setPayerId(rechargeDO.getUserId());
 		directPaymentDTO.setPayPassword(rechargeDTO.getPayPassword());
+		directPaymentDTO.setValidateRandom(rechargeDTO.getValidateRandom());
 		directPaymentDTO.setPayeeId(rechargeDO.getUserId());
 		directPaymentDTO.setAppCnl(LemonUtils.getApplicationName());
 		directPaymentDTO.setBusPaytype(PwmConstants.BUS_PAY_TYPE);

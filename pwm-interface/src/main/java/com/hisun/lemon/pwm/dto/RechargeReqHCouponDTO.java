@@ -58,9 +58,13 @@ public class RechargeReqHCouponDTO {
 	@NotEmpty(message = "PWM10049")
 	private String mblNo;
 	
-	@ApiModelProperty(name = "payPassword", value = "支付密码")
-	@NotEmpty(message = "PWM10049")
+	@ApiModelProperty(name = "payPassword", value = "支付密码(密文)")
+	@NotEmpty(message = "PWM10053")
 	private String payPassword;
+	
+	@ApiModelProperty(name = "validateRandom", value = "支付密码随机数")
+	@NotEmpty(message = "PWM10054")
+	private String validateRandom;
 
 	
 	public String getPayPassword() {
@@ -110,6 +114,12 @@ public class RechargeReqHCouponDTO {
 	public void sethCouponAmt(BigDecimal hCouponAmt) {
 		this.hCouponAmt = hCouponAmt;
 	}
-	
-	
+
+	public String getValidateRandom() {
+		return validateRandom;
+	}
+
+	public void setValidateRandom(String validateRandom) {
+		this.validateRandom = validateRandom;
+	}
 }
