@@ -17,4 +17,4 @@ database :
     password : pwm
 
 eureka :
-  zone : http://192.168.3.38:9002/eureka/,http://192.168.3.39:9012/eureka/
+  zone : http://192.168.3.38:9002/eureka/,http://192.168.3.39:9002/eureka/
