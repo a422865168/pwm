@@ -4,7 +4,7 @@ spring :
     host : 192.168.3.39
     port : 6379
     password : Hisunpay2017
-    pool : 
+    pool :
       #连接池最大连接数（使用负值表示没有限制）
       max-active : 8
       #连接池最大阻塞等待时间（使用负值表示没有限制）
@@ -35,7 +35,7 @@ spring :
   thymeleaf :
     cache : false
   jackson :
-    serialization : 
+    serialization :
       write_dates_as_timestamps : false
   cache :
     jcache :
@@ -86,12 +86,13 @@ spring :
         output3 :
           enable : true
           destination : TFM
+          producer :
+            deliveryMode : PERSISTENT
         output6 :
           enable : true
           destination : BIL
           producer :
             deliveryMode : PERSISTENT
-
 ribbon :
   #retry next Server times
   MaxAutoRetriesNextServer : 0
@@ -124,15 +125,11 @@ feign :
       min-request-size : 2048
     response:
       enabled : true
-    
-#logging configuration
-logging :
-  config : classpath:config/logback-spring.xml
 
 #lemon framework configuration
 lemon :
   #dynamic datasource
-  dynamicDataSource : 
+  dynamicDataSource :
     enabled : true
     dataSources : lemon,primary
     defaultDataSource : primary
@@ -143,17 +140,17 @@ lemon :
   idgen :
     #每次从reids申请Id的数量
     delta :
-       default : 500
-       MSGID_ : 1000
-       REQUESTID_ : 1000
+      default : 500
+      MSGID_ : 1000
+      REQUESTID_ : 1000
     #在redis里Id key 的前缀，prefix+"."+ applicationName,申请ID key作为hash key.
     prefix : IDGEN
-    #ID sequence 最大值，默认值无穷大，配置方式是在max-value 下配置key 及长度 
+    #ID sequence 最大值，默认值无穷大，配置方式是在max-value 下配置key 及长度
     max-value :
       #msgId key
       MSGID_ : 999999999
       REQUESTID_ : 999999999
-      USER_ID : 999999  
+      USER_ID : 999999
     #common ID sequence length
     common-id-sequence-len : 10
     #request ID sequence length
@@ -178,7 +175,7 @@ lemon :
     redis :
       expires :
         #redis cache expire time; cacheName : expireTime/s; 0 - never expire
-        ${lemon.cache.cacheName.prefix}.user : 140 
+        ${lemon.cache.cacheName.prefix}.user : 140
   # distributed lock dependence on redisson
   redisson :
     enabled : true
@@ -190,36 +187,36 @@ lemon :
     idleTimeout : 60000
     connectionTimeout : 10000
     timeout : 5000
-  #redis distributed lock 
+  #redis distributed lock
   lock :
     defaultLeaseTime : 100
-    defaultWaitTime : 5    
+    defaultWaitTime : 5
 
 #Multiple dataSources
 dataSource :
   lemon :
     type : com.alibaba.druid.pool.DruidDataSource
     driverClassName : com.mysql.cj.jdbc.Driver
-    url : jdbc:mysql://119.23.126.119:3306/lemon?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    url : jdbc:mysql://119.23.126.119:3306/lemon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
     username : lemon
     password : lemon@123
-    initialSize : 5
-    minIdle : 5
-    maxActive : 20
+    initialSize : 2
+    minIdle : 2
+    maxActive : 5
     # 配置获取连接等待超时的时间
     maxWait : 30000
-    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
     timeBetweenEvictionRunsMillis : 60000
-    # 配置一个连接在池中最小生存的时间，单位是毫秒 
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
     minEvictableIdleTimeMillis : 300000
     validationQuery : SELECT 1
     testWhileIdle : true
     testOnBorrow : false
     testOnReturn : false
-    # 打开PSCache，并且指定每个连接上PSCache的大小 
+    # 打开PSCache，并且指定每个连接上PSCache的大小
     poolPreparedStatements : true
     maxPoolPreparedStatementPerConnectionSize : 20
-    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙 
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
     filters : stat,wall,log4j
     # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
     connectionProperties : druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
@@ -228,7 +225,7 @@ dataSource :
   primary :
     type : com.alibaba.druid.pool.DruidDataSource
     driverClassName : com.mysql.cj.jdbc.Driver
-    url : jdbc:mysql://119.23.126.119:3306/seatelpay_pwm?useUnicode=true&characterEncoding=utf-8
+    url : jdbc:mysql://119.23.126.119:3306/seatelpay_pwm?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
     username : pwm
     password : pwm
     initialSize : 5
@@ -236,35 +233,35 @@ dataSource :
     maxActive : 20
     # 配置获取连接等待超时的时间
     maxWait : 60000
-    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
     timeBetweenEvictionRunsMillis : 60000
-    # 配置一个连接在池中最小生存的时间，单位是毫秒 
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
     minEvictableIdleTimeMillis : 300000
     validationQuery : SELECT 1
     testWhileIdle : true
     testOnBorrow : false
     testOnReturn : false
-    # 打开PSCache，并且指定每个连接上PSCache的大小 
+    # 打开PSCache，并且指定每个连接上PSCache的大小
     poolPreparedStatements : true
     maxPoolPreparedStatementPerConnectionSize : 20
-    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙 
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙
     filters : stat,wall,log4j
     # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
     connectionProperties : druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
     # 合并多个DruidDataSource的监控数据
     useGlobalDataSourceStat : true
-    
-mybatis: 
+
+mybatis:
   mapperLocations: classpath*:com/hisun/**/mapper/*.xml
   typeAliasesPackage : com.hisun.**.entity
  # config : mybatis-config.xml
  # typeHandlersPackage 扫描typeHandlers的包
- 
+
 #page helper
 pagehelper :
   defaultPageNum : 1
   defaultPageSize : 8
-  
+
 swagger :
   profiles : dev,sit,ci
   show : true
@@ -298,6 +295,9 @@ security :
   user :
     name : lemon
     password : lemon123
+
+eureka :
+  zone : http://192.168.3.38:9002/eureka/,http://192.168.3.39:9012/eureka/
 
 pwm :
   recharge :

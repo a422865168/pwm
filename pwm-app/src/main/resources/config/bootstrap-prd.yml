@@ -11,3 +11,5 @@ eureka :
       defaultZone : http://172.22.181.72:9002/eureka/,http://172.22.181.73:9002/eureka/
   instance :
     preferIpAddress : true
+logging :
+  config : classpath:config/logback-spring.xml
