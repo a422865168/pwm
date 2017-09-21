@@ -181,7 +181,7 @@ lemon :
     enabled : true
     mode : single
     address : ${redis.host:192.168.3.39}:6379
-    password : Hisunpay2017
+    password : ${redis.password:Hisunpay2017}
     poolSize : 30
     idleSize : 5
     idleTimeout : 60000
