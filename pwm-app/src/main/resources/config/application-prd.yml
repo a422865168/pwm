@@ -18,3 +18,27 @@ database :
 
 eureka :
   zone : http://172.22.181.72:9002/eureka/,http://172.22.181.73:9002/eureka/
+
+pwm :
+  recharge :
+    #营业厅充值签名KEY值
+    HALLKEY : PWM123456789002
+    #营业厅ftp服务器配置
+    hall-sftp:
+       ip: 192.168.3.38
+       port: 22
+       name: payment
+       password: Hisunpay2017
+       connectTimeout: 120000
+  sftp :
+    ip : 172.22.181.80
+    port : 9898
+    name : seatel
+    password : seatel
+    connectTimeout : 120000
+  chk :
+    remotePath : /pwm/
+    localPath : /data/pwm/data/chk/
+    hallLocalPath: /data/pwm/data/hall/
+    #营业厅指定对账文件目录地址
+    hallRemotePath: /data/pwm/data/hall/
