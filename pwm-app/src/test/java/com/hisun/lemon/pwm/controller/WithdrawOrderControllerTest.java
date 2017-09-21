@@ -7,6 +7,7 @@ import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,7 @@ public class WithdrawOrderControllerTest {
      * @throws Exception
      */
     @Test
+    @Ignore
     public void testCreateOrder() throws Exception{
 
 /*        WithdrawResultDTO withdrawResultDTO = new WithdrawResultDTO();
@@ -80,6 +82,7 @@ public class WithdrawOrderControllerTest {
      * @throws Exception
      */
     @Test
+    @Ignore
     public void testCompleteOrder() throws Exception{
 
        /* WithdrawComplDTO withdrawComplDTO = new WithdrawComplDTO();
@@ -103,6 +106,7 @@ public class WithdrawOrderControllerTest {
 
 
     @Test
+    @Ignore
     public void hcouponTest(){
         Object[] args=new Object[]{100};
 //        String descStr=getViewOrderInfo(PwmConstants.BUS_TYPE_HCOUPON,args);

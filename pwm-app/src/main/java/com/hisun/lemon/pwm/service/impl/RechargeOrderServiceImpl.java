@@ -123,9 +123,6 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	MarketActivityClient mkmClient;
 
 	@Resource
-	private AccountManagementClient accountManagementClient;
-
-	@Resource
 	private RouteClient routeClient;
 
 	@Resource
@@ -459,7 +456,12 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 						mkmReqDTO.setType("00");
 						mkmReqDTO.setMkTool("02");
 						mkmReqDTO.setUserId(userId);
-						String mblNo=accountManagementClient.queryAcNo(userId).getBody();
+						GenericRspDTO<UserBasicInfDTO> genericUserBasicInfDTO = userBasicInfClient.queryUser(userId);
+						if(JudgeUtils.isNotSuccess(genericUserBasicInfDTO.getMsgCd())){
+							throw new LemonException(genericUserBasicInfDTO.getMsgCd());
+						}
+						UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
+						String mblNo=userBasicInfDTO.getMblNo();
 						String mobile=mblNo;
 						mkmReqDTO.setMobile(mobile);
 						BigDecimal hCouponAmt=rechargeSeaDO.gethCouponAmt();
