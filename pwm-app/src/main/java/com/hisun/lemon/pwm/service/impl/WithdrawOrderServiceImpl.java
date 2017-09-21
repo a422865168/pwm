@@ -206,7 +206,11 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             LemonException.throwBusinessException("PWM30017");
         }
         if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
-            LemonException.throwLemonException(genericRspDTO.getMsgCd(),genericRspDTO.getMsgInfo());
+            if(JudgeUtils.isNotBlank(genericRspDTO.getMsgInfo())) {
+                LemonException.throwLemonException(genericRspDTO.getMsgCd(), genericRspDTO.getMsgInfo());
+            }else{
+                LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+            }
         }
 
 		//初始化提现订单数据
