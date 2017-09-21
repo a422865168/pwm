@@ -615,11 +615,12 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 							updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 							updOrderDO.setOrderNo(orderNo);
                             updOrderDO.setFee(fee);
+							updOrderDO.setPayerId(rechargeOrderDO.getPayerId());
 							//若是汇款充值，此处为审核失败原因
 							updOrderDO.setRemark(remark);
 							if(JudgeUtils.equals(rechargeOrderDO.getBusType(),PwmConstants.BUS_TYPE_RECHARGE_OFL)){
 								logger.info("汇款拒绝理由: " + updOrderDO.getRemark());
-								sendMsgCenterInfo(rechargeOrderDO,RECHARGE_OFFLINE_BACK);
+								sendMsgCenterInfo(updOrderDO,RECHARGE_OFFLINE_BACK);
 							}
 							service.updateOrder(updOrderDO);
 							return null;
@@ -708,11 +709,13 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 						// 更新订单
 						RechargeOrderDO updOrderDO = new RechargeOrderDO();
-						updOrderDO.setAcTm(acDt);
+						updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 						updOrderDO.setExtOrderNo(extOrderNo);
 						updOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
 						updOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
                         updOrderDO.setFee(fee);
+						updOrderDO.setOrderAmt(rechargeOrderDO.getOrderAmt());
+						updOrderDO.setPayerId(rechargeOrderDO.getPayerId());
 						if(StringUtils.isNoneBlank(ccy)){
 							updOrderDO.setOrderCcy(ccy);
 						}
@@ -721,7 +724,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 						updOrderDO.setOrderNo(orderNo);
 						service.updateOrder(updOrderDO);
 						//推送充值信息到消息中心
-						sendMsgCenterInfo(rechargeOrderDO,RECHARGE_SUCCESS);
+						sendMsgCenterInfo(updOrderDO,RECHARGE_SUCCESS);
 						return null;
 					}
 			);
