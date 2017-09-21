@@ -718,6 +718,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 						updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 						updOrderDO.setOrderNo(orderNo);
 						service.updateOrder(updOrderDO);
+						//推送充值信息到消息中心
+						sendMsgCenterInfo(rechargeOrderDO,RECHARGE_SUCCESS);
 						return null;
 					}
 			);
