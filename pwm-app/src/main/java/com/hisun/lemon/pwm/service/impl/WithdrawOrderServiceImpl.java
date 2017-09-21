@@ -38,6 +38,7 @@ import com.hisun.lemon.pwm.entity.WithdrawCardInfoDO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import com.hisun.lemon.pwm.mq.BillSyncHandler;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
+import com.hisun.lemon.rsm.Constants;
 import com.hisun.lemon.rsm.client.RiskCheckClient;
 import com.hisun.lemon.rsm.dto.req.riskJrn.JrnReqDTO;
 import com.hisun.lemon.tfm.client.TfmServerClient;
@@ -46,6 +47,7 @@ import com.hisun.lemon.tfm.dto.TradeFeeRspDTO;
 import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
 import com.hisun.lemon.urm.client.UserAuthenticationClient;
 import com.hisun.lemon.urm.dto.CheckPayPwdDTO;
+import org.aspectj.apache.bcel.classfile.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -124,7 +126,11 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         jrnReqDTO.setTxJrnNo(orderNo);
         jrnReqDTO.setTxOrdNo(orderNo);
         jrnReqDTO.setStlUserId(withdrawDTO.getUserId());
-        jrnReqDTO.setStlUserTyp("01");
+        jrnReqDTO.setStlUserTyp(Constants.ID_TYP_USER_NO);
+        jrnReqDTO.setTxTyp(Constants.TX_TYP_WITHDRAW);
+        jrnReqDTO.setPayTyp(Constants.PAY_TYP_ACCOUNT);
+        jrnReqDTO.setTxAmt(withdrawDTO.getWcApplyAmt());
+        jrnReqDTO.setCcy(withdrawDTO.getOrderCcy());
         genericRspDTO = riskCheckClient.riskControl(jrnReqDTO);
 		if(JudgeUtils.isNull(genericRspDTO)){
 		    LemonException.throwBusinessException("PWM30007");
