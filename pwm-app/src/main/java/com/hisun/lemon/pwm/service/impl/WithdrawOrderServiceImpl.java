@@ -396,7 +396,6 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
                 }
             }
             if (JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_F1, withdrawOrderDO.getOrderStatus())) {
-                withdrawOrderDO.setAcTm(withdrawResultDTO.getAcTm());
                 sendMessage(withdrawOrderDO, "");
             }
         }
