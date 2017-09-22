@@ -377,23 +377,29 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }
         withdrawOrderDO.setAcTm(LemonUtils.getAccDate());
         //若更新提现单据状态及相关信息
-		withdrawOrderTransactionalService.updateOrder(withdrawOrderDO);
+		int num = withdrawOrderTransactionalService.updateOrder(withdrawOrderDO);
+		if(num != 1 ){
+            LemonException.throwBusinessException("PWM20005");
+        }else {
+            //同步账单数据
+            UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
+            BeanUtils.copyProperties(updateUserBillDTO, withdrawOrderDO);
+            billSyncHandler.updateBill(updateUserBillDTO);
 
-		//同步账单数据
-        UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
-        BeanUtils.copyProperties(updateUserBillDTO, withdrawOrderDO);
-        billSyncHandler.updateBill(updateUserBillDTO);
-
-        //订单成功或者失败时，做消息推送
-        if(JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_S1, withdrawOrderDO.getOrderStatus())) {
-            withdrawOrderDO.setAcTm(withdrawResultDTO.getAcTm());
-            sendMessage(withdrawOrderDO, withdrawResultDTO.getCardNoLast());
+            withdrawOrderDO.setUserId(queryWithdrawOrderDO.getUserId());
+            //订单成功或者失败时，做消息推送
+            if (JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_S1, withdrawOrderDO.getOrderStatus())) {
+                if (JudgeUtils.isNotBlank(withdrawResultDTO.getCardNoLast())) {
+                    sendMessage(withdrawOrderDO, withdrawResultDTO.getCardNoLast());
+                } else {
+                    sendMessage(withdrawOrderDO, null);
+                }
+            }
+            if (JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_F1, withdrawOrderDO.getOrderStatus())) {
+                withdrawOrderDO.setAcTm(withdrawResultDTO.getAcTm());
+                sendMessage(withdrawOrderDO, "");
+            }
         }
-        if(JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_F1, withdrawOrderDO.getOrderStatus())) {
-            withdrawOrderDO.setAcTm(withdrawResultDTO.getAcTm());
-            sendMessage(withdrawOrderDO, "");
-        }
-
         WithdrawRspDTO withdrawRspDTO = new WithdrawRspDTO();
         withdrawRspDTO.setOrderNo(withdrawOrderDO.getOrderNo());
         withdrawRspDTO.setOrderStatus(withdrawOrderDO.getOrderStatus());
@@ -578,6 +584,9 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         messageReq.setReplaceFieldMap(map);
         messageReqDTO.setBody(messageReq);
         GenericRspDTO<NoBody> rspDto = cmmServerClient.messageSend(messageReqDTO);
+        if(JudgeUtils.isNotSuccess(rspDto.getMsgCd())){
+            logger.error("个人提现推送订单号："+ withdrawOrderDO.getOrderNo()+"信息失败。");
+        }
     }
 
     /**
@@ -661,12 +670,15 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }
         withdrawOrderDO2.setAcTm(LemonUtils.getAccDate());
         //若更新提现单据状态及相关信息
-        withdrawOrderTransactionalService.updateOrder(withdrawOrderDO2);
-
-        //同步账单数据
-        UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
-        BeanUtils.copyProperties(updateUserBillDTO, withdrawOrderDO2);
-        billSyncHandler.updateBill(updateUserBillDTO);
+        int num = withdrawOrderTransactionalService.updateOrder(withdrawOrderDO2);
+        if(num != 1 ){
+            LemonException.throwBusinessException("PWM20005");
+        }else {
+            //同步账单数据
+            UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
+            BeanUtils.copyProperties(updateUserBillDTO, withdrawOrderDO2);
+            billSyncHandler.updateBill(updateUserBillDTO);
+        }
         return GenericRspDTO.newSuccessInstance();
     }
 }

@@ -43,12 +43,13 @@ public class WithdrawOrderTransactionalService extends BaseService {
     /**
      * 提现成功，更新提现单据信息
      */
-    public void updateOrder(WithdrawOrderDO withdrawOrderDO){
+    public int updateOrder(WithdrawOrderDO withdrawOrderDO){
 
         int num = withdrawOrderDao.update(withdrawOrderDO);
         if(num != 1){
             LemonException.throwBusinessException("PWM20005");
         }
+        return num;
     }
 
     /**
