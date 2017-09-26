@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hisun.lemon.acm.client.AccountManagementClient;
 import com.hisun.lemon.acm.client.AccountingTreatmentClient;
 import com.hisun.lemon.acm.constants.ACMConstants;
 import com.hisun.lemon.acm.constants.CapTypEnum;
@@ -43,7 +42,6 @@ import com.hisun.lemon.cpi.enums.CorpBusSubTyp;
 import com.hisun.lemon.cpi.enums.CorpBusTyp;
 import com.hisun.lemon.csh.client.CshOrderClient;
 import com.hisun.lemon.csh.client.CshRefundClient;
-import com.hisun.lemon.csh.constants.CshConstants;
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.csh.dto.cashier.DirectPaymentDTO;
 import com.hisun.lemon.csh.dto.cashier.InitCashierDTO;
@@ -53,6 +51,7 @@ import com.hisun.lemon.csh.dto.payment.OfflinePaymentResultDTO;
 import com.hisun.lemon.csh.dto.payment.PaymentResultDTO;
 import com.hisun.lemon.csh.dto.refund.RefundOrderDTO;
 import com.hisun.lemon.csh.dto.refund.RefundOrderRspDTO;
+import com.hisun.lemon.csh.enums.AcItem;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
@@ -666,12 +665,12 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 								// 借：其他应付款-暂收-收银台
 								cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
 										ACMConstants.ACCOUNTING_NOMARL, rechargeTotalAmt, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
-										CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
+										AcItem.O_CSH.getValue(), null, null, null, null, null);
 
 								// 贷：其他应付款-支付账户-xx用户现金账户
 								userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), tmpJrnNo, rechargeOrderDO.getTxType(),
 										ACMConstants.ACCOUNTING_NOMARL, userAmt, balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
-										CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "快捷充值$"+rechargeOrderDO.getOrderAmt());
+										AcItem.O_BAL.getValue(), null, null, null, null, "快捷充值$"+rechargeOrderDO.getOrderAmt());
 								//如果充值手续费大于0那么做手续费账务
 								if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
 									//贷：手续费收入-支付账户-充值
@@ -686,12 +685,12 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 								// 借：其他应付款-暂收-收银台
 								cshItemReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
 										ACMConstants.ACCOUNTING_NOMARL, rechargeTotalAmt, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_D_FLG,
-										CshConstants.AC_ITEM_CSH_PAY, null, null, null, null, null);
+										AcItem.O_CSH.getValue(), null, null, null, null, null);
 
 								// 贷：其他应付款-支付账户-xx用户现金账户
 								userAccountReqDTO=acmComponent.createAccountingReqDTO(rechargeOrderDO.getOrderNo(), acmJrnNo, rechargeOrderDO.getTxType(),
 										ACMConstants.ACCOUNTING_NOMARL, userAmt, balAcNo, ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
-										CshConstants.AC_ITEM_CSH_BAL, null, null, null, null, "汇款充值$"+rechargeOrderDO.getOrderAmt());
+										AcItem.O_BAL.getValue(), null, null, null, null, "汇款充值$"+rechargeOrderDO.getOrderAmt());
 
 								//如果充值手续费大于0那么做手续费账务
 								if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
@@ -816,7 +815,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				ACMConstants.ITM_AC_TYP,
 				balCapType,
 				ACMConstants.AC_D_FLG,
-				CshConstants.AC_ITEM_CNL_RECHARGE_HALL,
+				AcItem.I_CNL_HALL.getValue(),
 				null,
 				null,
 				null,
@@ -833,7 +832,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				ACMConstants.USER_AC_TYP,
 				balCapType,
 				ACMConstants.AC_C_FLG,
-				CshConstants.AC_ITEM_CSH_BAL,
+				AcItem.O_BAL.getValue(),
 				null,
 				null,
 				null,
@@ -921,7 +920,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 					ACMConstants.USER_AC_TYP,
 					balCapType,
 					ACMConstants.AC_D_FLG,
-					CshConstants.AC_ITEM_CSH_BAL,
+					AcItem.O_BAL.getValue(),
 					null,
 					null,
 					null,
@@ -949,7 +948,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 					ACMConstants.ITM_AC_TYP,
 					balCapType,
 					ACMConstants.AC_C_FLG,
-					CshConstants.AC_ITEM_CNL_RECHARGE_HALL,
+					AcItem.I_CNL_HALL.getValue(),
 					null,
 					null,
 					null,
@@ -1513,7 +1512,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				ACMConstants.ITM_AC_TYP,
 				balCapType,
 				ACMConstants.AC_D_FLG,
-				CshConstants.AC_ITEM_CNL_RECHARGE_HALL,
+				AcItem.I_CNL_HALL.getValue(),
 				null,
 				null,
 				null,
@@ -1531,7 +1530,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				ACMConstants.USER_AC_TYP,
 				balCapType,
 				ACMConstants.AC_C_FLG,
-				CshConstants.AC_ITEM_CSH_BAL,
+				AcItem.O_BAL.getValue(),
 				null,
 				null,
 				null,
@@ -1569,7 +1568,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				ACMConstants.ITM_AC_TYP,
 				balCapType,
 				ACMConstants.AC_C_FLG,
-				CshConstants.AC_ITEM_CNL_RECHARGE_HALL,
+				AcItem.I_CNL_HALL.getValue(),
 				null,
 				null,
 				null,
@@ -1587,7 +1586,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				ACMConstants.USER_AC_TYP,
 				balCapType,
 				ACMConstants.AC_D_FLG,
-				CshConstants.AC_ITEM_CSH_BAL,
+				AcItem.O_BAL.getValue(),
 				null,
 				null,
 				null,
