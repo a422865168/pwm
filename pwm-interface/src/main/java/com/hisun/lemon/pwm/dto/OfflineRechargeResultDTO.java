@@ -92,6 +92,9 @@ public class OfflineRechargeResultDTO {
 	@ApiModelProperty(name = "busType", value = "业务类型")
 	private String busType;
 
+	@ApiModelProperty(name = "fee", value = "手续费")
+	private BigDecimal fee;
+
 
 	public BigDecimal getAmount() {
 		return amount;
@@ -187,5 +190,13 @@ public class OfflineRechargeResultDTO {
 
 	public void setBusType(String busType) {
 		this.busType = busType;
+	}
+
+	public BigDecimal getFee() {
+		return fee;
+	}
+
+	public void setFee(BigDecimal fee) {
+		this.fee = fee;
 	}
 }
