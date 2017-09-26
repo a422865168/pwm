@@ -1061,6 +1061,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		rechargeOrderDO.setFeeFlag(cashierViewDTO.getFeeFlag());
 		rechargeOrderDO.setExtOrderNo(cashierViewDTO.getOrderNo());
 		rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+		rechargeOrderDO.setFee(cashierViewDTO.getFeeAmt());
 		this.service.updateOrder(rechargeOrderDO);
 
 		GenericRspDTO<RouteRspDTO> genericRounteListRsp = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
@@ -1080,6 +1081,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		offlineRechargeResultDTO.setOrderTm(DateTimeUtils.getCurrentLocalTime());
 		offlineRechargeResultDTO.setCashierOrderNo(cashierViewDTO.getOrderNo());
         offlineRechargeResultDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_OFL);
+		offlineRechargeResultDTO.setFee(cashierViewDTO.getFeeAmt());
+
 		if(JudgeUtils.isNotNull(userBasicInfDTO)){
 			offlineRechargeResultDTO.setMblNo(userBasicInfDTO.getMblNo());
 		}
