@@ -1315,6 +1315,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			try{
 				//将营业厅对账文件生成到服务器指定路径
 				FileSftpUtils.download(hallServer,hallPort,Integer.valueOf(connectTimeout),hallRemotePath,fileName,localPath,hallUserName,hallPassd);
+				//上传营业厅对账文件到sftp
+				uploadHall(fileName,localPath,fileName+".flag");
 			}catch (Exception e){
 				logger.error("获取营业厅对账文件失败!!");
 				throw new LemonException("PWM30016");
@@ -1861,8 +1863,37 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 		return updateOrder;
 	}
-    
-    
+
+	/**
+	 *
+	 * @param chkFileName
+	 * @param localPath
+	 * @param flagName
+	 */
+	private void uploadHall(String chkFileName,String localPath,String flagName){
+		String[] uploadFileNames=new String[]{localPath+chkFileName,localPath+flagName};
+
+		String remoteIp=LemonUtils.getProperty("pwm.sftp.ip");
+		int remotePort=Integer.valueOf(LemonUtils.getProperty("pwm.sftp.port"));
+		String timeoutStr=LemonUtils.getProperty("pwm.sftp.connectTimeout");
+		int connectTimeout=120000;
+		if(StringUtils.isNotEmpty(timeoutStr)){
+			connectTimeout=Integer.valueOf(timeoutStr);
+		}
+		//上传营业厅对账文件sftp路径
+		String remotePath=LemonUtils.getProperty("pwm.chk.remotePath") + "/hall";
+
+		String name=LemonUtils.getProperty("pwm.sftp.name");
+		String pwd=LemonUtils.getProperty("pwm.sftp.password");
+
+		try {
+			FileSftpUtils.upload(uploadFileNames,remoteIp,remotePort,connectTimeout,remotePath,name,pwd);
+		} catch (Exception e) {
+			logger.error(chkFileName+"上传SFTP文件服务器失败",e);
+			LemonException.throwBusinessException("PWM40702");
+		}
+	}
+
     /**
 	 * 国际化商品描述信息
 	 * @param busType
