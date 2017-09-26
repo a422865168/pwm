@@ -89,6 +89,6 @@ pwm :
   chk :
     remotePath : /data/pwm/
     localPath : /data/pwm/data/chk/
-    hallLocalPath: /data/pwm/data/hall/
+    hallLocalPath: /data/pwm/data/chk/HALL/
     #营业厅指定对账文件目录地址
-    hallRemotePath: /data/pwm/data/hall/
+    hallRemotePath: /data/pwm/hall/
