@@ -35,6 +35,7 @@ public abstract class AbstractChkFileService extends BaseService implements Call
 
     protected String appCnl;
 
+    protected String appCnl_F1;
 
     public AbstractChkFileService() {
 
