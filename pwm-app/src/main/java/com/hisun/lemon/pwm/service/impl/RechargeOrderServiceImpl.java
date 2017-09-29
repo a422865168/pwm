@@ -1038,8 +1038,9 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		//汇款人信息填充
 		Map<String,Map<Object,Object>> extMap = new HashMap<>();
 		Map<Object,Object> dataMap = new HashedMap();
+		String payeeCompany = getViewOrderInfo(rechargeOrderDO.getBusType(),new Object[]{offlineRechargeApplyDTO.getCrdCorpOrg(),"REMARK"});
 		dataMap.put(OfflineBilExtConstants.CRD_CORP_ORG,getViewOrderInfo(rechargeOrderDO.getBusType(),new Object[]{offlineRechargeApplyDTO.getCrdCorpOrg(),"ACCNM"}));
-		dataMap.put(OfflineBilExtConstants.PAYEE_COMPANY,getViewOrderInfo(rechargeOrderDO.getBusType(),new Object[]{offlineRechargeApplyDTO.getCrdCorpOrg(),"REMARK"}));
+		dataMap.put(OfflineBilExtConstants.PAYEE_COMPANY,payeeCompany);
 		dataMap.put(OfflineBilExtConstants.BANK_ACCOUNT_NO,offlineRechargeApplyDTO.getBankCrdNo());
 		extMap.put(PwmConstants.BUS_TYPE_RECHARGE_OFL, dataMap);
 		initCashierDTO.setExtMap(extMap);
@@ -1090,11 +1091,11 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			if(JudgeUtils.equals(crdCorpOrg,rd.getCrdCorpOrg())) {
 				//汇款银行账号
 				offlineRechargeResultDTO.setCrdNo(rd.getCorpAccNo());
-				//汇款银行账户
-				offlineRechargeResultDTO.setCrdUsrNm("");
 				break;
 			}
 		}
+		//汇款银行账户(备注写的是公司账户银行)
+		offlineRechargeResultDTO.setCrdUsrNm(payeeCompany);
 		return offlineRechargeResultDTO;
 	}
 
