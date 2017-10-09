@@ -27,7 +27,7 @@ public class WithdrawCardBindDTO {
     @Length(max = 24)
     private String branchName;
     //资金机构
-    @ApiModelProperty(name = "capCorg", value = "卡bin")
+    @ApiModelProperty(name = "capCorg", value = "资金机构")
     @NotEmpty(message = "PWM10045")
     @Length(max = 12)
     private String capCorg;

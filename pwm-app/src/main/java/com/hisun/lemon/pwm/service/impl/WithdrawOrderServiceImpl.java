@@ -17,7 +17,9 @@ import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.JudgeUtils;
+import com.hisun.lemon.cpo.client.RouteClient;
 import com.hisun.lemon.cpo.client.WithdrawClient;
+import com.hisun.lemon.cpo.dto.RouteRspDTO;
 import com.hisun.lemon.cpo.dto.WithdrawReqDTO;
 import com.hisun.lemon.cpo.enums.CorpBusSubTyp;
 import com.hisun.lemon.cpo.enums.CorpBusTyp;
@@ -72,6 +74,9 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 
 	@Resource
 	private WithdrawClient withdrawClient;
+
+    @Resource
+    private RouteClient routeClient;
 
     @Resource
     private TfmServerClient tfmServerClient;
@@ -434,13 +439,23 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
     @Override
     public List<WithdrawBankRspDTO> queryBank(GenericDTO genericDTO) {
 
-        List<WithdrawCardInfoDO> withdrawCardInfoDO = withdrawCardInfoDao.query();
+        //List<WithdrawCardInfoDO> withdrawCardInfoDO = withdrawCardInfoDao.query();
+        //查询路由
+        RouteRspDTO routeRspDTO = routeClient.queryEffCapOrgInfo(CorpBusTyp.WITHDRAW, CorpBusSubTyp.PER_WITHDRAW).getBody();
         List<WithdrawBankRspDTO> withdrawBankRspDTO = new ArrayList();
-        for(WithdrawCardInfoDO withdrawCardInfoDO1 : withdrawCardInfoDO) {
-            WithdrawBankRspDTO withdrawBankRspDTO1 = new WithdrawBankRspDTO();
-            BeanUtils.copyProperties(withdrawBankRspDTO1, withdrawCardInfoDO1);
-            withdrawBankRspDTO.add(withdrawBankRspDTO1);
+        List<RouteRspDTO.RouteDTO> list = null;
+        if(JudgeUtils.isNotNull(routeRspDTO)){
+            list = routeRspDTO.getList();
+
+            for(RouteRspDTO.RouteDTO routeDTO : list) {
+                WithdrawBankRspDTO withdrawBankRspDTO1 = new WithdrawBankRspDTO();
+                withdrawBankRspDTO1.setCapCorg(routeDTO.getCrdCorpOrg());
+                withdrawBankRspDTO1.setBankName(routeDTO.getCorpOrgNm());
+                withdrawBankRspDTO1.setCardAcType(routeDTO.getCrdAcTyp());
+                withdrawBankRspDTO.add(withdrawBankRspDTO1);
+            }
         }
+
         return withdrawBankRspDTO;
     }
 
