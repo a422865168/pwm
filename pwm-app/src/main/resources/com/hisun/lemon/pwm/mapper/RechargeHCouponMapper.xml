@@ -6,6 +6,7 @@
         <result column="user_id" property="userId" jdbcType="VARCHAR" />
         <result column="order_amt" property="orderAmt" jdbcType="DECIMAL" />
         <result column="order_ccy" property="orderCcy" jdbcType="VARCHAR" />
+        <result column="sys_channel" property="sysChannel" jdbcType="VARCHAR" />
         <result column="order_status" property="orderStatus" jdbcType="VARCHAR" />
         <result column="bus_type" property="busType" jdbcType="VARCHAR" />
         <result column="tx_type" property="txType" jdbcType="VARCHAR" />
@@ -17,7 +18,7 @@
     </resultMap>
 
     <sql id="Base_Column_List" >
-        order_no, user_id, order_amt, order_ccy, order_status, bus_type, tx_type, h_coupon_amt, 
+        order_no, user_id, order_amt, order_ccy,sys_channel, order_status, bus_type, tx_type, h_coupon_amt, 
         create_time, modify_time, ac_tm, tx_tm
     </sql>
 
@@ -47,6 +48,9 @@
             </if>
             <if test="orderCcy != null" >
                 order_ccy,
+            </if>
+            <if test="sysChannel != null" >
+                sys_channel,
             </if>
             <if test="orderStatus != null" >
                 order_status,
@@ -86,6 +90,9 @@
             <if test="orderCcy != null" >
                 #{orderCcy,jdbcType=VARCHAR},
             </if>
+            <if test="sysChannel != null" >
+                #{sysChannel,jdbcType=VARCHAR},
+            </if>
             <if test="orderStatus != null" >
                 #{orderStatus,jdbcType=VARCHAR},
             </if>
@@ -124,6 +131,9 @@
             </if>
             <if test="orderCcy != null" >
                 order_ccy = #{orderCcy,jdbcType=VARCHAR},
+            </if>
+            <if test="sysChannel != null" >
+                sys_channel = #{sysChannel,jdbcType=VARCHAR},
             </if>
             <if test="orderStatus != null" >
                 order_status = #{orderStatus,jdbcType=VARCHAR},

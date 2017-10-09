@@ -49,6 +49,18 @@ public class RechargeHCouponDTO {
 	@NotEmpty(message = "TAM10003")
 	@Length(max =4)
 	private String busType;
+	
+	/**
+	 * 订单来源渠道
+	 * WEB:WEB站点 <br/>
+	 * APP:手机APP<br/>
+	 * HALL:营业厅<br/>
+	 * OTHER:其他渠道<br/>
+	 */
+	@ApiModelProperty(name = "sysChannel", value = "订单来源渠道(WEB:web站点|APP:APP手机|HALL:营业厅|OTHER:其他渠道)")
+	@Length(max = 5)
+    private String sysChannel;
+	
 
 	public String getTxType() {
 		return txType;
@@ -81,6 +93,13 @@ public class RechargeHCouponDTO {
 	public void sethCouponAmt(BigDecimal hCouponAmt) {
 		this.hCouponAmt = hCouponAmt;
 	}
-	
+
+	public String getSysChannel() {
+		return sysChannel;
+	}
+
+	public void setSysChannel(String sysChannel) {
+		this.sysChannel = sysChannel;
+	}
 	
 }

@@ -24,6 +24,10 @@ public class RechargeHCouponDO extends BaseDO {
      */
     private String orderCcy;
     /**
+     * @Fields sysChannel 渠道
+     */
+    private String sysChannel;
+    /**
      * @Fields orderStatus 订单状态
      */
     private String orderStatus;
@@ -106,5 +110,11 @@ public class RechargeHCouponDO extends BaseDO {
 	}
 	public void setTxTm(LocalDateTime txTm) {
 		this.txTm = txTm;
+	}
+	public String getSysChannel() {
+		return sysChannel;
+	}
+	public void setSysChannel(String sysChannel) {
+		this.sysChannel = sysChannel;
 	}
 }

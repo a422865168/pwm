@@ -221,7 +221,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		directPaymentDTO.setOrderAmt(rechargeDO.getOrderAmt());
 		directPaymentDTO.setTxType(rechargeDO.getTxType());
 		directPaymentDTO.setBusType(rechargeDO.getBusType());
-		directPaymentDTO.setSysChannel("APP");
+		directPaymentDTO.setSysChannel("OTHER");
 		directPaymentDTO.setPayerId(rechargeDO.getUserId());
 		directPaymentDTO.setPayPassword(rechargeDTO.getPayPassword());
 		directPaymentDTO.setValidateRandom(rechargeDTO.getValidateRandom());
@@ -347,6 +347,11 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		rechargeDO.sethCouponAmt(hCouponAmt);
 		rechargeDO.setOrderNo(orderNo);
 		rechargeDO.setOrderAmt(amount);
+		String sysChannel=rechargeDTO.getSysChannel();
+		if(JudgeUtils.isBlank(sysChannel)){
+			sysChannel="APP";
+		}
+		rechargeDO.setSysChannel(sysChannel);
 		// 交易时间
 		rechargeDO.setTxTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeDO.setTxType(rechargeDTO.getTxType());
@@ -360,7 +365,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		initCashierDTO.setBusPaytype(null);
 		initCashierDTO.setBusType(PwmConstants.BUS_TYPE_HCOUPON);
 		initCashierDTO.setExtOrderNo(rechargeDO.getOrderNo());
-		initCashierDTO.setSysChannel("APP");
+		initCashierDTO.setSysChannel(rechargeDO.getSysChannel());
 		initCashierDTO.setPayerId(LemonUtils.getUserId());
 		initCashierDTO.setPayeeId(LemonUtils.getUserId());
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
