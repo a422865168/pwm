@@ -31,6 +31,10 @@ public class HallRechargeApplyDTO {
 	@Length(max = 16)
 	private String merchantId;
 
+	@ApiModelProperty(name = "merchantName", value = "营业厅名称")
+	@Length(max = 40)
+	private String merchantName;
+
 	private BussinessBody body;
 
 	/**
@@ -60,10 +64,10 @@ public class HallRechargeApplyDTO {
 		/**
 		 * 充值用户或商户id
 		 */
-		@ApiModelProperty(name = "payerId", value = "充值用户或商户id")
-		@NotEmpty(message="PWM10013")
-		@Length(max = 16)
-		private String payerId;
+		@ApiModelProperty(name = "mblNo", value = "充值用户手机号(eg:+86-18675988953)")
+		@NotEmpty(message="PWM10035")
+		@Length(max = 20)
+		private String mblNo;
 
 		/**
 		 * 状态:<br/>
@@ -102,10 +106,6 @@ public class HallRechargeApplyDTO {
 			return amount;
 		}
 
-		public String getPayerId() {
-			return payerId;
-		}
-
 		public String getHallOrderNo() {
 			return hallOrderNo;
 		}
@@ -116,10 +116,6 @@ public class HallRechargeApplyDTO {
 
 		public void setAmount(BigDecimal amount) {
 			this.amount = amount;
-		}
-
-		public void setPayerId(String payerId) {
-			this.payerId = payerId;
 		}
 
 		public void setStatus(String status) {
@@ -149,6 +145,14 @@ public class HallRechargeApplyDTO {
 		public void setFee(BigDecimal fee) {
 			this.fee = fee;
 		}
+
+		public String getMblNo() {
+			return mblNo;
+		}
+
+		public void setMblNo(String mblNo) {
+			this.mblNo = mblNo;
+		}
 	}
 
 	public void setSign(String sign) {
@@ -163,6 +167,14 @@ public class HallRechargeApplyDTO {
 	}
 	public String getMerchantId() {
 		return merchantId;
+	}
+
+	public String getMerchantName() {
+		return merchantName;
+	}
+
+	public void setMerchantName(String merchantName) {
+		this.merchantName = merchantName;
 	}
 
 	public BussinessBody getBody() {
