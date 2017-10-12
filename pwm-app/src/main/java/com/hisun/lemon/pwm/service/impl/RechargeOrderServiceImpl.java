@@ -1017,7 +1017,6 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 		// 调用收银,生成收银订单
 		InitCashierDTO initCashierDTO = new InitCashierDTO();
-//		initCashierDTO.setBusPaytype("");
 		initCashierDTO.setBusType(rechargeOrderDO.getBusType());
 		initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
 		initCashierDTO.setPayeeId(offlineRechargeApplyDTO.getPayerId());

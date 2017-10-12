@@ -108,7 +108,6 @@ public class WithdrawOrderControllerTest {
     @Test
     @Ignore
     public void hcouponTest(){
-        Object[] args=new Object[]{100};
 //        String descStr=getViewOrderInfo(PwmConstants.BUS_TYPE_HCOUPON,args);
 //        System.out.println(descStr);
  //       System"0501".substring(2);

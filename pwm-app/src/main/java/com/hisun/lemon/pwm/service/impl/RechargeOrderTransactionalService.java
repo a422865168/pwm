@@ -72,8 +72,7 @@ public class RechargeOrderTransactionalService extends BaseService {
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS,readOnly = true)
 	public RechargeHCouponDO getHCoupon(String orderNo) {
-		RechargeHCouponDO rechargeHCouponDO = this.rechargeHCouponDao.get(orderNo);
-		return rechargeHCouponDO;
+		return this.rechargeHCouponDao.get(orderNo);
 	}
 
 	/**
@@ -83,8 +82,7 @@ public class RechargeOrderTransactionalService extends BaseService {
 	 */
 	@Transactional(propagation = Propagation.SUPPORTS,readOnly = true)
 	public RechargeOrderDO getRechargeOrderByExtOrderNo(String extOrderNo) {
-		RechargeOrderDO rechargeOrderDO = this.rechangeOrderDao.getRechargeOrderByExtOrderNo(extOrderNo);
-		return rechargeOrderDO;
+		return this.rechangeOrderDao.getRechargeOrderByExtOrderNo(extOrderNo);
 	}
 
 	/**
