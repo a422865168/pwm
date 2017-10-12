@@ -235,9 +235,9 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		directPaymentDTO.sethCouponAmt(0);
 		directPaymentDTO.setCashAmt(rechargeDO.getOrderAmt());
 		logger.info("订单：" + rechargeDO.getOrderNo() + " 请求收银台");
-		GenericDTO<DirectPaymentDTO> DirectPayment = new GenericDTO<>();
-		DirectPayment.setBody(directPaymentDTO);
-		GenericRspDTO<PaymentResultDTO> rspDTO = cshOrderClient.payByDirectBal(DirectPayment);
+		GenericDTO<DirectPaymentDTO> directPayment = new GenericDTO<>();
+        directPayment.setBody(directPaymentDTO);
+		GenericRspDTO<PaymentResultDTO> rspDTO = cshOrderClient.payByDirectBal(directPayment);
 		if (!JudgeUtils.isSuccess(rspDTO.getMsgCd())) {
 			logger.error("调用收银台后台直付接口失败");
 			throw new LemonException(rspDTO.getMsgCd());
@@ -656,8 +656,6 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 						}else if(JudgeUtils.equals(feeFlag,"IN")){
 							//用户账户金额为充值订单金额减去手续费
 							userAmt = rechargeTotalAmt.subtract(fee);
-						}else{
-
 						}
 
 						if(JudgeUtils.isBlank(balAcNo)){
@@ -1443,7 +1441,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		return retStr;
 	}
 
-	private void signCheck(HallRechargeApplyDTO dto,UserBasicInfDTO userBasicInfDTO) {
+	private void signCheck(HallRechargeApplyDTO dto) {
 		String applySign = dto.getSign();
 		// 签名密钥
 		String key = LemonUtils.getProperty("pwm.recharge.HALLKEY");
@@ -1830,7 +1828,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
             LemonException.throwBusinessException(checkStatus.getMsgCd());
         }
         //签名校验
-        signCheck(dto,userBasicInfDTO);
+        signCheck(dto);
         //充值操作状态校验
 		RechargeOrderDO oriRechargeOrderDO = this.service.getRechargeOrderByHallOrderNo(bussinessBody.getHallOrderNo());
         String operationType = bussinessBody.getStatus();
