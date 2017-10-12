@@ -59,7 +59,9 @@ public class HallRechargeApplyDTO {
 		 */
 		@ApiModelProperty(name = "amount", value = "充值金额")
 		@Min(value=0, message="PWM10012")
-		private BigDecimal amount;
+		@NotNull(message="PWM10006")
+		@Length(max = 15)
+		private String amount;
 
 		/**
 		 * 充值用户或商户id
@@ -83,7 +85,8 @@ public class HallRechargeApplyDTO {
 		@ApiModelProperty(name = "fee", value = "营业厅充值操作手续费")
 		@NotNull(message="PWM10052")
 		@Min(value=0, message="PWM10016")
-		private BigDecimal fee;
+		@Length(max = 12)
+		private String fee;
 
 		@ApiModelProperty(name = "ccy", value = "营业厅充值币种")
         @NotNull(message="PWM10017")
@@ -102,9 +105,6 @@ public class HallRechargeApplyDTO {
 			return status;
 		}
 
-		public BigDecimal getAmount() {
-			return amount;
-		}
 
 		public String getHallOrderNo() {
 			return hallOrderNo;
@@ -114,9 +114,6 @@ public class HallRechargeApplyDTO {
 			this.hallOrderNo = hallOrderNo;
 		}
 
-		public void setAmount(BigDecimal amount) {
-			this.amount = amount;
-		}
 
 		public void setStatus(String status) {
 			this.status = status;
@@ -138,20 +135,28 @@ public class HallRechargeApplyDTO {
 			this.psnFlag = psnFlag;
 		}
 
-		public BigDecimal getFee() {
-			return fee;
-		}
-
-		public void setFee(BigDecimal fee) {
-			this.fee = fee;
-		}
-
 		public String getMblNo() {
 			return mblNo;
 		}
 
 		public void setMblNo(String mblNo) {
 			this.mblNo = mblNo;
+		}
+
+		public String getAmount() {
+			return amount;
+		}
+
+		public void setAmount(String amount) {
+			this.amount = amount;
+		}
+
+		public String getFee() {
+			return fee;
+		}
+
+		public void setFee(String fee) {
+			this.fee = fee;
 		}
 	}
 
