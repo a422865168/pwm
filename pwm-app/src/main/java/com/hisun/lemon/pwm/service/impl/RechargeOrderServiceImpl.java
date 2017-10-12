@@ -781,8 +781,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
 		BigDecimal orderAmt = bussinessBody.getAmount();
 		//充值请求校验
-		checkHallRequestBeforeHandler(dto);
-
+		UserBasicInfDTO userBasicInfDTO = checkHallRequestBeforeHandler(dto);
 		//手续费校验
 		BigDecimal applyFee = bussinessBody.getFee();
 		BigDecimal fee = caculateHallRechargeFee(orderAmt);
@@ -790,9 +789,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			throw new LemonException("PWM30006");
 		}
 
-
 		// 生成充值订单
-		RechargeOrderDO rechargeOrderDO = createHallRechargeOrder(bussinessBody);
+		RechargeOrderDO rechargeOrderDO = createHallRechargeOrder(bussinessBody,userBasicInfDTO);
 		BigDecimal rechargeTotalAmt = orderAmt;
 		BigDecimal userAmt = orderAmt;
 		String feeFlag = rechargeOrderDO.getFeeFlag();
@@ -803,7 +801,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		}
 		//个人账户查询
 		String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
-		String balAcNo=acmComponent.getAcmAcNo(bussinessBody.getPayerId(), balCapType);
+		String balAcNo=acmComponent.getAcmAcNo(userBasicInfDTO.getUserId(), balCapType);
 		if(JudgeUtils.isBlank(balAcNo)){
 			throw new LemonException("PWM20022");
 		}
@@ -864,7 +862,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 			updateOrderDO = syncOrderData(rechargeOrderDO,updateOrderDO);
 			//同步账单
-            synchronizeRechargeBil(updateOrderDO,CREATE_BIL);
+            synchronizeRechargeBil(updateOrderDO,CREATE_BIL,dto);
 			LemonException.throwBusinessException(e.getMsgCd());
 		}
 
@@ -888,7 +886,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
         updateOrderDO = syncOrderData(rechargeOrderDO,updateOrderDO);
 
         //同步账单
-        synchronizeRechargeBil(updateOrderDO,CREATE_BIL);
+        synchronizeRechargeBil(updateOrderDO,CREATE_BIL,dto);
 		//返回
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(orderAmt);
@@ -904,13 +902,13 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	public HallRechargeResultDTO hallRechargeRevocation(HallRechargeApplyDTO dto) {
 		HallRechargeApplyDTO.BussinessBody busBody= dto.getBody();
 		//充值冲正请求校验
-		checkHallRequestBeforeHandler(dto);
+		UserBasicInfDTO userBasicInfDTO = checkHallRequestBeforeHandler(dto);
 		RechargeOrderDO rechargeOrderDO = this.service.getRechargeOrderByHallOrderNo(busBody.getHallOrderNo());
 		//查询充值订单和收银订单状态
 		if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_S)){
 			//个人账户信息
 			String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
-			String balAcNo=acmComponent.getAcmAcNo(busBody.getPayerId(), balCapType);
+			String balAcNo=acmComponent.getAcmAcNo(userBasicInfDTO.getUserId(), balCapType);
 			String tmpJrnNo =  LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_HALL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
 			AccountingReqDTO rechargeFeeReqDTO = null;
 			//营业厅撤销账务处理
@@ -978,7 +976,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		service.updateOrder(updateOrderDO);
 
 		//同步账单数据
-        synchronizeRechargeBil(updateOrderDO,UPD_BIL);
+        synchronizeRechargeBil(updateOrderDO,UPD_BIL,dto);
 		//返回处理结果
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(updateOrderDO.getOrderAmt());
@@ -1424,7 +1422,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 	}
 
-	private String md5Str(HallRechargeApplyDTO.BussinessBody busBody, String key) {
+	private String md5Str(HallRechargeApplyDTO.BussinessBody busBody,String key) {
 		ObjectMapper om = new ObjectMapper();
 		String retStr = "";
 		try {
@@ -1433,7 +1431,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			oriMap.put("ccy",busBody.getCcy());
 			oriMap.put("fee",busBody.getFee().setScale(2));
 			oriMap.put("hallOrderNo",busBody.getHallOrderNo());
-			oriMap.put("payerId",busBody.getPayerId());
+			oriMap.put("mblNo",busBody.getMblNo());
 			oriMap.put("status",busBody.getStatus());
 			retStr = om.writeValueAsString(oriMap);
 
@@ -1445,12 +1443,12 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		return retStr;
 	}
 
-	private void signCheck(HallRechargeApplyDTO dto) {
+	private void signCheck(HallRechargeApplyDTO dto,UserBasicInfDTO userBasicInfDTO) {
 		String applySign = dto.getSign();
 		// 签名密钥
 		String key = LemonUtils.getProperty("pwm.recharge.HALLKEY");
 		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
-		String md5 = md5Str(bussinessBody, key);
+		String md5 = md5Str(bussinessBody,key);
 		// 签名校验
 		if (JudgeUtils.isNull(md5) || !JudgeUtils.equals(applySign, md5.toUpperCase())) {
 			throw new LemonException("PWM10036");
@@ -1708,9 +1706,10 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
     /**
      * 同步账单方法
      * @param updOrderDO
+	 * @param dto 营业厅请求报文
      * @param flag 1 创建账单  2 更新账单
      */
-    public void synchronizeRechargeBil(RechargeOrderDO updOrderDO,int flag){
+    public void synchronizeRechargeBil(RechargeOrderDO updOrderDO,int flag,HallRechargeApplyDTO dto){
         switch (flag){
             case CREATE_BIL:
             	//获取国际化账单描述
@@ -1723,11 +1722,16 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
                 createUserBillDTO.setGoodsInfo(descStr);
                 createUserBillDTO.setCrdPayType("3");
                 createUserBillDTO.setCrdPayAmt(updOrderDO.getOrderAmt());
+                //设置商户收款方id
+				logger.info("账单同步营业厅id:>>" + dto.getMerchantId());
+				createUserBillDTO.setPayeeId(dto.getMerchantId());
+				createUserBillDTO.setMercName(dto.getMerchantName());
                 billSyncHandler.createBill(createUserBillDTO);
                 break;
             case UPD_BIL:
                 UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
                 BeanUtils.copyProperties(updateUserBillDTO, updOrderDO);
+				updateUserBillDTO.setPayeeId(dto.getMerchantId());
                 billSyncHandler.updateBill(updateUserBillDTO);
                 break;
             default:
@@ -1740,7 +1744,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	 * @param busBody
 	 * @return
 	 */
-	public RechargeOrderDO createHallRechargeOrder(HallRechargeApplyDTO.BussinessBody busBody){
+	public RechargeOrderDO createHallRechargeOrder(HallRechargeApplyDTO.BussinessBody busBody,UserBasicInfDTO userBasicInfDTO){
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = PwmConstants.BUS_TYPE_RECHARGE_HALL + ymd + IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 15);
 		// 生成充值订单
@@ -1763,7 +1767,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		rechargeOrderDO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
 		rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setRemark("");
-		rechargeOrderDO.setPayerId(busBody.getPayerId());
+		//设置付款方
+		rechargeOrderDO.setPayerId(userBasicInfDTO.getUserId());
 		rechargeOrderDO.setHallOrderNo(busBody.getHallOrderNo());
 		rechargeOrderDO.setFee(busBody.getFee());
 		rechargeOrderDO.setFeeFlag(PwmConstants.FEE_IN);
@@ -1805,14 +1810,19 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	 * 营业厅请求处理前校验
 	 * @param dto 请求对象
 	 */
-	private void checkHallRequestBeforeHandler(HallRechargeApplyDTO dto){
+	private UserBasicInfDTO checkHallRequestBeforeHandler(HallRechargeApplyDTO dto){
         HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
         if(JudgeUtils.isNull(bussinessBody)){
             throw new LemonException("PWM10053");
         }
+		GenericRspDTO<UserBasicInfDTO> genericUserInfoRspDTO = userBasicInfClient.queryUserByLoginId(bussinessBody.getMblNo());
+        if(JudgeUtils.isNotSuccess(genericUserInfoRspDTO.getMsgCd())){
+        	LemonException.throwBusinessException("查询手机号为: " + bussinessBody.getMblNo() + " 用户信息失败>>"+genericUserInfoRspDTO.getMsgCd());
+		}
+		UserBasicInfDTO userBasicInfDTO = genericUserInfoRspDTO.getBody();
         RiskCheckUserStatusReqDTO riskCheckUserStatusReqDTO = new RiskCheckUserStatusReqDTO();
         riskCheckUserStatusReqDTO.setIdTyp(Constants.ID_TYP_USER_NO);
-        riskCheckUserStatusReqDTO.setId(bussinessBody.getPayerId());
+        riskCheckUserStatusReqDTO.setId(userBasicInfDTO.getUserId());
         riskCheckUserStatusReqDTO.setTxTyp(PwmConstants.TX_TYPE_RECHANGE);
         //用户状态检查
         GenericRspDTO<NoBody> checkStatus = riskCheckClient.checkUserStatus(riskCheckUserStatusReqDTO);
@@ -1820,8 +1830,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
             LemonException.throwBusinessException(checkStatus.getMsgCd());
         }
         //签名校验
-        signCheck(dto);
-
+        signCheck(dto,userBasicInfDTO);
         //充值操作状态校验
 		RechargeOrderDO oriRechargeOrderDO = this.service.getRechargeOrderByHallOrderNo(bussinessBody.getHallOrderNo());
         String operationType = bussinessBody.getStatus();
@@ -1837,6 +1846,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
         }else {
             throw new LemonException("PWM10037");
         }
+
+        return userBasicInfDTO;
 
     }
 
