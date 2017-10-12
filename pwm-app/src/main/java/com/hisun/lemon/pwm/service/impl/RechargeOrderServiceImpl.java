@@ -779,11 +779,11 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	@Override
 	public HallRechargeResultDTO hallRechargePay(HallRechargeApplyDTO dto) {
 		HallRechargeApplyDTO.BussinessBody bussinessBody = dto.getBody();
-		BigDecimal orderAmt = bussinessBody.getAmount();
+		BigDecimal orderAmt = new BigDecimal(bussinessBody.getAmount());
 		//充值请求校验
 		UserBasicInfDTO userBasicInfDTO = checkHallRequestBeforeHandler(dto);
 		//手续费校验
-		BigDecimal applyFee = bussinessBody.getFee();
+		BigDecimal applyFee = new BigDecimal(bussinessBody.getFee());
 		BigDecimal fee = caculateHallRechargeFee(orderAmt);
 		if(applyFee.compareTo(fee) != 0){
 			throw new LemonException("PWM30006");
@@ -1427,9 +1427,9 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		String retStr = "";
 		try {
 			Map<String,Object> oriMap = new LinkedHashMap<>();
-			oriMap.put("amount",busBody.getAmount().setScale(2));
+			oriMap.put("amount",new BigDecimal(String.valueOf(busBody.getAmount())).setScale(2).toString());
 			oriMap.put("ccy",busBody.getCcy());
-			oriMap.put("fee",busBody.getFee().setScale(2));
+			oriMap.put("fee",new BigDecimal(String.valueOf(busBody.getFee())).setScale(2).toString());
 			oriMap.put("hallOrderNo",busBody.getHallOrderNo());
 			oriMap.put("mblNo",busBody.getMblNo());
 			oriMap.put("status",busBody.getStatus());
@@ -1752,7 +1752,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		rechargeOrderDO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_HALL);
 		rechargeOrderDO.setExtOrderNo("");
-		rechargeOrderDO.setOrderAmt(busBody.getAmount());
+		rechargeOrderDO.setOrderAmt(new BigDecimal(busBody.getAmount()));
 		rechargeOrderDO.setOrderCcy(busBody.getCcy());
 		rechargeOrderDO.setOrderExpTm(DateTimeUtils.getCurrentLocalDateTime().plusMinutes(15));
 		rechargeOrderDO.setOrderNo(orderNo);
@@ -1770,7 +1770,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		//设置付款方
 		rechargeOrderDO.setPayerId(userBasicInfDTO.getUserId());
 		rechargeOrderDO.setHallOrderNo(busBody.getHallOrderNo());
-		rechargeOrderDO.setFee(busBody.getFee());
+		rechargeOrderDO.setFee(new BigDecimal(busBody.getFee()));
 		rechargeOrderDO.setFeeFlag(PwmConstants.FEE_IN);
 		this.service.initOrder(rechargeOrderDO);
 
