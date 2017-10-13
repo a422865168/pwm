@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.pwm.dto.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -22,23 +23,6 @@ import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.constants.PwmConstants;
-import com.hisun.lemon.pwm.dto.HallOrderQueryResultDTO;
-import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeErrorFundDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeMatchDTO;
-import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
-import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponDTO;
-import com.hisun.lemon.pwm.dto.RechargeHCouponResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeRedoDTO;
-import com.hisun.lemon.pwm.dto.RechargeReqHCouponDTO;
-import com.hisun.lemon.pwm.dto.RechargeResultDTO;
-import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
-import com.hisun.lemon.pwm.dto.RechargeRspHCouponDTO;
-import com.hisun.lemon.pwm.dto.RemittanceUploadDTO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
 
 import io.swagger.annotations.Api;
@@ -74,11 +58,9 @@ public class RechargeOrderController extends BaseController{
 
 	@ApiOperation(value = "营业厅查询", notes = "查询用户账户信息")
 	@ApiResponse(code = 200, message = "查询到的用户与账户信息")
-	@GetMapping(value = "/hall/info")
-	public GenericRspDTO<HallQueryResultDTO> queryUserInfo(@Validated @RequestParam(value = "key",required = true) String key,
-														   @Validated @RequestParam(value = "amount",required = false) BigDecimal amount,
-														   @Validated @RequestParam(value = "type",required = true) String type) {
-		HallQueryResultDTO resultDTO = service.queryUserInfo(key,amount,type);
+	@PostMapping(value = "/hall/info")
+	public GenericRspDTO<HallQueryResultDTO> queryUserInfo(@Validated @RequestBody GenericDTO<HallQueryDTO> genericResultDTO) {
+		HallQueryResultDTO resultDTO = service.queryUserInfo(genericResultDTO);
 		return GenericRspDTO.newSuccessInstance(resultDTO);
 	}
 

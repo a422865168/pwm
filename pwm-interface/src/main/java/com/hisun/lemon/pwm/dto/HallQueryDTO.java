@@ -25,7 +25,7 @@ public class HallQueryDTO {
     private BigDecimal amount;
 
 	@NotEmpty(message = "PWM10018")
-	@Length(max = 15)
+	@Length(max = 18)
 	private  String key;
 	@ApiModelProperty(name = "type", value = "类型(U:用户|M:商户)")
 	@NotEmpty(message = "PWM10019")

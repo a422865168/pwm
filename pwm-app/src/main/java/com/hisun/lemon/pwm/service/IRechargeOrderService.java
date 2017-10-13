@@ -26,12 +26,10 @@ public interface IRechargeOrderService {
 
     /**
      * 查询用户与订单信息
-     * @param key
-     * @param amount
-     * @param type
+     * @param genericResultDTO
      * @return
      */
-    public HallQueryResultDTO queryUserInfo(String key,BigDecimal amount,String type);
+    public HallQueryResultDTO queryUserInfo(GenericDTO<HallQueryDTO> genericResultDTO);
 
     /**
      * 营业厅充值处理
