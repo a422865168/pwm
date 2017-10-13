@@ -221,11 +221,13 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10054','zh','支付密码随机数不能为空!',now(),now());
 
 INSERT INTO lemon_msg_info(msg_cd,LANGUAGE,msg_info,create_time,modifyTime)
-VALUES ('PWM10054','zh','支付密码随机数不能为空!',NOW(),NOW());
-
-INSERT INTO lemon_msg_info(msg_cd,LANGUAGE,msg_info,create_time,modifyTime)
 VALUES ('PWM10055','zh','支付密码不能为空!',NOW(),NOW());
-
+INSERT INTO lemon_msg_info(msg_cd,LANGUAGE,msg_info,create_time,modifyTime)
+VALUES ('PWM10056','zh','营业厅对账类型不能为空!',NOW(),NOW());
+INSERT INTO lemon_msg_info(msg_cd,LANGUAGE,msg_info,create_time,modifyTime)
+VALUES ('PWM10057','zh','营业厅对账日期不能为空!',NOW(),NOW());
+INSERT INTO lemon_msg_info(msg_cd,LANGUAGE,msg_info,create_time,modifyTime)
+VALUES ('PWM10058','zh','营业厅指定对账文件名不能为空!',NOW(),NOW());
 
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM20001','zh','业务类型与交易类型不匹配!',now(),now());

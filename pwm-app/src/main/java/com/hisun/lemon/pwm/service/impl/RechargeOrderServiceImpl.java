@@ -1313,7 +1313,10 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	}
 
 	@Override
-	public void uploadHallRechargeChkFile(String type,String date,String fileName){
+	public void uploadHallRechargeChkFile(GenericDTO<HallChkDTO> genericDTO){
+		HallChkDTO hallChkDTO = genericDTO.getBody();
+		String fileName = hallChkDTO.getFilename();
+		String type = hallChkDTO.getType();
 		//营业厅文件服务器配置
 		final String hallServer = LemonUtils.getProperty("pwm.recharge.hall-sftp.ip");
 		final int hallPort = Integer.valueOf(LemonUtils.getProperty("pwm.recharge.hall-sftp.port"));

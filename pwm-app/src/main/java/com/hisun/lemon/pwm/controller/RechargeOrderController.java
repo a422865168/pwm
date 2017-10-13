@@ -154,10 +154,9 @@ public class RechargeOrderController extends BaseController{
 
 	@ApiOperation(value = "获取营业厅充值对账文件", notes = "处理营业对账文件上传服务器")
 	@ApiResponse(code = 200, message = "获取营业厅对账文件结果")
-	@GetMapping(value = "/chk/{type}/{date}/{filename}")
-	public GenericRspDTO<NoBody> uploadHallChkFile(@PathVariable(value="type",required = true) String type, @PathVariable(value="date",required = true) String date,
-												  @PathVariable(value="filename",required = true) String filename) {
-		service.uploadHallRechargeChkFile(type,date,filename);
+	@PostMapping(value = "/chk/{type}/{date}/{filename}")
+	public GenericRspDTO<NoBody> uploadHallChkFile(@Validated @RequestBody GenericDTO<HallChkDTO> genericDTO) {
+		service.uploadHallRechargeChkFile(genericDTO);
 		return GenericRspDTO.newSuccessInstance();
 	}
 

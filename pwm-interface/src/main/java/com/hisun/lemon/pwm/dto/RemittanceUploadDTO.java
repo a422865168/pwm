@@ -4,11 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
-import java.math.BigDecimal;
-
 /**
  * Created by Xian on 2017/8/9.
  */
