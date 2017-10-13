@@ -46,12 +46,12 @@ public class WithdrawDTO {
 	@Length(max =3)
 	private String orderCcy;
 	//提现类型
-	@ApiModelProperty(name = "wcType", value = "提现类型")
+	@ApiModelProperty(name = "wcType", value = "提现类型 11.自主提现")
 	@NotEmpty(message="PWM10031")
 	@Length(max = 2)
 	private String wcType;
 	//付款加急标识
-	@ApiModelProperty(name = "payUrgeFlg", value = "付款加急标识")
+	@ApiModelProperty(name = "payUrgeFlg", value = "付款加急标识 1.是 0.否")
 	@NotEmpty(message="PWM10032")
 	@Length(max = 1)
 	private String payUrgeFlg;
