@@ -23,7 +23,6 @@ public class WithdrawCardBindDTO {
     private String cardNo;
 	//支行名称
 	@ApiModelProperty(name = "branchName", value = "支行名称")
-    @NotEmpty(message = "PWM10044")
     @Length(max = 24)
     private String branchName;
     //资金机构
