@@ -1,6 +1,6 @@
 <configuration>
   <springProperty scope="context" name="appName" source="spring.application.name" defaultValue="appName"/>
-  <springProperty scope="context" name="rootLevel" source="logging.level.root" defaultValue="INFO"/>
+  <springProperty scope="context" name="rootLevel" source="logging.level.root" defaultValue="DEBUG"/>
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${lemon.log.path}/lemon-${appName}.log</file>
