@@ -1104,15 +1104,17 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			offlineRechargeResultDTO.setMblNo(userBasicInfDTO.getMblNo());
 		}
 		String crdCorpOrg = offlineRechargeApplyDTO.getCrdCorpOrg();
+		String remitCompany = "";
 		for(RouteRspDTO.RouteDTO rd : rounteList) {
 			if(JudgeUtils.equals(crdCorpOrg,rd.getCrdCorpOrg())) {
 				//汇款银行账号
 				offlineRechargeResultDTO.setCrdNo(rd.getCorpAccNo());
+				remitCompany = rd.getRmk();
 				break;
 			}
 		}
 		//汇款银行账户(备注写的是公司账户银行)
-		offlineRechargeResultDTO.setCrdUsrNm(payeeCompany);
+		offlineRechargeResultDTO.setCrdUsrNm(JudgeUtils.isBlank(remitCompany) ? payeeCompany : remitCompany);
 		return offlineRechargeResultDTO;
 	}
 
