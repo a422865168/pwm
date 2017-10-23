@@ -1,10 +1,13 @@
+/*
 package com.hisun.lemon.pwm.controller;
 
+*/
 /**
  * @author leon
  * @date 2017/7/14
  * @time 16:52
- */
+ *//*
+
 //@RunWith(SpringRunner.class)
 //@SpringBootTest
 public class WithdrawOrderControllerTest {
@@ -18,14 +21,17 @@ public class WithdrawOrderControllerTest {
 
    // }
 
-    /**
+    */
+/**
      * 测试生成提现订单
      * @throws Exception
-     */
+     *//*
+
 //    @Test
 //    @Ignore
     public void testCreateOrder() throws Exception{
 
+*/
 /*        WithdrawResultDTO withdrawResultDTO = new WithdrawResultDTO();
         withdrawResultDTO.setUserId("userId");
         withdrawResultDTO.setPayPassWord("password2");
@@ -50,19 +56,23 @@ public class WithdrawOrderControllerTest {
         String content = mvcResult.getResponse().getContentAsString();
 
         Assert.assertTrue("正确", status == 200);
-        Assert.assertFalse("错误", status != 200);*/
+        Assert.assertFalse("错误", status != 200);*//*
+
     }
 
 
-    /**
+    */
+/**
      * 测试提现结果处理
      * @throws Exception
-     */
+     *//*
+
 //    @Test
 //    @Ignore
     public void testCompleteOrder() throws Exception{
 
-       /* WithdrawComplDTO withdrawComplDTO = new WithdrawComplDTO();
+       */
+/* WithdrawComplDTO withdrawComplDTO = new WithdrawComplDTO();
         withdrawComplDTO.setOrderNo("20170717000000000001501");
         withdrawComplDTO.setWcActAmt(new BigDecimal(36));
         withdrawComplDTO.setRspOrderNo("111110304958940");
@@ -78,7 +88,8 @@ public class WithdrawOrderControllerTest {
         String content = mvcResult.getResponse().getContentAsString();
 
         Assert.assertTrue("正确", status == 200);
-        Assert.assertFalse("错误", status != 200);*/
+        Assert.assertFalse("错误", status != 200);*//*
+
     }
 
 
@@ -90,3 +101,4 @@ public class WithdrawOrderControllerTest {
  //       System"0501".substring(2);
     }
 }
+*/
