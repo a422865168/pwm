@@ -115,10 +115,13 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 	public WithdrawRspDTO createOrder(GenericDTO<WithdrawDTO> genericWithdrawDTO) {
 
         //生成订单号
+        WithdrawDTO withdrawDTO = genericWithdrawDTO.getBody();
+
+        String userId = withdrawDTO.getUserId();
         String ymd= DateTimeUtils.getCurrentDateStr();
         String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE+ymd,15);
         orderNo = PwmConstants.BUS_TYPE_WITHDRAW_P+ymd+orderNo;
-		WithdrawDTO withdrawDTO = genericWithdrawDTO.getBody();
+
         GenericRspDTO genericRspDTO = null;
         GenericDTO genericDTO = new GenericDTO();
 
@@ -130,7 +133,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         jrnReqDTO.setTxTime(DateTimeUtils.getCurrentLocalTime());
         jrnReqDTO.setTxJrnNo(orderNo);
         jrnReqDTO.setTxOrdNo(orderNo);
-        jrnReqDTO.setStlUserId(withdrawDTO.getUserId());
+        jrnReqDTO.setStlUserId(userId);
         jrnReqDTO.setStlUserTyp(Constants.ID_TYP_USER_NO);
         jrnReqDTO.setTxTyp(Constants.TX_TYP_WITHDRAW);
         jrnReqDTO.setPayTyp(Constants.PAY_TYP_ACCOUNT);
@@ -159,7 +162,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_P);
         tradeFeeReqDTO.setCcy(withdrawDTO.getOrderCcy());
         tradeFeeReqDTO.setTradeAmt(withdrawDTO.getWcApplyAmt());
-        tradeFeeReqDTO.setUserId(withdrawDTO.getUserId());
+        tradeFeeReqDTO.setUserId(userId);
         genericDTO.setBody(tradeFeeReqDTO);
 
         //调用tfm接口查询手续费
@@ -179,7 +182,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         BigDecimal balance = new BigDecimal(0);
         //查询用户账户余额
         UserAccountDTO userAccountDTO = new UserAccountDTO();
-        userAccountDTO.setUserId(withdrawDTO.getUserId());
+        userAccountDTO.setUserId(userId);
         //调用账户接口，查询账户余额
         genericRspDTO = accountManagementClient.queryAcBal(userAccountDTO);
         List<QueryAcBalRspDTO> queryAcBalRspDTO = (List<QueryAcBalRspDTO>) genericRspDTO.getBody();
@@ -199,7 +202,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 
 		//查询用户支付密码，校验支付密码，错误则抛异常
         CheckPayPwdDTO checkPayPwdDTO =new CheckPayPwdDTO();
-        checkPayPwdDTO.setUserId(withdrawDTO.getUserId());
+        checkPayPwdDTO.setUserId(userId);
         checkPayPwdDTO.setPayPwd(withdrawDTO.getPayPassWord());
         checkPayPwdDTO.setPayPwdRandom(withdrawDTO.getPayPassWordRand());
         genericDTO.setBody(checkPayPwdDTO);
@@ -271,7 +274,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
          * 账务处理
          */
         //查询用户账号
-        String acNo = accountManagementClient.queryAcNo(withdrawDTO.getUserId()).getBody();
+        String acNo = accountManagementClient.queryAcNo(userId).getBody();
         if(JudgeUtils.isEmpty(acNo)){
             LemonException.throwBusinessException("PWM40006");
         }
@@ -303,7 +306,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }
 
         //国际化订单信息
-        WithdrawCardBindDO withdrawCardBindDO = withdrawCardBindDao.query(withdrawOrderDO.getCapCardNo());
+        WithdrawCardBindDO withdrawCardBindDO = withdrawCardBindDao.query(withdrawOrderDO.getCapCardNo(), userId);
         Object[] args=new Object[]{withdrawCardBindDO.getCardNoLast(), withdrawOrderDO.getWcApplyAmt()};
         String desc=getViewOrderInfo(withdrawOrderDO.getCapCorgNo(),args);
 
@@ -487,7 +490,8 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         if(JudgeUtils.isNotNull(commonEncryptRspDTO)) {
             cardNoEnc = commonEncryptRspDTO.getData();
         }
-        WithdrawCardBindDO withdrawCardBindDO1 = withdrawCardBindDao.query(cardNoEnc);
+        String userId = withdrawCardBindDTO.getUserId();
+        WithdrawCardBindDO withdrawCardBindDO1 = withdrawCardBindDao.query(cardNoEnc, userId);
         //初始化需要返回的卡信息
         WithdrawCardQueryDTO withdrawCardQueryDTO = new WithdrawCardQueryDTO();
         //判断提现银行卡是否存在
