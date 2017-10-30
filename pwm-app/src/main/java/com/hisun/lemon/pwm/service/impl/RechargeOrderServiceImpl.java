@@ -1,6 +1,5 @@
 package com.hisun.lemon.pwm.service.impl;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
@@ -1456,8 +1455,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			oriMap.put("mblNo",busBody.getMblNo());
 			oriMap.put("status",busBody.getStatus());
 			retStr = om.writeValueAsString(oriMap);
-			retStr = new String(Digests.md5(retStr.getBytes(Charset.forName("UTF-8"))),"UTF-8");
-		} catch (JsonProcessingException | UnsupportedCharsetException | UnsupportedEncodingException e) {
+			retStr = bytesToHexString(Digests.md5((retStr+key).getBytes(Charset.forName("UTF-8"))));
+		} catch (JsonProcessingException | UnsupportedCharsetException e) {
 
 		}
 		return retStr;
@@ -1475,6 +1474,18 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		}
 	}
 
+	public static final String bytesToHexString(byte[] bArray) {
+		StringBuffer sb = new StringBuffer(bArray.length);
+		String sTemp;
+		for (int i = 0; i < bArray.length; i++) {
+			sTemp = Integer.toHexString(0xFF & bArray[i]);
+			if(sTemp.length() < 2){
+				sb.append(0);
+			}
+			sb.append(sTemp.toUpperCase());
+		}
+		return sb.toString();
+	}
 
 	private RechargeOrderDO checkBeforeErrHandle(HallRechargeErrorFundDTO hallrep, String handleType){
 		String orderNo = hallrep.getOrderNo();
