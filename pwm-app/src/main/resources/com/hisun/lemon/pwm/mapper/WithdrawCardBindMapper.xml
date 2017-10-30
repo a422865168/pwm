@@ -29,11 +29,12 @@
         where card_id = #{cardId,jdbcType=VARCHAR}
     </select>
 
-    <select id="query" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    <select id="query" resultMap="BaseResultMap" >
         select
         <include refid="Base_Column_List" />
         from pwm_withdraw_card
-        where card_no = #{cardNo,jdbcType=VARCHAR} and user_id = #{userId,jdbcType=VARCHAR}
+        where card_no = #{cardNo,jdbcType=VARCHAR}
+        and user_id = #{userId,jdbcType=VARCHAR} and cap_corg = #{capCorg, jdbcType=VARCHAR}
     </select>
 
     <select id="queryCardList" resultMap="BaseResultMap" parameterType="java.lang.String" >
