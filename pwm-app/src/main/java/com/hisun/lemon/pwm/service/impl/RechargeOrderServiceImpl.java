@@ -1,6 +1,9 @@
 package com.hisun.lemon.pwm.service.impl;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +14,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.common.security.Digests;
 import com.hisun.lemon.framework.service.BaseService;
 import com.hisun.lemon.pwm.constants.OfflineBilExtConstants;
 import com.hisun.lemon.pwm.dto.*;
@@ -18,7 +22,6 @@ import com.hisun.lemon.tfm.dto.*;
 import org.apache.commons.collections.map.HashedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -1453,10 +1456,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			oriMap.put("mblNo",busBody.getMblNo());
 			oriMap.put("status",busBody.getStatus());
 			retStr = om.writeValueAsString(oriMap);
-
-			Md5PasswordEncoder md5 = new Md5PasswordEncoder();
-			retStr = md5.encodePassword(retStr+key,null);
-		} catch (JsonProcessingException e) {
+			retStr = new String(Digests.md5(retStr.getBytes(Charset.forName("UTF-8"))),"UTF-8");
+		} catch (JsonProcessingException | UnsupportedCharsetException | UnsupportedEncodingException e) {
 
 		}
 		return retStr;
