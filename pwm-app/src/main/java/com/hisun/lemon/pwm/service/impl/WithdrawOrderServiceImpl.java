@@ -306,7 +306,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }
 
         //国际化订单信息
-        WithdrawCardBindDO withdrawCardBindDO = withdrawCardBindDao.query(withdrawOrderDO.getCapCardNo(), userId);
+        WithdrawCardBindDO withdrawCardBindDO = withdrawCardBindDao.query(withdrawOrderDO.getCapCardNo(), userId, withdrawOrderDO.getCapCorgNo());
         Object[] args=new Object[]{withdrawCardBindDO.getCardNoLast(), withdrawOrderDO.getWcApplyAmt()};
         String desc=getViewOrderInfo(withdrawOrderDO.getCapCorgNo(),args);
 
@@ -491,7 +491,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             cardNoEnc = commonEncryptRspDTO.getData();
         }
         String userId = withdrawCardBindDTO.getUserId();
-        WithdrawCardBindDO withdrawCardBindDO1 = withdrawCardBindDao.query(cardNoEnc, userId);
+        WithdrawCardBindDO withdrawCardBindDO1 = withdrawCardBindDao.query(cardNoEnc, userId, withdrawCardBindDTO.getCapCorg());
         //初始化需要返回的卡信息
         WithdrawCardQueryDTO withdrawCardQueryDTO = new WithdrawCardQueryDTO();
         //判断提现银行卡是否存在
