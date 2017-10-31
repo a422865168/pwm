@@ -304,7 +304,7 @@ security :
 pwm :
   recharge :
     #营业厅充值签名KEY值
-    HALLKEY : PWM123456789002
+    HALLKEY : 304B5C6562C7A43498760FD93209ABBE
     #营业厅ftp服务器配置
     hall-sftp:
        ip: 192.168.3.38
