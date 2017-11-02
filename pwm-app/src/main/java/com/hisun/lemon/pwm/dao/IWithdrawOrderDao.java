@@ -18,4 +18,5 @@ import java.util.Map;
 @Component
 public interface IWithdrawOrderDao extends BaseDao<WithdrawOrderDO>{
     public List<WithdrawOrderDO> queryList(Map o);
+    public List<WithdrawOrderDO> getListByCondition(WithdrawOrderDO withdrawOrderDO);
 }
