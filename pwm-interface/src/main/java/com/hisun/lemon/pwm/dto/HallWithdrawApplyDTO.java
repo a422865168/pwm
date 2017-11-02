@@ -41,7 +41,7 @@ public class HallWithdrawApplyDTO {
     private String orderCcy;
 
     /** 结算金额 */
-    @ApiModelProperty(name = "settleAmt", value = "提现金额", required = true)
+    @ApiModelProperty(name = "withdrawAmt", value = "提现金额", required = true)
     @NotNull(message = "PWM10041")
     @Min(value=0, message="PWM10029")
     private BigDecimal withdrawAmt;
