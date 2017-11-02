@@ -129,4 +129,12 @@ public class WithdrawOrderController  extends BaseController {
 	public GenericRspDTO withdrawErrorHandler(@Validated @RequestBody GenericDTO<WithdrawErrorHandleDTO> genericWithdrawErrorHandleDTO) {
 		return withdrawOrderService.withdrawErrorHandler(genericWithdrawErrorHandleDTO);
 	}
+
+	@ApiOperation(value = "营业厅个人提现", notes = "营业厅个人提现处理")
+	@ApiResponse(code = 200, message = "个人营业厅提现结果")
+	@PostMapping(value = "/hall")
+	public GenericRspDTO<HallWithdrawResultDTO> hallWithdrawHandle(@Validated @RequestBody GenericDTO<HallWithdrawApplyDTO> genericWithdrawResultDTO) {
+		HallWithdrawResultDTO hallWithdrawResultDTO = withdrawOrderService.handleHallWithdraw(genericWithdrawResultDTO);
+		return GenericRspDTO.newSuccessInstance(hallWithdrawResultDTO);
+	}
 }

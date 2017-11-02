@@ -343,4 +343,93 @@
             </if>
         </where>
     </select>
+
+    <select id="getListByCondition" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from pwm_withdraw_order
+        <where>
+            <if test="orderTm != null" >
+                order_tm = #{orderTm,jdbcType=TIMESTAMP}
+            </if>
+            <if test="orderExpTm != null" >
+                order_exp_tm = #{orderExpTm,jdbcType=TIMESTAMP}
+            </if>
+            <if test="acTm != null" >
+                ac_tm = #{acTm,jdbcType=DATE}
+            </if>
+            <if test="orderCcy != null" >
+                order_ccy = #{orderCcy,jdbcType=CHAR}
+            </if>
+            <if test="orderSuccTm != null" >
+                order_succ_tm = #{orderSuccTm,jdbcType=TIMESTAMP}
+            </if>
+            <if test="wcType != null" >
+                wc_type = #{wcType,jdbcType=CHAR}
+            </if>
+            <if test="txType != null" >
+                tx_type = #{txType,jdbcType=VARCHAR}
+            </if>
+            <if test="busType != null" >
+                bus_type = #{busType,jdbcType=VARCHAR}
+            </if>
+            <if test="wcApplyAmt != null" >
+                wc_apply_amt = #{wcApplyAmt,jdbcType=DECIMAL}
+            </if>
+            <if test="wcActAmt != null" >
+                wc_act_amt = #{wcActAmt,jdbcType=DECIMAL}
+            </if>
+            <if test="wcTotalAmt != null" >
+                wc_total_amt = #{wcTotalAmt,jdbcType=DECIMAL}
+            </if>
+            <if test="feeAmt != null" >
+                fee_amt = #{feeAmt,jdbcType=DECIMAL}
+            </if>
+            <if test="payUrgeFlg != null" >
+                pay_urge_flg = #{payUrgeFlg,jdbcType=CHAR}
+            </if>
+            <if test="userId != null" >
+                user_id = #{userId,jdbcType=VARCHAR}
+            </if>
+            <if test="userName != null" >
+                user_name = #{userName,jdbcType=VARCHAR}
+            </if>
+            <if test="agrNo != null" >
+                agr_no = #{agrNo,jdbcType=VARCHAR}
+            </if>
+            <if test="capCorgNo != null" >
+                cap_corg_no = #{capCorgNo,jdbcType=VARCHAR}
+            </if>
+            <if test="capCardNo != null" >
+                cap_card_no = #{capCardNo,jdbcType=VARCHAR}
+            </if>
+            <if test="capCardType != null" >
+                cap_card_type = #{capCardType,jdbcType=CHAR}
+            </if>
+            <if test="capCardName != null" >
+                cap_card_name = #{capCardName,jdbcType=VARCHAR}
+            </if>
+            <if test="wcRemark != null" >
+                wc_remark = #{wcRemark,jdbcType=VARCHAR}
+            </if>
+            <if test="ntfMbl != null" >
+                ntf_mbl = #{ntfMbl,jdbcType=VARCHAR}
+            </if>
+            <if test="orderStatus != null" >
+                order_status = #{orderStatus,jdbcType=CHAR}
+            </if>
+            <if test="rspOrderNo != null" >
+                rsp_order_no = #{rspOrderNo,jdbcType=VARCHAR}
+            </if>
+            <if test="rspSuccTm != null" >
+                rsp_succ_tm = #{rspSuccTm,jdbcType=TIMESTAMP}
+            </if>
+            <if test="busCnl != null" >
+                bus_cnl = #{busCnl,jdbcType=VARCHAR}
+            </if>
+            <if test="modifyTime != null" >
+                modify_time = #{modifyTime,jdbcType=TIMESTAMP}
+            </if>
+        </where>
+    </select>
 </mapper>

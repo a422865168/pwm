@@ -64,4 +64,11 @@ public interface IWithdrawOrderService {
      * @return
      */
     public GenericRspDTO withdrawErrorHandler(GenericDTO<WithdrawErrorHandleDTO> genericWithdrawErrorHandleDTO);
+
+    /**
+     * 个人营业厅提现
+     * @param genericWithdrawHallDTO
+     * @return
+     */
+    public HallWithdrawResultDTO handleHallWithdraw(GenericDTO<HallWithdrawApplyDTO> genericWithdrawHallDTO);
 }

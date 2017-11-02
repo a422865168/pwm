@@ -64,6 +64,11 @@ public class PwmConstants {
 	 * 业务类型：提现--商户提现
 	 */
 	public static final String BUS_TYPE_WITHDRAW_M="0402";
+
+	/**
+	 * 业务类型：充值--个人营业厅提现
+	 */
+	public static final String BUS_TYPE_WITHDRAW_HALL ="0406";
 	
 	/**
 	 * 充值订单状态：等待充值
@@ -333,5 +338,15 @@ public class PwmConstants {
 	 * 手续费类型：EX外扣
 	 */
 	public static final String FEE_EX="EX";
+
+	/**
+	 * 手续费类型：IN内扣
+	 */
+	public static final String FEE_IN_MODE="internal";
+
+	/**
+	 * 手续费类型：EX外扣
+	 */
+	public static final String FEE_EX_MODE="external";
 
 }
