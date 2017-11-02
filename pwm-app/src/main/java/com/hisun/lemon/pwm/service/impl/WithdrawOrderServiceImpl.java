@@ -67,7 +67,7 @@ import java.util.List;
 import java.util.Map;
 
 
-@Transactional
+
 @Service("withdrawOrderService")
 public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOrderService {
     private static final Logger logger = LoggerFactory.getLogger(WithdrawOrderServiceImpl.class);
@@ -128,6 +128,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
      * @param genericWithdrawDTO
      */
 	@Override
+    @Transactional
 	public WithdrawRspDTO createOrder(GenericDTO<WithdrawDTO> genericWithdrawDTO) {
 
         //生成订单号
@@ -347,6 +348,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
      * 处理提现订单结果
      * @param genericWithdrawResultDTO
      */
+    @Transactional
 	public WithdrawRspDTO completeOrder(GenericDTO<WithdrawResultDTO> genericWithdrawResultDTO) {
 
         WithdrawResultDTO withdrawResultDTO = genericWithdrawResultDTO.getBody();
@@ -488,6 +490,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
      * @return
      */
     @Override
+    @Transactional
     public GenericRspDTO addCard(GenericDTO<WithdrawCardBindDTO> genericWithdrawCardBindDTO) {
         WithdrawCardBindDTO withdrawCardBindDTO = genericWithdrawCardBindDTO.getBody();
         WithdrawCardBindDO withdrawCardBindDO = new WithdrawCardBindDO();
@@ -565,6 +568,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
      * @return
      */
     @Override
+    @Transactional
     public GenericRspDTO<WithdrawCardDelRspDTO> delCard(GenericDTO<WithdrawCardDelDTO> genericWithdrawCardDelDTO) {
         WithdrawCardDelDTO withdrawCardDelDTO = genericWithdrawCardDelDTO.getBody();
         WithdrawCardBindDO withdrawCardBindDO = withdrawCardBindDao.get(withdrawCardDelDTO.getCardId());
@@ -648,6 +652,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
      * @param genericWithdrawErrorHandleDTO
      * @return
      */
+    @Transactional
     public GenericRspDTO withdrawErrorHandler(GenericDTO<WithdrawErrorHandleDTO> genericWithdrawErrorHandleDTO) {
         WithdrawErrorHandleDTO withdrawErrorHandleDTO = genericWithdrawErrorHandleDTO.getBody();
         //查询订单是否存在
@@ -765,7 +770,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }
         String ymd= DateTimeUtils.getCurrentDateStr();
         String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE+ymd,15);
-        orderNo = PwmConstants.BUS_TYPE_WITHDRAW_P+ymd+orderNo;
+        orderNo = PwmConstants.BUS_TYPE_WITHDRAW_HALL+ymd+orderNo;
         //5 新建提现记录
         withdrawOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
         withdrawOrderDO.setAgrNo("");
@@ -804,7 +809,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         withdrawOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
         withdrawOrderDO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_HALL);
         withdrawOrderDO.setWcApplyAmt(withdrawAmt);
-
+        this.withdrawOrderDao.insert(withdrawOrderDO);
         //6 账务处理
         //个人账户查询
         String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
@@ -856,14 +861,44 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
                     ACMConstants.ACCOUNTING_NOMARL, fee, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
                     PwmConstants.AC_ITEM_FEE_PAY_WIDR, null, null, null, null, "营业厅提现手续费$"+fee);
         }
+        try{
+            acmComponent.requestAc(userAccountReqDTO,cnlWithdrawHallReqDTO,withdrawFeeReqDTO);
+        }catch (Exception e){
+            WithdrawOrderDO updateOrderDO = new WithdrawOrderDO();
+            updateOrderDO.setOrderNo(withdrawOrderDO.getOrderNo());
+            updateOrderDO.setOrderStatus(PwmConstants.WITHDRAW_ORD_F1);
+            updateOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+            updateOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+            this.withdrawOrderDao.update(updateOrderDO);
 
-        acmComponent.requestAc(userAccountReqDTO,cnlWithdrawHallReqDTO,withdrawFeeReqDTO);
+            //账单同步
+            CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
+            BeanUtils.copyProperties(createUserBillDTO, withdrawOrderDO);
+            createUserBillDTO.setTxTm(withdrawOrderDO.getOrderTm());
+            createUserBillDTO.setOrderChannel(withdrawOrderDO.getBusCnl());
+            createUserBillDTO.setPayerId(withdrawOrderDO.getUserId());
+            createUserBillDTO.setOrderAmt(withdrawOrderDO.getWcApplyAmt());
+            createUserBillDTO.setFee(withdrawOrderDO.getFeeAmt());
+            createUserBillDTO.setPayeeId(merchantId);
+            createUserBillDTO.setOrderStatus(updateOrderDO.getOrderStatus());
+            createUserBillDTO.setGoodsInfo(desc);
+            createUserBillDTO.setMercName(merchantName);
+            billSyncHandler.createBill(createUserBillDTO);
+            if(e instanceof LemonException){
+                LemonException.throwBusinessException(((LemonException) e).getMsgCd());
+            }else {
+                throw e;
+            }
+        }
+
         //7 修改订单状态
-        withdrawOrderDO.setOrderStatus(PwmConstants.WITHDRAW_ORD_S1);
-        withdrawOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-        withdrawOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
-        withdrawOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
-        this.withdrawOrderDao.insert(withdrawOrderDO);
+        WithdrawOrderDO updateOrderDO = new WithdrawOrderDO();
+        updateOrderDO.setOrderNo(withdrawOrderDO.getOrderNo());
+        updateOrderDO.setOrderStatus(PwmConstants.WITHDRAW_ORD_S1);
+        updateOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+        updateOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+        updateOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+        this.withdrawOrderDao.update(updateOrderDO);
         //8 登记手续费
         if(fee.compareTo(BigDecimal.ZERO)>0){
             paymentHandler.registUserWithdrawFee(withdrawOrderDO);
@@ -881,7 +916,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         createUserBillDTO.setOrderAmt(withdrawOrderDO.getWcApplyAmt());
         createUserBillDTO.setFee(withdrawOrderDO.getFeeAmt());
         createUserBillDTO.setPayeeId(merchantId);
-        createUserBillDTO.setOrderStatus(withdrawOrderDO.getOrderStatus());
+        createUserBillDTO.setOrderStatus(updateOrderDO.getOrderStatus());
         createUserBillDTO.setGoodsInfo(desc);
         createUserBillDTO.setMercName(merchantName);
         billSyncHandler.createBill(createUserBillDTO);
