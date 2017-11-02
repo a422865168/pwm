@@ -837,7 +837,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
                  null,
                  "营业厅提现$"+withdrawOrderDO.getWcApplyAmt());
 
-        //贷：应收账款-渠道充值-营业厅
+        //贷：应付账款-待结算款-营业厅付款
         AccountingReqDTO cnlWithdrawHallReqDTO=acmComponent.createAccountingReqDTO(
                 withdrawOrderDO.getOrderNo(),
                 tmpJrnNo,
@@ -848,12 +848,12 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
                 ACMConstants.ITM_AC_TYP,
                 balCapType,
                 ACMConstants.AC_C_FLG,
-                AcItem.I_CNL_HALL.getValue(),
+                PwmConstants.AC_ITEM_SETTLED_HALL,
                 null,
                 null,
                 null,
                 null,
-                null);
+                merchantId);
         //如果充值手续费大于0那么做手续费账务
         if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
             //贷：手续费收入-支付账户-提现

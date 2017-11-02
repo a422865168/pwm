@@ -186,6 +186,12 @@ public class PwmConstants {
 	 * 手续费收入-支付账户-充值
 	 */
 	public static final String AC_ITEM_RECHARGE_FEE="6021010005";
+
+	/**
+	 * 内部科目
+	 * 应付账款-待结算款-营业厅付款
+	 */
+	public static final String AC_ITEM_SETTLED_HALL="2202010002";
 	
 	/**
 	 * 海币换算美元比率
