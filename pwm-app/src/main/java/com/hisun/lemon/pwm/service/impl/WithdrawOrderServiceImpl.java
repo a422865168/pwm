@@ -191,6 +191,9 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         BigDecimal fee = tradeGenericRspDTO.getBody().getTradeFee();
         //总提现金额
         BigDecimal totalAmt = tradeGenericRspDTO.getBody().getTradeTotalAmt();
+        if(JudgeUtils.isNull(withdrawDTO.getFeeAmt())){
+            withdrawDTO.setFeeAmt(BigDecimal.ZERO);
+        }
         //校验前端传入的手续费与计算出的手续费是否一致
         if(fee.compareTo(withdrawDTO.getFeeAmt())!=0){
             LemonException.throwBusinessException("PWM30006");
