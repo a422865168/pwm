@@ -35,6 +35,12 @@ public class HallWithdrawResultDTO {
     @ApiModelProperty(name = "orderNo", value = "平台提现订单号")
     private String orderNo;
 
+    /**
+     * 订单状态 success-成功；fail-失败
+     */
+    @ApiModelProperty(name = "orderSts", value = "订单状态")
+    private String orderSts;
+
 
     /**
      * 订单日期
@@ -88,5 +94,13 @@ public class HallWithdrawResultDTO {
 
     public void setFeeAmt(String feeAmt) {
         this.feeAmt = feeAmt;
+    }
+
+    public String getOrderSts() {
+        return orderSts;
+    }
+
+    public void setOrderSts(String orderSts) {
+        this.orderSts = orderSts;
     }
 }

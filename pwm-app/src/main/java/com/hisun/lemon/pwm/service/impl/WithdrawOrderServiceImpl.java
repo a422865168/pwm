@@ -736,24 +736,62 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
     @Override
     public HallWithdrawResultDTO handleHallWithdraw(GenericDTO<HallWithdrawApplyDTO> genericWithdrawResultDTO) {
         HallWithdrawApplyDTO hallApplyDTO = genericWithdrawResultDTO.getBody();
+        // 营业厅商户号
         String merchantId = hallApplyDTO.getMerchantId();
-        String passwd = hallApplyDTO.getPayPassword();
-        String passwdRand = hallApplyDTO.getPayPwdRandom();
+        // 营业厅商户名
         String merchantName = hallApplyDTO.getMerchantName();
+        // 提现用户/商户支付密码
+        String passwd = hallApplyDTO.getPayPassword();
+        // 支付密码随机数
+        String passwdRand = hallApplyDTO.getPayPwdRandom();
+        // 营业厅订单号
         String hallWithdrawOrderNo = hallApplyDTO.getBusOrderNo();
+        // 用户类型
+        String userType = hallApplyDTO.getUserType();
+        // 提现用户手机号
         String mblNo = hallApplyDTO.getMblNo();
+        // 提现商户号
+        String userNo = hallApplyDTO.getUserNo();
+        // 申请提现金额
         BigDecimal withdrawAmt = hallApplyDTO.getWithdrawAmt();
+        // 提现手续费
         BigDecimal feeAmt = hallApplyDTO.getFeeAmt();
-        //1 查询用户信息，风控
-        UserBasicInfDTO userBasicInfo = getUserBasicInfo(mblNo);
-        String userId = userBasicInfo.getUserId();
 
+        // 1.根据userId检查用户/商户的账户状态
+        String userId = null;
+        if(JudgeUtils.equals(userType, "U")) {
+            // 若是用户
+            if(JudgeUtils.isNotBlank(mblNo)) {
+                UserBasicInfDTO userBasicInfo = getUserBasicInfo(mblNo);
+                if(JudgeUtils.isNotNull(userBasicInfo)) {
+                    userId = userBasicInfo.getUserId();
+                } else {
+                    // 提现用户信息不存在
+                    logger.info("User info does not exists!");
+                    LemonException.throwBusinessException("PWM20014");
+                }
+            } else {
+                // 提现用户手机号不能为空
+                logger.info("User mobil number should not be null!");
+                LemonException.throwBusinessException("PWM10035");
+            }
+        } else {
+            // 若是商户
+            if(JudgeUtils.isNotBlank(userNo)) {
+                userId = userNo;
+            } else {
+                // 提现商户号不能为空
+                logger.info("Merchant id should not be null!");
+                LemonException.throwBusinessException("PWM10035");
+            }
+        }
+        // 检查账户状态是否正常
         checkUserStatus(userId);
 
-        //2 校验支付密码
-        checkPayPassword(userId,passwd,true,passwdRand);
+        // 2.校验支付密码
+        checkPayPassword(userId, passwd,true, passwdRand);
 
-        //3 校验订单,金额,重复下单
+        // 3.校验订单,金额,重复下单
         if(withdrawAmt.compareTo(new BigDecimal(0)) <= 0) {
             LemonException.throwBusinessException("PWM10029");
         }
@@ -762,19 +800,19 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         if(this.withdrawOrderDao.getListByCondition(withdrawOrderDO).stream().filter(wd -> wd != null).count() > 0){
             LemonException.throwBusinessException("PWM20021");
         }
-        //4 手续费处理
+
+        // 4.手续费处理，校验前端传入的手续费与计算出的手续费是否一致
         TradeFeeCaculateRspDTO tradeFeeCaculateRspDTO = caculateHallWithdrawFee(withdrawAmt);
         String feeFlag = tradeFeeCaculateRspDTO.getCalculateMode();
         BigDecimal fee = tradeFeeCaculateRspDTO.getTradeFee();
-
-        //校验前端传入的手续费与计算出的手续费是否一致
-        if(feeAmt.compareTo(fee) != 0){
+        if(feeAmt.compareTo(fee) != 0) {
             LemonException.throwBusinessException("PWM30006");
         }
-        String ymd= DateTimeUtils.getCurrentDateStr();
-        String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE+ymd,15);
-        orderNo = PwmConstants.BUS_TYPE_WITHDRAW_HALL+ymd+orderNo;
-        //5 新建提现记录
+        String currDateStr = DateTimeUtils.getCurrentDateStr();
+        String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE + currDateStr, 15);
+        orderNo = PwmConstants.BUS_TYPE_WITHDRAW_HALL + currDateStr + orderNo;
+
+        // 5.创建提现记录
         withdrawOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
         withdrawOrderDO.setAgrNo("");
         withdrawOrderDO.setBusCnl("HALL");
@@ -783,132 +821,82 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         withdrawOrderDO.setFeeAmt(feeAmt);
         withdrawOrderDO.setNtfMbl(mblNo);
         withdrawOrderDO.setOrderCcy("USD");
-        withdrawOrderDO.setOrderExpTm(DateTimeUtils.getCurrentLocalDateTime().minusMinutes(15));
+        withdrawOrderDO.setOrderExpTm(null);
         withdrawOrderDO.setOrderNo(orderNo);
         withdrawOrderDO.setCapCardType("");
         withdrawOrderDO.setTxType(PwmConstants.TX_TYPE_WITHDRAW);
         withdrawOrderDO.setPayUrgeFlg("");
         withdrawOrderDO.setWcType("11");
+        // 提现用户号/商户号
         withdrawOrderDO.setUserId(userId);
+        withdrawOrderDO.setUserName("");
 
+        // 计算实际支付金额
         BigDecimal acUserAmt = new BigDecimal(0);
-        //根据扣费标识判断手续费
-        if(JudgeUtils.equals(PwmConstants.FEE_IN_MODE,feeFlag)){
+        if(JudgeUtils.equals(PwmConstants.FEE_IN_MODE, feeFlag)) {
+            // 手续费内扣
             acUserAmt = withdrawAmt.subtract(fee);
-        }else if(JudgeUtils.equals(PwmConstants.FEE_EX_MODE,feeFlag)){
+        }else if(JudgeUtils.equals(PwmConstants.FEE_EX_MODE, feeFlag)) {
+            // 手续费外扣
             acUserAmt = withdrawAmt.add(fee);
         }
+        // 实际支付金额
         withdrawOrderDO.setWcActAmt(acUserAmt);
-        Object[] args=new Object[]{withdrawAmt};
-        String desc=getViewOrderInfo(PwmConstants.ORD_SYSCHANNEL_HALL,args);
+        // 申请提现金额
+        withdrawOrderDO.setWcApplyAmt(withdrawAmt);
+        // 描述信息国际化
+        Object[] args = new Object[]{withdrawAmt};
+        String desc = getViewOrderInfo(PwmConstants.ORD_SYSCHANNEL_HALL, args);
         withdrawOrderDO.setWcRemark(desc);
+        // 订单总金额
         withdrawOrderDO.setWcTotalAmt(tradeFeeCaculateRspDTO.getTradeToalAmt());
         withdrawOrderDO.setCreateTime(DateTimeUtils.getCurrentLocalDateTime());
         withdrawOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
         withdrawOrderDO.setRspSuccTm(null);
-        withdrawOrderDO.setUserName(userBasicInfo.getUsrNm());
         withdrawOrderDO.setRspOrderNo(hallWithdrawOrderNo);
         withdrawOrderDO.setOrderStatus(PwmConstants.WITHDRAW_ORD_W1);
         withdrawOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
         withdrawOrderDO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_HALL);
-        withdrawOrderDO.setWcApplyAmt(withdrawAmt);
         this.withdrawOrderDao.insert(withdrawOrderDO);
-        //6 账务处理
-        //个人账户查询
-        String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
-        String balAcNo=acmComponent.getAcmAcNo(userId, balCapType);
-        if(JudgeUtils.isBlank(balAcNo)){
-            throw new LemonException("PWM20022");
-        }
-        String tmpJrnNo = LemonUtils.getRequestId();
-        AccountingReqDTO withdrawFeeReqDTO=null;//充值手续费账务处理
-         //借：其他应付款-支付账户-现金账户
-        AccountingReqDTO userAccountReqDTO=acmComponent.createAccountingReqDTO(
-                 withdrawOrderDO.getOrderNo(),
-                 tmpJrnNo,
-                 PwmConstants.TX_TYPE_RECHANGE,
-                 ACMConstants.ACCOUNTING_NOMARL,
-                 acUserAmt,
-                 balAcNo,
-                 ACMConstants.USER_AC_TYP,
-                 balCapType,
-                 ACMConstants.AC_D_FLG,
-                 AcItem.O_BAL.getValue(),
-                 null,
-                 null,
-                 null,
-                 null,
-                 "营业厅提现$"+withdrawOrderDO.getWcApplyAmt());
 
-        //贷：应付账款-待结算款-营业厅付款
-        AccountingReqDTO cnlWithdrawHallReqDTO=acmComponent.createAccountingReqDTO(
-                withdrawOrderDO.getOrderNo(),
-                tmpJrnNo,
-                PwmConstants.TX_TYPE_RECHANGE,
-                ACMConstants.ACCOUNTING_NOMARL,
-                withdrawAmt,
-                balAcNo,
-                ACMConstants.ITM_AC_TYP,
-                balCapType,
-                ACMConstants.AC_C_FLG,
-                PwmConstants.AC_ITEM_SETTLED_HALL,
-                null,
-                null,
-                null,
-                null,
-                merchantId);
-        //如果充值手续费大于0那么做手续费账务
-        if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
-            //贷：手续费收入-支付账户-提现
-            withdrawFeeReqDTO=acmComponent.createAccountingReqDTO(withdrawOrderDO.getOrderNo(), tmpJrnNo, withdrawOrderDO.getTxType(),
-                    ACMConstants.ACCOUNTING_NOMARL, fee, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
-                    PwmConstants.AC_ITEM_FEE_PAY_WIDR, null, null, null, null, "营业厅提现手续费$"+fee);
-        }
-        try{
-            acmComponent.requestAc(userAccountReqDTO,cnlWithdrawHallReqDTO,withdrawFeeReqDTO);
-        }catch (Exception e){
-            WithdrawOrderDO updateOrderDO = new WithdrawOrderDO();
-            updateOrderDO.setOrderNo(withdrawOrderDO.getOrderNo());
-            updateOrderDO.setOrderStatus(PwmConstants.WITHDRAW_ORD_F1);
-            updateOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-            updateOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
-            this.withdrawOrderDao.update(updateOrderDO);
-
-            //账单同步
-            CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
-            BeanUtils.copyProperties(createUserBillDTO, withdrawOrderDO);
-            createUserBillDTO.setTxTm(withdrawOrderDO.getOrderTm());
-            createUserBillDTO.setOrderChannel(withdrawOrderDO.getBusCnl());
-            createUserBillDTO.setPayerId(withdrawOrderDO.getUserId());
-            createUserBillDTO.setOrderAmt(withdrawOrderDO.getWcApplyAmt());
-            createUserBillDTO.setFee(withdrawOrderDO.getFeeAmt());
-            createUserBillDTO.setPayeeId(merchantId);
-            createUserBillDTO.setOrderStatus(updateOrderDO.getOrderStatus());
-            createUserBillDTO.setGoodsInfo(desc);
-            createUserBillDTO.setMercName(merchantName);
-            billSyncHandler.createBill(createUserBillDTO);
-            if(e instanceof LemonException){
-                LemonException.throwBusinessException(((LemonException) e).getMsgCd());
-            }else {
-                throw e;
-            }
+        // 6.账务处理
+        GenericRspDTO<NoBody> genericRspDTO = null;
+        try {
+            List<AccountingReqDTO> accountingReqDTOList =  hallWithdrawAccounting(userType, merchantId, withdrawOrderDO);
+            genericRspDTO = acmComponent.accountingTreatment(accountingReqDTOList);
+        } catch (LemonException e) {
+            logger.info("Hall withdraw failed, the exception is ", e);
+            LemonException.throwBusinessException(((LemonException) e).getMsgCd());
+        } catch (Exception e1) {
+            logger.info("Hall withdraw failed, the exception is ", e1);
+            throw e1;
         }
 
-        //7 修改订单状态
+        // 7.修改提现订单状态
+        String msgCd = genericRspDTO.getMsgCd();
+        String orderStatus = PwmConstants.WITHDRAW_ORD_F1;
+        String orderSts = "fail";
+        if(JudgeUtils.isSuccess(msgCd)) {
+            orderStatus = PwmConstants.WITHDRAW_ORD_S1;
+            orderSts = "success";
+        }
         WithdrawOrderDO updateOrderDO = new WithdrawOrderDO();
         updateOrderDO.setOrderNo(withdrawOrderDO.getOrderNo());
-        updateOrderDO.setOrderStatus(PwmConstants.WITHDRAW_ORD_S1);
+        updateOrderDO.setOrderStatus(orderStatus);
         updateOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
         updateOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
         updateOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
         this.withdrawOrderDao.update(updateOrderDO);
-        //8 登记手续费
-        if(fee.compareTo(BigDecimal.ZERO)>0){
-            paymentHandler.registUserWithdrawFee(withdrawOrderDO);
-        }
 
-        //登记营业厅商户手续费
-        paymentHandler.registMerChantWithdrawFee(withdrawOrderDO,merchantId);
+        // 8.登记提现用户的手续费
+        if(JudgeUtils.equals(userType, "U")) {
+            if(fee.compareTo(BigDecimal.ZERO) > 0) {
+                paymentHandler.registUserWithdrawFee(withdrawOrderDO);
+            }
+        } else {
+            //登记提现商户手续费
+            paymentHandler.registMerChantWithdrawFee(withdrawOrderDO, userId);
+        }
 
         //9 账单同步
         CreateUserBillDTO createUserBillDTO = new CreateUserBillDTO();
@@ -931,6 +919,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         hallWithdrawResultDTO.setOrderNo(withdrawOrderDO.getOrderNo());
         hallWithdrawResultDTO.setTradeDate(DateTimeUtils.getCurrentLocalDate());
         hallWithdrawResultDTO.setTradeTime(withdrawOrderDO.getOrderTm().toLocalTime());
+        hallWithdrawResultDTO.setOrderSts(orderSts);
         return hallWithdrawResultDTO;
     }
 
@@ -1025,5 +1014,89 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }
         TradeFeeCaculateRspDTO tradeFeeCaculateRspDTO = tradeFeeCaculateResult.getBody();
         return tradeFeeCaculateRspDTO;
+    }
+
+    /**
+     * 营业厅提现账务处理
+     */
+    private List<AccountingReqDTO> hallWithdrawAccounting(String userType, String merchantId, WithdrawOrderDO withdrawOrderDO) {
+        // 提现用户号/商户号
+        String userId = withdrawOrderDO.getUserId();
+        // 实际支付金额
+        BigDecimal wcActAmt = withdrawOrderDO.getWcActAmt();
+        // 申请提现金额
+        BigDecimal withdrawAmt = withdrawOrderDO.getWcApplyAmt();
+        // 提现手续费
+        BigDecimal fee = withdrawOrderDO.getFeeAmt();
+        // 账务处理请求 List
+        List<AccountingReqDTO> accountingReqDTOList = new ArrayList<>();
+        // 若是用户营业厅提现
+        if(JudgeUtils.equals(userType, "U")) {
+            // 个人账户查询
+            String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
+            String balAcNo = acmComponent.getAcmAcNo(userId, balCapType);
+            if(JudgeUtils.isBlank(balAcNo)){
+                throw new LemonException("PWM20022");
+            }
+            String tmpJrnNo = LemonUtils.getRequestId();
+            // 借：其他应付款-支付账户-现金账户
+            AccountingReqDTO accountingReqDTO1 = acmComponent.createAccountingReqDTO(withdrawOrderDO.getOrderNo(),
+                    tmpJrnNo, PwmConstants.TX_TYPE_WITHDRAW, ACMConstants.ACCOUNTING_NOMARL, wcActAmt, balAcNo,
+                    ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_D_FLG, AcItem.O_BAL.getValue(),
+                    null,null,null,null,
+                    "营业厅用户提现$" + withdrawOrderDO.getWcApplyAmt());
+
+            // 贷：应付账款-待结算款-营业厅付款
+            AccountingReqDTO accountingReqDTO2 = acmComponent.createAccountingReqDTO(withdrawOrderDO.getOrderNo(),
+                    tmpJrnNo, PwmConstants.TX_TYPE_WITHDRAW, ACMConstants.ACCOUNTING_NOMARL, withdrawAmt,
+                    balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG, PwmConstants.AC_ITEM_SETTLED_HALL,
+                    null, null, null, null, merchantId);
+
+            // 添加到list中
+            accountingReqDTOList.add(accountingReqDTO1);
+            accountingReqDTOList.add(accountingReqDTO2);
+
+            // 若手续费大于0，则收取手续费，贷：手续费收入-支付账户-提现
+            if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
+                AccountingReqDTO accountingReqDTO3 = acmComponent.createAccountingReqDTO(withdrawOrderDO.getOrderNo(), tmpJrnNo, withdrawOrderDO.getTxType(),
+                        ACMConstants.ACCOUNTING_NOMARL, fee, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+                        PwmConstants.AC_ITEM_FEE_PAY_WIDR, null, null, null, null, "营业厅用户提现手续费$"+fee);
+                accountingReqDTOList.add(accountingReqDTO3);
+            }
+        } else {
+            // 商户营业厅取现
+            // 商户账户查询
+            String balCapType = CapTypEnum.CAP_TYP_SETTLEMENT.getCapTyp();
+            String balAcNo = acmComponent.getAcmAcNo(userId, balCapType);
+            if(JudgeUtils.isBlank(balAcNo)){
+                throw new LemonException("PWM20022");
+            }
+            String tmpJrnNo = LemonUtils.getRequestId();
+            // 借：其他应付款-支付账户-商户结算账户
+            AccountingReqDTO accountingReqDTO1 = acmComponent.createAccountingReqDTO(withdrawOrderDO.getOrderNo(),
+                    tmpJrnNo, PwmConstants.TX_TYPE_WITHDRAW, ACMConstants.ACCOUNTING_NOMARL, wcActAmt, balAcNo,
+                    ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_D_FLG, AcItem.O_BAL.getValue(),
+                    null,null,null,null,
+                    "营业厅商户提现$" + withdrawOrderDO.getWcApplyAmt());
+
+            // 贷：应付账款-待结算款-营业厅付款
+            AccountingReqDTO accountingReqDTO2 = acmComponent.createAccountingReqDTO(withdrawOrderDO.getOrderNo(),
+                    tmpJrnNo, PwmConstants.TX_TYPE_WITHDRAW, ACMConstants.ACCOUNTING_NOMARL, withdrawAmt,
+                    balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG, PwmConstants.AC_ITEM_SETTLED_HALL,
+                    null, null, null, null, merchantId);
+
+            // 添加到list中
+            accountingReqDTOList.add(accountingReqDTO1);
+            accountingReqDTOList.add(accountingReqDTO2);
+
+            // 贷：手续费收入-支付账户-商户结算
+            if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
+                AccountingReqDTO accountingReqDTO3 = acmComponent.createAccountingReqDTO(withdrawOrderDO.getOrderNo(), tmpJrnNo, withdrawOrderDO.getTxType(),
+                        ACMConstants.ACCOUNTING_NOMARL, fee, balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG,
+                        PwmConstants.AC_ITEM_FEE_MERC_WIDR, null, null, null, null, "营业厅商户提现手续费$"+fee);
+                accountingReqDTOList.add(accountingReqDTO3);
+            }
+        }
+        return accountingReqDTOList;
     }
 }
