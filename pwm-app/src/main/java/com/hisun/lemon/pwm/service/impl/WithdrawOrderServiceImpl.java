@@ -21,7 +21,9 @@ import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.cpo.client.RouteClient;
 import com.hisun.lemon.cpo.client.WithdrawClient;
 import com.hisun.lemon.cpo.dto.RouteRspDTO;
+import com.hisun.lemon.cpo.dto.WithdrawHallReqDTO;
 import com.hisun.lemon.cpo.dto.WithdrawReqDTO;
+import com.hisun.lemon.cpo.dto.WithdrawResDTO;
 import com.hisun.lemon.cpo.enums.CorpBusSubTyp;
 import com.hisun.lemon.cpo.enums.CorpBusTyp;
 import com.hisun.lemon.csh.enums.AcItem;
@@ -61,11 +63,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 
 @Service("withdrawOrderService")
@@ -122,6 +120,9 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 
     @Resource
     protected PaymentHandler paymentHandler;
+
+    @Resource
+    protected WithdrawClient withdrawCpoClient;
 
     /**
      * 生成提现订单
@@ -869,7 +870,34 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }
         //9 账单同步
         syncHallWithdrawBil(merchantId,merchantName,desc,withdrawOrderDO);
-        //10 处理返回
+
+        //10 cpo模块订单同步
+        GenericDTO<WithdrawHallReqDTO> genericHallDTO = new GenericDTO<>();
+        WithdrawHallReqDTO withdrawHallReqDTO = new WithdrawHallReqDTO();
+        withdrawHallReqDTO.setUserNo(userBasicInfo.getUserId());
+        withdrawHallReqDTO.setUserNm(userBasicInfo.getUsrNm());
+        withdrawHallReqDTO.setCapCrdNm(userBasicInfo.getUsrNm());
+        withdrawHallReqDTO.setCcy(withdrawOrderDO.getOrderCcy());
+        withdrawHallReqDTO.setCorpBusTyp(CorpBusTyp.WITHDRAW);
+        withdrawHallReqDTO.setCorpBusSubTyp(CorpBusSubTyp.PER_HALL_WITHDRAW);
+        withdrawHallReqDTO.setPsnCrpFlg("C");
+        withdrawHallReqDTO.setCapTyp("1");  //1 现金
+        withdrawHallReqDTO.setAgrPayDt(DateTimeUtils.getCurrentLocalDate());
+        withdrawHallReqDTO.setReqOrdNo(withdrawOrderDO.getOrderNo());
+        withdrawHallReqDTO.setReqOrdDt(DateTimeUtils.getCurrentLocalDate());
+        withdrawHallReqDTO.setReqOrdTm(DateTimeUtils.getCurrentLocalTime());
+        withdrawHallReqDTO.setWcAplAmt(withdrawAmt);
+        withdrawHallReqDTO.setWcRmk("手机号:" + mblNo + "用户营业厅：" + merchantName + "取现");
+        genericHallDTO.setBody(withdrawHallReqDTO);
+        try{
+            GenericRspDTO<WithdrawResDTO> withdrawenericRspDTO = withdrawCpoClient.createHallOrder(genericHallDTO);
+            if(JudgeUtils.isNotSuccess(withdrawenericRspDTO.getMsgCd())){
+                logger.error("个人营业厅提现订单号:" + withdrawOrderDO.getOrderNo() +",订单同步资金能力cpo失败。");
+            }
+        }catch (Exception e){
+            logger.error("个人营业厅提现订单号:" + withdrawOrderDO.getOrderNo() +",订单同步资金能力cpo失败。");
+        }
+        //11 处理返回
         HallWithdrawResultDTO hallWithdrawResultDTO = new HallWithdrawResultDTO();
         hallWithdrawResultDTO.setBusOrderNo(hallWithdrawOrderNo);
         hallWithdrawResultDTO.setFeeAmt(String.valueOf(fee));
