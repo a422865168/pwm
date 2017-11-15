@@ -71,4 +71,13 @@ public interface IWithdrawOrderService {
      * @return
      */
     public HallWithdrawResultDTO handleHallWithdraw(GenericDTO<HallWithdrawApplyDTO> genericWithdrawHallDTO);
+
+
+    /**
+     * 处理个人营业厅取现长款处理
+     * @param genericWithdrawRevokeDTO
+     * @return
+     */
+    public void hallWithdrawRevokeHandle(GenericDTO<HallWithdrawRevokeDTO> genericWithdrawRevokeDTO);
+
 }

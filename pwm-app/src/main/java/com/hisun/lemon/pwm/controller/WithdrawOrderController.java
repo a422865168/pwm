@@ -2,8 +2,10 @@ package com.hisun.lemon.pwm.controller;
 
 import javax.annotation.Resource;
 
+import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.framework.controller.BaseController;
 import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.dto.*;
 import io.swagger.annotations.ApiImplicitParam;
 import org.slf4j.Logger;
@@ -136,5 +138,17 @@ public class WithdrawOrderController  extends BaseController {
 	public GenericRspDTO<HallWithdrawResultDTO> hallWithdrawHandle(@Validated @RequestBody GenericDTO<HallWithdrawApplyDTO> genericWithdrawResultDTO) {
 		HallWithdrawResultDTO hallWithdrawResultDTO = withdrawOrderService.handleHallWithdraw(genericWithdrawResultDTO);
 		return GenericRspDTO.newSuccessInstance(hallWithdrawResultDTO);
+	}
+
+	@ApiOperation(value = "个人营业厅提现对账撤单处理", notes = "个人营业厅提现对账撤单处理")
+	@ApiResponse(code = 200, message = "个人营业厅提现对账撤单处理")
+	@PostMapping(value = "/hall/revoke")
+	public GenericRspDTO<NoBody> hallWithdrawRevokeHandle(@Validated @RequestBody GenericDTO<HallWithdrawRevokeDTO> genericWithdrawRevokeDTO) {
+		try{
+			withdrawOrderService.hallWithdrawRevokeHandle(genericWithdrawRevokeDTO);
+		}catch (LemonException e){
+			LemonException.throwBusinessException(e.getMsgCd());
+		}
+		return GenericRspDTO.newSuccessInstance();
 	}
 }
