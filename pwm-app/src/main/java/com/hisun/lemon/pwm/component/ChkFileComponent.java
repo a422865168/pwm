@@ -76,6 +76,14 @@ public class ChkFileComponent {
 		return rechargeOrderDao.queryListOfHall(queryDo);
 	}
 
+	public List<WithdrawOrderDO> queryHallWithdraw(LocalDate date,String[] chkOrderStatus){
+		Map queryDo=new HashMap<>();
+		queryDo.put("acTm",date);
+		queryDo.put("statusList",chkOrderStatus);
+		queryDo.put("busType", PwmConstants.BUS_TYPE_WITHDRAW_HALL);
+		return withdrawOrderDao.queryListOfHall(queryDo);
+	}
+
 	/**
 	 * 获取对账数据日期
 	 * @return
