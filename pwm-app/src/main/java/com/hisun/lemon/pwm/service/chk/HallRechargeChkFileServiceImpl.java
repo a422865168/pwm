@@ -1,7 +1,9 @@
 package com.hisun.lemon.pwm.service.chk;
 
 import com.hisun.lemon.common.exception.LemonException;
+import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.JudgeUtils;
+import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.jcommon.file.FileUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
@@ -36,7 +38,8 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
         //获取对账日期
         LocalDate chkDate=chkFileComponent.getChkDate();
         //对账文件名
-        String  chkFileName=chkFileComponent.getChkFileName(appCnl,chkDate);
+        //String  chkFileName=chkFileComponent.getChkFileName(appCnl,chkDate);
+        String  chkFileName=getChkFileName(appCnl,chkDate);
         //标志文件名
         String flagName=chkFileName+".flag";
         if(chkFileComponent.isStart(appCnl,flagName)){
@@ -105,5 +108,9 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
             LemonException.throwBusinessException("PWM40701");
         }
 
+    }
+    //自定义平台生成的营业厅对账的文件名
+    private String getChkFileName(String appCnl,LocalDate chkDate){
+        return LemonUtils.getApplicationName()+"_"+appCnl+"_RECHARGE"+"_"+DateTimeUtils.formatLocalDate(chkDate,"yyyyMMdd")+".ck";
     }
 }
