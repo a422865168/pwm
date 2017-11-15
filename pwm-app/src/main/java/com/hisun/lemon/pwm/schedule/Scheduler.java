@@ -19,7 +19,7 @@ public class Scheduler {
 	@Resource
 	private List<AbstractChkFileService> scheduleService;
 
-    @BatchScheduled(cron="0 0/1  * * * *")
+    @BatchScheduled(cron="0 0 0/1 * * ?")
 	public void createChkFile(){
 		for(AbstractChkFileService item:scheduleService){
 			executorService.submit(item);
