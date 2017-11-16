@@ -367,6 +367,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         BeanUtils.copyProperties(withdrawOrderDO, withdrawResultDTO);
         // 校验订单是否存在
         WithdrawOrderDO queryWithdrawOrderDO = withdrawOrderTransactionalService.query(withdrawOrderDO.getOrderNo());
+        withdrawOrderDO.setOrderTm(queryWithdrawOrderDO.getOrderTm());
         withdrawOrderDO.setFeeAmt(queryWithdrawOrderDO.getFeeAmt());
         withdrawOrderDO.setWcTotalAmt(withdrawOrderDO.getWcActAmt().add(withdrawOrderDO.getFeeAmt()));
         //判断订单状态为'S1'，则修改订单成功时间
@@ -626,7 +627,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         if(JudgeUtils.equals("",cardNoLast)) {
             messageReq.setMessageTemplateId(PwmConstants.WITHDRAW_FAIL_TEMPL);
             map.put("amount",withdrawOrderDO.getWcActAmt().toString());
-            map.put("date",DateTimeUtils.formatLocalDate(withdrawOrderDO.getAcTm(), "yyyy-MM-dd"));
+            map.put("date",DateTimeUtils.formatLocalDate(withdrawOrderDO.getOrderTm().toLocalDate(), "yyyy-MM-dd"));
         }else {
             messageReq.setMessageTemplateId(PwmConstants.WITHDRAW_SUCC_TEMPL);
             map.put("amount", withdrawOrderDO.getWcActAmt().toString());
@@ -635,7 +636,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             }else {
                 map.put("cardNoLast", "");
             }
-            map.put("date",DateTimeUtils.formatLocalDate(withdrawOrderDO.getAcTm(), "yyyy-MM-dd"));
+            map.put("date",DateTimeUtils.formatLocalDate(withdrawOrderDO.getOrderTm().toLocalDate(), "yyyy-MM-dd"));
         }
         messageReq.setReplaceFieldMap(map);
         messageReqDTO.setBody(messageReq);
