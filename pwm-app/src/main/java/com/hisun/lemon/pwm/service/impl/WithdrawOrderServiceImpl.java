@@ -823,8 +823,8 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             // 手续费内扣
             acUserAmt = withdrawAmt.subtract(fee);
         }else if(JudgeUtils.equals(PwmConstants.FEE_EX_MODE, feeFlag)) {
-            // 手续费外扣
-            acUserAmt = withdrawAmt.add(fee);
+            // 手续费外扣 外口申请提现金额和实际拿到的金额是一样的
+            acUserAmt = withdrawAmt;
         }
         // 实际支付金额
         withdrawOrderDO.setWcActAmt(acUserAmt);
@@ -912,6 +912,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         hallWithdrawResultDTO.setTradeDate(DateTimeUtils.getCurrentLocalDate());
         hallWithdrawResultDTO.setTradeTime(withdrawOrderDO.getOrderTm().toLocalTime());
         hallWithdrawResultDTO.setOrderSts(updateWithdrawOrder.getOrderStatus());
+        hallWithdrawResultDTO.setWithdrawAmt(String.valueOf(withdrawOrderDO.getWcApplyAmt()));
         return hallWithdrawResultDTO;
     }
 
@@ -1082,8 +1083,8 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         String userId = withdrawOrderDO.getUserId();
         // 实际支付金额
         BigDecimal wcActAmt = withdrawOrderDO.getWcActAmt();
-        // 申请提现金额
-        BigDecimal withdrawAmt = withdrawOrderDO.getWcApplyAmt();
+        // 申请提现总金额 用户账户要扣掉的钱
+        BigDecimal withdrawTotalAmt = withdrawOrderDO.getWcTotalAmt();
         // 提现手续费
         BigDecimal fee = withdrawOrderDO.getFeeAmt();
         // 账务处理请求 List
@@ -1098,14 +1099,14 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         String tmpJrnNo = LemonUtils.getRequestId();
         // 借：其他应付款-支付账户-现金账户
         AccountingReqDTO accountingReqDTO1 = acmComponent.createAccountingReqDTO(withdrawOrderDO.getOrderNo(),
-                tmpJrnNo, PwmConstants.TX_TYPE_WITHDRAW, ACMConstants.ACCOUNTING_NOMARL, wcActAmt, balAcNo,
+                tmpJrnNo, PwmConstants.TX_TYPE_WITHDRAW, ACMConstants.ACCOUNTING_NOMARL, withdrawTotalAmt, balAcNo,
                 ACMConstants.USER_AC_TYP, balCapType, ACMConstants.AC_D_FLG, AcItem.O_BAL.getValue(),
                 null,null,null,null,
                 "营业厅用户提现$" + withdrawOrderDO.getWcApplyAmt());
 
         // 贷：应付账款-待结算款-营业厅付款
         AccountingReqDTO accountingReqDTO2 = acmComponent.createAccountingReqDTO(withdrawOrderDO.getOrderNo(),
-                tmpJrnNo, PwmConstants.TX_TYPE_WITHDRAW, ACMConstants.ACCOUNTING_NOMARL, withdrawAmt,
+                tmpJrnNo, PwmConstants.TX_TYPE_WITHDRAW, ACMConstants.ACCOUNTING_NOMARL, wcActAmt,
                 balAcNo, ACMConstants.ITM_AC_TYP, balCapType, ACMConstants.AC_C_FLG, PwmConstants.AC_ITEM_SETTLED_HALL,
                 null, null, null, null, merchantId);
 
