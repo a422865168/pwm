@@ -425,6 +425,9 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             //同步账单数据
             UpdateUserBillDTO updateUserBillDTO = new UpdateUserBillDTO();
             BeanUtils.copyProperties(updateUserBillDTO, withdrawOrderDO);
+            if(JudgeUtils.isNotNull(withdrawOrderDO.getWcRemark())){
+                updateUserBillDTO.setRemark(withdrawOrderDO.getWcRemark());
+            }
             billSyncHandler.updateBill(updateUserBillDTO);
 
             withdrawOrderDO.setUserId(queryWithdrawOrderDO.getUserId());
