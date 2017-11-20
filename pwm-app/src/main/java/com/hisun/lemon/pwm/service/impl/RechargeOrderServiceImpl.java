@@ -1851,10 +1851,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
             LemonException.throwBusinessException(tradeFeeCaculateResult.getMsgCd());
         }
         TradeFeeCaculateRspDTO tradeFeeCaculateRspDTO = tradeFeeCaculateResult.getBody();
-        if(JudgeUtils.isNotNull(tradeFeeCaculateRspDTO)){
-            return tradeFeeCaculateRspDTO.getTradeFee();
-        }
-        return null;
+        return tradeFeeCaculateRspDTO.getTradeFee();
 	}
 
 	/**
