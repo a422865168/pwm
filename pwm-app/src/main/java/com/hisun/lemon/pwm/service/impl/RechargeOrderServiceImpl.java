@@ -841,7 +841,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		}
 		try{
 			acmComponent.requestAc(userAccountReqDTO,cnlRechargeHallReqDTO,rechargeFeeReqDTO);
-		}catch (LemonException e){
+		}catch (Exception e){
 			//更新失败订单
 			RechargeOrderDO updateOrderDO = new RechargeOrderDO();
             updateOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
@@ -853,7 +853,35 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			updateOrderDO = syncOrderData(rechargeOrderDO,updateOrderDO);
 			//同步账单
             synchronizeRechargeBil(updateOrderDO,CREATE_BIL,dto);
-			LemonException.throwBusinessException(e.getMsgCd());
+			LemonException.throwBusinessException(((LemonException)e).getMsgCd());
+		}
+
+		//更新充值订单
+		RechargeOrderDO updateOrderDO = new RechargeOrderDO();
+        updateOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
+        updateOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+        updateOrderDO.setOrderCcy(rechargeOrderDO.getOrderCcy());
+        updateOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+        updateOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
+        updateOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+        try{
+			service.updateOrder(updateOrderDO);
+		}catch(Exception e){
+        	//账务冲正
+			cnlRechargeHallReqDTO.setTxSts(ACMConstants.ACCOUNTING_CANCEL);
+			userAccountReqDTO.setTxSts(ACMConstants.ACCOUNTING_CANCEL);
+
+			if(JudgeUtils.isNotNull(fee) && fee.compareTo(BigDecimal.valueOf(0))>0){
+				rechargeFeeReqDTO.setTxSts(ACMConstants.ACCOUNTING_CANCEL);
+			}
+			try{
+				acmComponent.requestAc(userAccountReqDTO,cnlRechargeHallReqDTO,rechargeFeeReqDTO);
+			}catch (Exception e1) {
+				logger.error("营业厅充值更新订单,账务冲正失败...",e1);
+				LemonException.throwBusinessException("SYS99999");
+			}
+			logger.error("营业厅充值更新订单失败...",e);
+			LemonException.throwBusinessException("SYS99999");
 		}
 
 		//登记用户手续费
@@ -864,15 +892,6 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		//登记营业厅商户手续费
 		paymentHandler.registMerChantFee(rechargeOrderDO,dto.getMerchantId());
 
-		//更新充值订单
-		RechargeOrderDO updateOrderDO = new RechargeOrderDO();
-        updateOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_S);
-        updateOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
-        updateOrderDO.setOrderCcy(rechargeOrderDO.getOrderCcy());
-        updateOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-        updateOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
-        updateOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
-		service.updateOrder(updateOrderDO);
 		sendMsgCenterInfo(rechargeOrderDO,RECHARGE_SUCCESS);
 
 		//同步更新订单数据
