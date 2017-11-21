@@ -14,6 +14,9 @@ import java.util.regex.Pattern;
 import javax.annotation.Resource;
 
 import com.hisun.lemon.common.security.Digests;
+import com.hisun.lemon.cpi.client.RemittanceClient;
+import com.hisun.lemon.cpi.dto.RemittanceReqDTO;
+import com.hisun.lemon.cpi.dto.RemittanceRspDTO;
 import com.hisun.lemon.framework.service.BaseService;
 import com.hisun.lemon.pwm.constants.OfflineBilExtConstants;
 import com.hisun.lemon.pwm.dto.*;
@@ -132,10 +135,12 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 	@Resource
 	BillSyncHandler billSyncHandler;
+
 	@Resource
 	LocaleMessageSource localeMessageSource;
-	
-	
+
+	@Resource
+	RemittanceClient remittanceClient;
 	/**
 	 * 查询账户信息
 	 */
@@ -899,6 +904,33 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
         //同步账单
         synchronizeRechargeBil(updateOrderDO,CREATE_BIL,dto);
+
+        //登记资金能力充值订单
+        try{
+			GenericDTO<RemittanceReqDTO> remitGenericDTO = new GenericDTO<>();
+			RemittanceReqDTO remittanceReqDTO = new RemittanceReqDTO();
+			remittanceReqDTO.setBnkPsnFlg("C");
+			remittanceReqDTO.setCorpBusTyp(CorpBusTyp.REMITTANCE);
+			remittanceReqDTO.setCorpBusSubTyp(CorpBusSubTyp.BUSSINESS_REMITTANCE);
+			remittanceReqDTO.setMblNo(bussinessBody.getMblNo());
+			remittanceReqDTO.setUserNo(rechargeOrderDO.getPayerId());
+			remittanceReqDTO.setRmk("充值营业厅:" + dto.getMerchantName() + "(" + dto.getMerchantId()+")");
+			remittanceReqDTO.setOrdCcy(rechargeOrderDO.getOrderCcy());
+			remittanceReqDTO.setOrdAmt(rechargeOrderDO.getOrderAmt());
+			remittanceReqDTO.setReqOrdDt(rechargeOrderDO.getCreateTime().toLocalDate());
+			remittanceReqDTO.setReqOrdNo(rechargeOrderDO.getOrderNo());
+			remittanceReqDTO.setReqOrdTm(rechargeOrderDO.getOrderTm().toLocalTime());
+			remittanceReqDTO.setUserTyp("U");
+			remittanceReqDTO.setCrdCorpOrg("HALL");
+			remittanceReqDTO.setCrdAcTyp("U");
+			remitGenericDTO.setBody(remittanceReqDTO);
+			GenericRspDTO<RemittanceRspDTO> remitRspGenericDTO = remittanceClient.hallRemit(remitGenericDTO);
+			if(JudgeUtils.isNotSuccess(remitRspGenericDTO.getMsgCd())){
+				logger.error("营业厅充值订单号 >> " + rechargeOrderDO.getOrderNo() + ",资金能力cpi登记失败。" + remitRspGenericDTO.getMsgCd());
+			}
+		}catch (Exception e){
+			logger.error("营业厅充值订单号 >> " + rechargeOrderDO.getOrderNo() + ",资金能力cpi登记失败。" ,e);
+		}
 		//返回
 		HallRechargeResultDTO hallRechargeResultDTO = new HallRechargeResultDTO();
 		hallRechargeResultDTO.setAmount(orderAmt);
