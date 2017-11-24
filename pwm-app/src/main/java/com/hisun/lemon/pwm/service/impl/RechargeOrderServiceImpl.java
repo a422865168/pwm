@@ -948,6 +948,12 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		//充值冲正请求校验
 		UserBasicInfDTO userBasicInfDTO = checkHallRequestBeforeHandler(dto);
 		RechargeOrderDO rechargeOrderDO = this.service.getRechargeOrderByHallOrderNo(busBody.getHallOrderNo());
+
+		AccountingReqDTO rechargeFeeReqDTO = null;
+		AccountingReqDTO cshItemReqDTO = null;
+		AccountingReqDTO cnlRechargeHallReqDTO = null;
+		//商户服务费退款请求订单号
+		String merchantRefundFeeOrderNo = "";
 		//查询充值订单和收银订单状态
 		if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_S)){
 			//先处理商户手续费退回
@@ -962,16 +968,17 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				logger.error("撤销订单号:" + rechargeOrderDO.getOrderNo()+",退回商户手续费失败...");
 				LemonException.throwBusinessException(rspDTO.getMsgCd());
 			}
+			merchantRefundFeeOrderNo = rspDTO.getBody().getOrderNo();
 			logger.info("营业厅撤销，商户手续费退回成功......");
 			//个人账户信息
 			String balCapType= CapTypEnum.CAP_TYP_CASH.getCapTyp();
 			String balAcNo=acmComponent.getAcmAcNo(userBasicInfDTO.getUserId(), balCapType);
 			String tmpJrnNo =  LemonUtils.getApplicationName() + PwmConstants.BUS_TYPE_RECHARGE_HALL + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,10);
-			AccountingReqDTO rechargeFeeReqDTO = null;
+
 			try{
 				//营业厅撤销账务处理
 				//借：其他应付款-支付账户-现金账户
-				AccountingReqDTO cshItemReqDTO=acmComponent.createAccountingReqDTO(
+				cshItemReqDTO=acmComponent.createAccountingReqDTO(
 						rechargeOrderDO.getOrderNo(),
 						tmpJrnNo,
 						rechargeOrderDO.getTxType(),
@@ -999,7 +1006,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				}
 
 				//贷：应收账款-渠道充值-营业厅
-				AccountingReqDTO cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
+				cnlRechargeHallReqDTO=acmComponent.createAccountingReqDTO(
 						rechargeOrderDO.getOrderNo(),
 						tmpJrnNo,
 						rechargeOrderDO.getTxType(),
@@ -1019,10 +1026,9 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				acmComponent.requestAc(cshItemReqDTO,cnlRechargeHallReqDTO,rechargeFeeReqDTO);
 			}catch (Exception e) {
 				//商户手续费退回撤销
-				MerchantRefundFeeRspDTO merchantRefundFeeRspDTO = rspDTO.getBody();
-				GenericRspDTO<NoBody> reversalGenericDTO = merchantRefundFeeReversal(merchantRefundFeeRspDTO.getOrderNo());
+				GenericRspDTO<NoBody> reversalGenericDTO = merchantRefundFeeReversal(merchantRefundFeeOrderNo);
 				if(JudgeUtils.isNotSuccess(reversalGenericDTO.getMsgCd())){
-					logger.info("商户id:"+dto.getMerchantId()+",订单号：" + merchantRefundFeeRspDTO.getOrderNo() + "，手续费退回撤销失败..");
+					logger.info("商户id:"+dto.getMerchantId()+",订单号：" + merchantRefundFeeOrderNo + "，手续费退回撤销失败..");
 				}
 				logger.info("商户id:"+dto.getMerchantId()+",手续费退回撤销成功..");
 			}
@@ -1040,7 +1046,28 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
         updateOrderDO.setOrderNo(rechargeOrderDO.getOrderNo());
         updateOrderDO.setHallOrderNo(rechargeOrderDO.getHallOrderNo());
         updateOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
-		service.updateOrder(updateOrderDO);
+        try{
+			service.updateOrder(updateOrderDO);
+		}catch (Exception e){
+			if(JudgeUtils.equals(rechargeOrderDO.getOrderStatus(),PwmConstants.RECHARGE_ORD_S)){
+				//账务冲正
+				logger.error("更新营业厅撤销订单失败，账务冲正处理开始..");
+				if(JudgeUtils.isNotNull(cnlRechargeHallReqDTO) && JudgeUtils.isNotNull(cshItemReqDTO)){
+					cnlRechargeHallReqDTO.setTxSts(ACMConstants.ACCOUNTING_CANCEL);
+					cshItemReqDTO.setTxSts(ACMConstants.ACCOUNTING_CANCEL);
+					if(JudgeUtils.isNotNull(rechargeFeeReqDTO)){
+						rechargeFeeReqDTO.setTxSts(ACMConstants.ACCOUNTING_CANCEL);
+					}
+					acmComponent.requestAc(cshItemReqDTO,cnlRechargeHallReqDTO,rechargeFeeReqDTO);
+					//商户手续费退回撤销
+					GenericRspDTO<NoBody> reversalGenericDTO = merchantRefundFeeReversal(merchantRefundFeeOrderNo);
+					if(JudgeUtils.isNotSuccess(reversalGenericDTO.getMsgCd())){
+						logger.info("商户id:"+dto.getMerchantId()+",订单号：" + merchantRefundFeeOrderNo + "，手续费退回撤销失败..");
+					}
+				}
+			}
+			LemonException.throwBusinessException("SYS99999");
+		}
 
 		//同步账单数据
         synchronizeRechargeBil(updateOrderDO,UPD_BIL,dto);
