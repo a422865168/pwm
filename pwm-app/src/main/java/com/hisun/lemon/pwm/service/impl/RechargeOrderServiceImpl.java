@@ -1333,6 +1333,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 				rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 				rechargeOrderDO.setOrderSuccTm(DateTimeUtils.getCurrentLocalDateTime());
+				rechargeOrderDO.setRemark("营业厅充值订单" + rechargeOrderNo + "补单成功");
 				this.service.updateOrder(rechargeOrderDO);
                 logger.info("营业厅充值订单" + rechargeOrderNo + "补单成功");
 
@@ -1340,6 +1341,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 			});
 		} catch (Exception e) {
+			logger.error("营业厅充值订单" + rechargeOrderNo + "补单异常>>" + e.getMessage());
 			LemonException.throwBusinessException("PWM20027");
 		}
 	}
@@ -1384,12 +1386,14 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_C);
 				rechargeOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 				rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+				rechargeOrderDO.setRemark("营业厅充值订单" + rechargeOrderNo + "撤单成功");
 				this.service.updateOrder(rechargeOrderDO);
                 logger.info("营业厅充值订单" + rechargeOrderNo + "撤单成功");
 
 				return null;
 			});
 		} catch (Exception e) {
+			logger.error("营业厅充值订单" + rechargeOrderNo + "撤单异常>>" + e.getMessage());
 			LemonException.throwBusinessException("PWM20028");
 		}
 	}
@@ -1440,33 +1444,43 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		if(!JudgeUtils.equals(chkSubType,"0404")){
 			throw new LemonException("PWM20034");
 		}
-		List<AccountingReqDTO> accList = createMatchAmtAccList(hallRechargeMatchDTO);
+		try{
+			locker.lock("PWM_LOCK.HALL.MATCHAMT." + DateTimeUtils.getCurrentDateStr() , 18, 22, () -> {
 
-		BigDecimal dAmt = BigDecimal.ZERO;
-		BigDecimal cAmt = BigDecimal.ZERO;
-		for (AccountingReqDTO dto : accList) {
-			if (JudgeUtils.isNotNull(dto)) {
-				if (JudgeUtils.equals(dto.getDcFlg(), ACMConstants.AC_D_FLG)) {
-					dAmt = dAmt.add(dto.getTxAmt());
-				} else {
-					cAmt = cAmt.add(dto.getTxAmt());
+				List<AccountingReqDTO> accList = createMatchAmtAccList(hallRechargeMatchDTO);
+
+				BigDecimal dAmt = BigDecimal.ZERO;
+				BigDecimal cAmt = BigDecimal.ZERO;
+				for (AccountingReqDTO dto : accList) {
+					if (JudgeUtils.isNotNull(dto)) {
+						if (JudgeUtils.equals(dto.getDcFlg(), ACMConstants.AC_D_FLG)) {
+							dAmt = dAmt.add(dto.getTxAmt());
+						} else {
+							cAmt = cAmt.add(dto.getTxAmt());
+						}
+					}
 				}
-			}
-		}
 
-		// 借贷平衡校验
-		if (cAmt.compareTo(dAmt) != 0) {
-			LemonException.throwBusinessException("PWM20026");
-		}
+				// 借贷平衡校验
+				if (cAmt.compareTo(dAmt) != 0) {
+					LemonException.throwBusinessException("PWM20026");
+				}
 
-		GenericDTO<List<AccountingReqDTO>> userAccDto = new GenericDTO<>();
-		userAccDto.setBody(accList);
-		GenericRspDTO<NoBody> accountingTreatment = accountingTreatmentClient.accountingTreatment(userAccDto);
-		if (!JudgeUtils.isSuccess(accountingTreatment.getMsgCd())) {
-			logger.error("营业厅对平金额账务处理失败：" + accountingTreatment.getMsgCd());
-			LemonException.throwBusinessException(accountingTreatment.getMsgCd());
+				GenericDTO<List<AccountingReqDTO>> userAccDto = new GenericDTO<>();
+				userAccDto.setBody(accList);
+				GenericRspDTO<NoBody> accountingTreatment = accountingTreatmentClient.accountingTreatment(userAccDto);
+				if (!JudgeUtils.isSuccess(accountingTreatment.getMsgCd())) {
+					logger.error("营业厅对平金额账务处理失败：" + accountingTreatment.getMsgCd());
+					LemonException.throwBusinessException(accountingTreatment.getMsgCd());
+				}
+				logger.info("营业厅对平金额账务处理成功，总金额：" + hallRechargeMatchDTO.getTotalAmt());
+
+				return null;
+			});
+		} catch (Exception e) {
+			logger.error("营业厅充值对账处理异常>>" + e.getMessage());
+			LemonException.throwBusinessException("SYS00001");
 		}
-		logger.info("营业厅对平金额账务处理成功，总金额：" + hallRechargeMatchDTO.getTotalAmt());
 	}
 
 	@Override
@@ -1621,16 +1635,16 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				rechargeOrderDO.getTxType(),
 				ACMConstants.ACCOUNTING_NOMARL,
 				totalAmt,
-				null,
+				balAcNo,
 				ACMConstants.ITM_AC_TYP,
 				balCapType,
 				ACMConstants.AC_D_FLG,
 				AcItem.I_CNL_HALL.getValue(),
+				balAcNo,
 				null,
 				null,
 				null,
-				null,
-				null);
+				"营业厅补单$"+totalAmt);
 
 		//贷:其他应付款-支付账户-现金账户
 		AccountingReqDTO userAccountReqDTO=acmComponent.createAccountingReqDTO(
@@ -1648,7 +1662,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				null,
 				null,
 				null,
-				"营业厅长款补单$"+totalAmt);
+				"营业厅补单$"+totalAmt);
 
 		accList.add(cnlRechargeHallReqDTO);
 		accList.add(userAccountReqDTO);
@@ -1667,7 +1681,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		if(JudgeUtils.isBlank(balAcNo)){
 			throw new LemonException("PWM20022");
 		}
-		String tmpJrnNo =  IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,14);
+		String tmpJrnNo =  LemonUtils.getApplicationName() + IdGenUtils.generateIdWithDate(PwmConstants.R_ORD_GEN_PRE,11);
 		//订单交易总金额
 		BigDecimal totalAmt = rechargeOrderDO.getOrderAmt();
 		//贷:应收账款-渠道充值-营业厅
@@ -1682,11 +1696,11 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				balCapType,
 				ACMConstants.AC_C_FLG,
 				AcItem.I_CNL_HALL.getValue(),
+				balAcNo,
 				null,
 				null,
 				null,
-				null,
-				null);
+				"营业厅撤单$"+totalAmt);
 
 		//借:其他应付款-支付账户-现金账户
 		AccountingReqDTO userAccountReqDTO=acmComponent.createAccountingReqDTO(
@@ -1704,7 +1718,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				null,
 				null,
 				null,
-				"营业厅短款撤单$"+totalAmt);
+				"营业厅撤单$"+totalAmt);
 
 		accList.add(cnlRechargeHallReqDTO);
 		accList.add(userAccountReqDTO);
