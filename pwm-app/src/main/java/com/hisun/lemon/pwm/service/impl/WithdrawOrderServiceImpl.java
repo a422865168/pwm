@@ -269,6 +269,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		//用户姓名
 		withdrawOrderDO.setUserName(withdrawDTO.getCardUserName());
 		withdrawOrderDO.setCapCardName(withdrawDTO.getCardUserName());
+		withdrawOrderDO.setCapCardType("");
 		withdrawOrderDO.setOrderStatus(PwmConstants.WITHDRAW_ORD_W1);
         //生成提现单据
         withdrawOrderTransactionalService.createOrder(withdrawOrderDO);
