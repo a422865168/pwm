@@ -265,7 +265,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		//业务类型 0401个人提现
 		withdrawOrderDO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_P);
 		withdrawOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
-		withdrawOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("99991231235959"));
+		withdrawOrderDO.setOrderExpTm(DateTimeUtils.parseLocalDateTime("90001231235959"));
 		//用户姓名
 		withdrawOrderDO.setUserName(withdrawDTO.getCardUserName());
 		withdrawOrderDO.setCapCardName(withdrawDTO.getCardUserName());
