@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.schedule;
 
 import com.hisun.lemon.framework.schedule.batch.BatchScheduled;
 import com.hisun.lemon.pwm.service.chk.AbstractChkFileService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -19,7 +20,8 @@ public class Scheduler {
 	@Resource
 	private List<AbstractChkFileService> scheduleService;
 
-    @BatchScheduled(cron="0 0 0/1 * * ?")
+//	@BatchScheduled(cron="0 0 0/1 * * ?")
+    @Scheduled(cron="0 0/1 * * * ?")
 	public void createChkFile(){
 		for(AbstractChkFileService item:scheduleService){
 			executorService.submit(item);
