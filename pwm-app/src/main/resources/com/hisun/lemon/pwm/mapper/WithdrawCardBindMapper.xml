@@ -37,7 +37,7 @@
         and user_id = #{userId,jdbcType=VARCHAR}
     </select>
 
-    <select id="queryCount" resultMap="java.lang.Integer" >
+    <select id="queryCount" resultType="java.lang.Integer" >
         select
         count(*)
         from pwm_withdraw_card
