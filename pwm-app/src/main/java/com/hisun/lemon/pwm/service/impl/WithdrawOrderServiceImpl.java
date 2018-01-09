@@ -530,7 +530,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         //初始化需要返回的卡信息
         WithdrawCardQueryDTO withdrawCardQueryDTO = new WithdrawCardQueryDTO();
         //判断提现银行卡是否存在
-        if(Integer.compare(0,withdrawCardBindDO1)>0){
+        if(Integer.compare(0,withdrawCardBindDO1)<0){
             LemonException.throwBusinessException("PWM30012");
             //判断提现银行卡状态是否失效
 //            if(JudgeUtils.equals(PwmConstants.WITHDRAW_CARD_STAT_EFF,withdrawCardBindDO1.getCardStatus())){
