@@ -526,11 +526,11 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             cardNoEnc = commonEncryptRspDTO.getData();
         }
         String userId = withdrawCardBindDTO.getUserId();
-        WithdrawCardBindDO withdrawCardBindDO1 = withdrawCardBindDao.query(cardNoEnc, userId);
+        int withdrawCardBindDO1 = withdrawCardBindDao.queryCount(cardNoEnc, userId);
         //初始化需要返回的卡信息
         WithdrawCardQueryDTO withdrawCardQueryDTO = new WithdrawCardQueryDTO();
         //判断提现银行卡是否存在
-        if(JudgeUtils.isNotNull(withdrawCardBindDO1)){
+        if(Integer.compare(0,withdrawCardBindDO1)>0){
             LemonException.throwBusinessException("PWM30012");
             //判断提现银行卡状态是否失效
 //            if(JudgeUtils.equals(PwmConstants.WITHDRAW_CARD_STAT_EFF,withdrawCardBindDO1.getCardStatus())){
