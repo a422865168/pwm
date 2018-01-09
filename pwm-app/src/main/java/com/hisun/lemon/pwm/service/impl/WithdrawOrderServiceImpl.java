@@ -531,21 +531,22 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         WithdrawCardQueryDTO withdrawCardQueryDTO = new WithdrawCardQueryDTO();
         //判断提现银行卡是否存在
         if(JudgeUtils.isNotNull(withdrawCardBindDO1)){
+            LemonException.throwBusinessException("PWM30012");
             //判断提现银行卡状态是否失效
-            if(JudgeUtils.equals(PwmConstants.WITHDRAW_CARD_STAT_EFF,withdrawCardBindDO1.getCardStatus())){
-                LemonException.throwBusinessException("PWM30012");
-            }
-            if(JudgeUtils.equals(PwmConstants.WITHDRAW_CARD_STAT_FAIL,withdrawCardBindDO1.getCardStatus())){
-                //失效则更新状态
-                WithdrawCardBindDO withdrawCardBindDO2 = new WithdrawCardBindDO();
-                withdrawCardBindDO2.setCardNo(cardNoEnc);
-                withdrawCardBindDO2.setCardStatus(PwmConstants.WITHDRAW_CARD_STAT_EFF);
-                withdrawCardBindDO2.setEftTm(DateTimeUtils.getCurrentLocalDateTime());
-                withdrawCardBindDO2.setFailTm("");
-                withdrawCardBindDO2.setCardId(withdrawCardBindDO1.getCardId());
-                withdrawOrderTransactionalService.updateCard(withdrawCardBindDO2);
-                BeanUtils.copyProperties(withdrawCardQueryDTO, withdrawCardBindDO1);
-            }
+//            if(JudgeUtils.equals(PwmConstants.WITHDRAW_CARD_STAT_EFF,withdrawCardBindDO1.getCardStatus())){
+//                LemonException.throwBusinessException("PWM30012");
+//            }
+//            if(JudgeUtils.equals(PwmConstants.WITHDRAW_CARD_STAT_FAIL,withdrawCardBindDO1.getCardStatus())){
+//                //失效则更新状态
+//                WithdrawCardBindDO withdrawCardBindDO2 = new WithdrawCardBindDO();
+//                withdrawCardBindDO2.setCardNo(cardNoEnc);
+//                withdrawCardBindDO2.setCardStatus(PwmConstants.WITHDRAW_CARD_STAT_EFF);
+//                withdrawCardBindDO2.setEftTm(DateTimeUtils.getCurrentLocalDateTime());
+//                withdrawCardBindDO2.setFailTm("");
+//                withdrawCardBindDO2.setCardId(withdrawCardBindDO1.getCardId());
+//                withdrawOrderTransactionalService.updateCard(withdrawCardBindDO2);
+//                BeanUtils.copyProperties(withdrawCardQueryDTO, withdrawCardBindDO1);
+//            }
         }else{
             //提现银行卡不存在，则填充数据，添加入库
             String ymd= DateTimeUtils.getCurrentDateStr();
