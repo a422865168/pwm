@@ -526,7 +526,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             cardNoEnc = commonEncryptRspDTO.getData();
         }
         String userId = withdrawCardBindDTO.getUserId();
-        int withdrawCardBindDO1 = withdrawCardBindDao.queryCount(cardNoEnc, userId);
+        Integer withdrawCardBindDO1 = withdrawCardBindDao.queryCount(cardNoEnc, userId);
         //初始化需要返回的卡信息
         WithdrawCardQueryDTO withdrawCardQueryDTO = new WithdrawCardQueryDTO();
         //判断提现银行卡是否存在
