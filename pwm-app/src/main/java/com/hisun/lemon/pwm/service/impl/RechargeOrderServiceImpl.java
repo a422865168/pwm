@@ -204,6 +204,14 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		UserInfoRspDTO userInfo = userInfo(mblNo);
 		String userNo = userInfo.getUserId();
 		rechargeDO.setUserId(userNo);
+
+		/*
+		* 查询余额，若是余额小于海币充值金额，不能下单
+		 */
+		BigDecimal userAccBal = acmComponent.getAccountBal(userNo,"1");
+		if(amount.compareTo(userAccBal) > 0){
+			LemonException.throwBusinessException("PWM20039");
+		}
 		// 生成海币充值订单
 		this.service.initSeaOrder(rechargeDO);
 
@@ -350,6 +358,15 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		rechargeDO.setTxType(rechargeDTO.getTxType());
 		rechargeDO.setBusType(rechargeDTO.getBusType());
 		rechargeDO.setUserId(LemonUtils.getUserId());
+
+		/*
+		* 查询余额，若是余额小于海币充值金额，不能下单
+		 */
+		BigDecimal userAccBal = acmComponent.getAccountBal(LemonUtils.getUserId(),"1");
+		if(amount.compareTo(userAccBal) > 0){
+			LemonException.throwBusinessException("PWM20039");
+		}
+
 		// 生成海币充值订单
 		this.service.initSeaOrder(rechargeDO);
 		// 调用收银
