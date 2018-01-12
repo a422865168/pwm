@@ -1123,68 +1123,81 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	@Override
 	public OfflineRechargeResultDTO offlineRemittanceUpload(GenericDTO<RemittanceUploadDTO> genericDTO) {
 		RemittanceUploadDTO remittanceUploadDTO = genericDTO.getBody();
+
 		//原订单校验
 		String cashOrderNo = remittanceUploadDTO.getOrderNo();
-		RechargeOrderDO rechargeOrderDO = this.service.getRechangeOrderDao().getRechargeOrderByExtOrderNo(cashOrderNo);
+		String lockName= "PWM_LOCK"+ cashOrderNo;
 
-		if(JudgeUtils.isNull(rechargeOrderDO)) {
-			throw new LemonException("PWM20015");
-		}
-		//判断充值订单是否已提交审核
-		if(JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_W1,rechargeOrderDO.getOrderStatus()) || JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_S,rechargeOrderDO.getOrderStatus())) {
-			throw new LemonException("PWM20017");
-		}
 
-		//查询汇款充值个人信息
-		GenericRspDTO<UserBasicInfDTO> genericUserBasicInfDTO = userBasicInfClient.queryUser(remittanceUploadDTO.getPayerId());
-		UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
+		try{
+			return locker.lock(lockName,18,22,
+					()->{
+				RechargeOrderDO rechargeOrderDO = this.service.getRechangeOrderDao().getRechargeOrderByExtOrderNo(cashOrderNo);
 
-		//根据资金机构查询汇款账户
-		GenericRspDTO<RouteRspDTO> genericRounteListRsp = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
-		RouteRspDTO routeRspDTO = genericRounteListRsp.getBody();
-		List<RouteRspDTO.RouteDTO> rounteList = routeRspDTO.getList();
-		if(JudgeUtils.isNotSuccess(genericRounteListRsp.getMsgCd())) {
-			LemonException.throwBusinessException(genericRounteListRsp.getMsgCd());
-		}
-		RouteRspDTO.RouteDTO routeDTO = rounteList.get(0);
-		if(JudgeUtils.isNull(routeDTO)){
-			throw new LemonException("PWM30015");
-		}
-		GenericDTO<OfflinePaymentDTO> genericOfflinePaymentDTO = new GenericDTO<>();
-		OfflinePaymentDTO offlinePaymentDTO = new OfflinePaymentDTO();
-		offlinePaymentDTO.setCashRemittUrl(remittanceUploadDTO.getRemittUrl());
-		offlinePaymentDTO.setPayerId(remittanceUploadDTO.getPayerId());
-		offlinePaymentDTO.setRemark(remittanceUploadDTO.getRemark());
-		offlinePaymentDTO.setCrdCorpOrg(routeDTO.getCrdCorpOrg());
-		offlinePaymentDTO.setCrdAcTyp(routeDTO.getCrdAcTyp());
-		offlinePaymentDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_OFL);
-		offlinePaymentDTO.setOrderNo(rechargeOrderDO.getOrderNo());
-		genericOfflinePaymentDTO.setBody(offlinePaymentDTO);
+				if(JudgeUtils.isNull(rechargeOrderDO)) {
+					throw new LemonException("PWM20015");
+				}
+				//判断充值订单是否已提交审核
+				if(JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_W1,rechargeOrderDO.getOrderStatus()) || JudgeUtils.equals(PwmConstants.OFFLINE_RECHARGE_ORD_S,rechargeOrderDO.getOrderStatus())) {
+					throw new LemonException("PWM20017");
+				}
 
-		//收银台线下汇款处理
-		GenericRspDTO<OfflinePaymentResultDTO> genericOfflinePaymentResultDTO = cshOrderClient.offlinePayment(genericOfflinePaymentDTO);
-		OfflinePaymentResultDTO offlinePaymentResultDTO = genericOfflinePaymentResultDTO.getBody();
-		if (JudgeUtils.isNotSuccess(genericOfflinePaymentResultDTO.getMsgCd())) {
-			LemonException.throwBusinessException(genericOfflinePaymentResultDTO.getMsgCd());
-		}
-		//更新充值订单状态为已提交审核
-		RechargeOrderDO updateRechargeOrderDo = new RechargeOrderDO();
-		BeanUtils.copyProperties(updateRechargeOrderDo,rechargeOrderDO);
-		updateRechargeOrderDo.setOrderStatus(PwmConstants.OFFLINE_RECHARGE_ORD_W1);
-		updateRechargeOrderDo.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
-		this.service.getRechangeOrderDao().update(updateRechargeOrderDo);
+				//查询汇款充值个人信息
+				GenericRspDTO<UserBasicInfDTO> genericUserBasicInfDTO = userBasicInfClient.queryUser(remittanceUploadDTO.getPayerId());
+				UserBasicInfDTO userBasicInfDTO = genericUserBasicInfDTO.getBody();
 
-		OfflineRechargeResultDTO offlineRechargeResultDTO = new OfflineRechargeResultDTO();
-		offlineRechargeResultDTO.setCashierOrderNo(offlinePaymentResultDTO.getCashierOrderNo());
-		offlineRechargeResultDTO.setOrderTm(DateTimeUtils.getCurrentLocalTime());
-		offlineRechargeResultDTO.setPayerId(offlinePaymentResultDTO.getPayerId());
-		offlineRechargeResultDTO.setAmount(offlinePaymentResultDTO.getOrderAmt());
-		offlineRechargeResultDTO.setCcy(offlinePaymentResultDTO.getOrderCcy());
-		offlineRechargeResultDTO.setOrderNo(offlinePaymentResultDTO.getRemittOrderNo());
-		offlineRechargeResultDTO.setStatus(offlinePaymentResultDTO.getOrderStatus());
-		offlineRechargeResultDTO.setMblNo(userBasicInfDTO.getMblNo());
-		offlineRechargeResultDTO.setRemark(offlinePaymentResultDTO.getRemark());
-		return offlineRechargeResultDTO;
+				//根据资金机构查询汇款账户
+				GenericRspDTO<RouteRspDTO> genericRounteListRsp = routeClient.queryEffOrgInfo(CorpBusTyp.REMITTANCE, CorpBusSubTyp.REMITTANCE);
+				RouteRspDTO routeRspDTO = genericRounteListRsp.getBody();
+				List<RouteRspDTO.RouteDTO> rounteList = routeRspDTO.getList();
+				if(JudgeUtils.isNotSuccess(genericRounteListRsp.getMsgCd())) {
+					LemonException.throwBusinessException(genericRounteListRsp.getMsgCd());
+				}
+				RouteRspDTO.RouteDTO routeDTO = rounteList.get(0);
+				if(JudgeUtils.isNull(routeDTO)){
+					throw new LemonException("PWM30015");
+				}
+				GenericDTO<OfflinePaymentDTO> genericOfflinePaymentDTO = new GenericDTO<>();
+				OfflinePaymentDTO offlinePaymentDTO = new OfflinePaymentDTO();
+				offlinePaymentDTO.setCashRemittUrl(remittanceUploadDTO.getRemittUrl());
+				offlinePaymentDTO.setPayerId(remittanceUploadDTO.getPayerId());
+				offlinePaymentDTO.setRemark(remittanceUploadDTO.getRemark());
+				offlinePaymentDTO.setCrdCorpOrg(routeDTO.getCrdCorpOrg());
+				offlinePaymentDTO.setCrdAcTyp(routeDTO.getCrdAcTyp());
+				offlinePaymentDTO.setBusType(PwmConstants.BUS_TYPE_RECHARGE_OFL);
+				offlinePaymentDTO.setOrderNo(rechargeOrderDO.getOrderNo());
+				genericOfflinePaymentDTO.setBody(offlinePaymentDTO);
+
+				//收银台线下汇款处理
+				GenericRspDTO<OfflinePaymentResultDTO> genericOfflinePaymentResultDTO = cshOrderClient.offlinePayment(genericOfflinePaymentDTO);
+				OfflinePaymentResultDTO offlinePaymentResultDTO = genericOfflinePaymentResultDTO.getBody();
+				if (JudgeUtils.isNotSuccess(genericOfflinePaymentResultDTO.getMsgCd())) {
+					LemonException.throwBusinessException(genericOfflinePaymentResultDTO.getMsgCd());
+				}
+				//更新充值订单状态为已提交审核
+				RechargeOrderDO updateRechargeOrderDo = new RechargeOrderDO();
+				BeanUtils.copyProperties(updateRechargeOrderDo,rechargeOrderDO);
+				updateRechargeOrderDo.setOrderStatus(PwmConstants.OFFLINE_RECHARGE_ORD_W1);
+				updateRechargeOrderDo.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
+				this.service.getRechangeOrderDao().update(updateRechargeOrderDo);
+
+				OfflineRechargeResultDTO offlineRechargeResultDTO = new OfflineRechargeResultDTO();
+				offlineRechargeResultDTO.setCashierOrderNo(offlinePaymentResultDTO.getCashierOrderNo());
+				offlineRechargeResultDTO.setOrderTm(DateTimeUtils.getCurrentLocalTime());
+				offlineRechargeResultDTO.setPayerId(offlinePaymentResultDTO.getPayerId());
+				offlineRechargeResultDTO.setAmount(offlinePaymentResultDTO.getOrderAmt());
+				offlineRechargeResultDTO.setCcy(offlinePaymentResultDTO.getOrderCcy());
+				offlineRechargeResultDTO.setOrderNo(offlinePaymentResultDTO.getRemittOrderNo());
+				offlineRechargeResultDTO.setStatus(offlinePaymentResultDTO.getOrderStatus());
+				offlineRechargeResultDTO.setMblNo(userBasicInfDTO.getMblNo());
+				offlineRechargeResultDTO.setRemark(offlinePaymentResultDTO.getRemark());
+				return offlineRechargeResultDTO;
+			});
+		}catch (LemonException e){
+			throw e;
+		}catch (Exception e){
+			throw LemonException.create(e);
+		}
 	}
 
 	@Override
