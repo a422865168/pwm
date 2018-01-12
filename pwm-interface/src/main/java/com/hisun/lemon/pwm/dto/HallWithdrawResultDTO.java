@@ -24,6 +24,12 @@ public class HallWithdrawResultDTO {
     private String feeAmt;
 
     /**
+     * 提现手续费
+     * */
+    @ApiModelProperty(name = "withdrawAmt", value = "申请提现金额")
+    private String withdrawAmt;
+
+    /**
      * 业务订单号
      * */
     @ApiModelProperty(name = "busOrderNo", value = "业务订单号(营业厅请求订单号)")
@@ -34,6 +40,12 @@ public class HallWithdrawResultDTO {
      */
     @ApiModelProperty(name = "orderNo", value = "平台提现订单号")
     private String orderNo;
+
+    /**
+     * 订单状态 success-成功；fail-失败
+     */
+    @ApiModelProperty(name = "orderSts", value = "订单状态")
+    private String orderSts;
 
 
     /**
@@ -88,5 +100,21 @@ public class HallWithdrawResultDTO {
 
     public void setFeeAmt(String feeAmt) {
         this.feeAmt = feeAmt;
+    }
+
+    public String getOrderSts() {
+        return orderSts;
+    }
+
+    public void setOrderSts(String orderSts) {
+        this.orderSts = orderSts;
+    }
+
+    public String getWithdrawAmt() {
+        return withdrawAmt;
+    }
+
+    public void setWithdrawAmt(String withdrawAmt) {
+        this.withdrawAmt = withdrawAmt;
     }
 }

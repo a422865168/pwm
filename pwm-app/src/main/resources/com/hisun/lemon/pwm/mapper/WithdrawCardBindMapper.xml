@@ -34,7 +34,15 @@
         <include refid="Base_Column_List" />
         from pwm_withdraw_card
         where card_no = #{cardNo,jdbcType=VARCHAR}
-        and user_id = #{userId,jdbcType=VARCHAR} and cap_corg = #{capCorg, jdbcType=VARCHAR}
+        and user_id = #{userId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="queryCount" resultType="java.lang.Integer" >
+        select
+        count(*)
+        from pwm_withdraw_card
+        where card_no = #{cardNo,jdbcType=VARCHAR}
+        and user_id = #{userId,jdbcType=VARCHAR}
     </select>
 
     <select id="queryCardList" resultMap="BaseResultMap" parameterType="java.lang.String" >

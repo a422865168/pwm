@@ -7,6 +7,7 @@ import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.jcommon.file.FileUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
+import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,17 +18,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 生成营业厅充值对账文件，上传至服务器
+ * 生成营业厅个人提现对账文件，上传至服务器
  */
 @Transactional
 @Service
-public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
+public class HallWithdrawChkFileServiceImpl extends AbstractChkFileService {
 
 
-    public HallRechargeChkFileServiceImpl() {
+    public HallWithdrawChkFileServiceImpl() {
         super();
         this.chkOrderStatus=new String[]{
-                PwmConstants.RECHARGE_ORD_S
+                PwmConstants.WITHDRAW_ORD_S1
         };
         appCnl="HALL";
         this.lockName="PWM_HALL_CHK_FILE_LOCK";
@@ -37,8 +38,8 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
     protected void execute() {
         //获取对账日期
         LocalDate chkDate=chkFileComponent.getChkDate();
+       // LocalDate chkDate=DateTimeUtils.getCurrentLocalDate().minusDays(2);
         //对账文件名
-        //String  chkFileName=chkFileComponent.getChkFileName(appCnl,chkDate);
         String  chkFileName=getChkFileName(appCnl,chkDate);
         //标志文件名
         String flagName=chkFileName+".flag";
@@ -50,18 +51,19 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
         //生成标志文件
         chkFileComponent.createFlagFile(appCnl,flagName);
         //读取数据
-        List<RechargeOrderDO> orders=chkFileComponent.queryHallRecharges(chkDate,chkOrderStatus);
+        List<WithdrawOrderDO> orders=chkFileComponent.queryHallWithdraw(chkDate,chkOrderStatus);
 
         //读取对账文件汇总信息项:
         Map<String,Object> headItemMap = new HashMap<>();
         BigDecimal totalFee = BigDecimal.valueOf(0);
         BigDecimal totalAmt = BigDecimal.valueOf(0);
-        for(RechargeOrderDO ro : orders) {
-            BigDecimal tmpFee = ro.getFee();
+        for(WithdrawOrderDO ro : orders) {
+            BigDecimal tmpFee = ro.getFeeAmt();
             if(JudgeUtils.isNotNull(tmpFee)){
                 totalFee = totalFee.add(tmpFee);
             }
-            totalAmt = totalAmt.add(ro.getOrderAmt());
+            //申请提现金额，订单金额
+            totalAmt = totalAmt.add(ro.getWcApplyAmt());
         }
         headItemMap.put("count",orders.size());
         headItemMap.put("totalAmt",totalAmt);
@@ -82,7 +84,7 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
      * @param datas
      * @param fileName
      */
-    private void writeToFile(String appCnl, List<RechargeOrderDO> datas, String fileName, Map<String, Object> headItemMap) {
+    private void writeToFile(String appCnl, List<WithdrawOrderDO> datas, String fileName, Map<String, Object> headItemMap) {
         final String itemSeperator = "|";
         final String lineSeparator = System.getProperty("line.separator", "\n");
         StringBuilder contextBuilder = new StringBuilder();
@@ -91,13 +93,14 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
                 .append(headItemMap.get("totalAmt")).append(itemSeperator)
                 .append(headItemMap.get("totalFee")).append(lineSeparator);
 
-        //营业厅订单号|充值订单号|付款方|订单金额|手续费|订单日期|
-        for (RechargeOrderDO rdo : datas) {
-            contextBuilder.append(rdo.getHallOrderNo()).append(itemSeperator)
+        //营业厅订单号|平台提现订单号|提现用户id|订单金额|手续费|订单状态|订单日期|
+        for (WithdrawOrderDO rdo : datas) {
+            contextBuilder.append(rdo.getRspOrderNo()).append(itemSeperator)
                     .append(rdo.getOrderNo()).append(itemSeperator)
-                    .append(rdo.getPayerId()).append(itemSeperator)
-                    .append(rdo.getOrderAmt()).append(itemSeperator)
-                    .append(rdo.getFee()).append(itemSeperator)
+                    .append(rdo.getUserId()).append(itemSeperator)
+                    .append(rdo.getWcApplyAmt()).append(itemSeperator)
+                    .append(rdo.getFeeAmt()).append(itemSeperator)
+                    .append(rdo.getOrderStatus()).append(itemSeperator)
                     .append(rdo.getOrderSuccTm()).append(lineSeparator);
         }
         //写入文件
@@ -111,6 +114,6 @@ public class HallRechargeChkFileServiceImpl extends AbstractChkFileService {
     }
     //自定义平台生成的营业厅对账的文件名
     private String getChkFileName(String appCnl,LocalDate chkDate){
-        return LemonUtils.getApplicationName()+"_"+appCnl+"_RECHARGE"+"_"+DateTimeUtils.formatLocalDate(chkDate,"yyyyMMdd")+".ck";
+        return LemonUtils.getApplicationName()+"_"+appCnl+"_WITHDRAW"+"_"+DateTimeUtils.formatLocalDate(chkDate,"yyyyMMdd")+".ck";
     }
 }

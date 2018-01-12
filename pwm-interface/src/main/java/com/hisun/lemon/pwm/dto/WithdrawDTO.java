@@ -33,7 +33,7 @@ public class WithdrawDTO {
     private String capCardNo;
 	//申请提现金额
 	@ApiModelProperty(name = "wcApplyAmt", value = "申请提现金额")
-    @NotNull(message = "PWM10041")
+    @NotNull(message = "PWM10042")
 	@Min(value=0, message="PWM10029")
 	private BigDecimal wcApplyAmt;
 	//提现手续费

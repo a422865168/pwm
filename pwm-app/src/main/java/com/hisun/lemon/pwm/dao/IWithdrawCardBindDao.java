@@ -18,7 +18,9 @@ import java.util.List;
 @Component
 public interface IWithdrawCardBindDao extends BaseDao<WithdrawCardBindDO> {
     //查询提现银行卡号是否存在
-    public WithdrawCardBindDO query(@Param("cardNo") String cardNo, @Param("userId") String userId, @Param("capCorg") String capCorg);
+    public WithdrawCardBindDO query(@Param("cardNo") String cardNo, @Param("userId") String userId);
+    //查询提现银行卡号是否存在
+    public Integer queryCount(@Param("cardNo") String cardNo, @Param("userId") String userId);
     //查询已添加提现银行卡
     public List<WithdrawCardBindDO> queryCardList(String userid);
 }

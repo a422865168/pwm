@@ -43,6 +43,9 @@ public class WithdrawResultDTO {
     @NotEmpty(message="PWM10048")
     private String cardNoLast;
 
+    @ApiModelProperty(name = "wcRemark", value = "备注")
+    private String wcRemark;
+
     public String getOrderNo() {
         return orderNo;
     }
@@ -89,5 +92,13 @@ public class WithdrawResultDTO {
 
     public void setCardNoLast(String cardNoLast) {
         this.cardNoLast = cardNoLast;
+    }
+
+    public String getWcRemark() {
+        return wcRemark;
+    }
+
+    public void setWcRemark(String wcRemark) {
+        this.wcRemark = wcRemark;
     }
 }

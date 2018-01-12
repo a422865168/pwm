@@ -274,6 +274,7 @@
         <include refid="Base_Column_List" />
         from pwm_rechange_order
         <where>
+            bus_type != '0103'
             <if test="acTm != null">
                 <![CDATA[and ac_tm = #{acTm}]]>
             </if>

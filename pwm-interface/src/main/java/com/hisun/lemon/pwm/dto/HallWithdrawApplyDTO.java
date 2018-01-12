@@ -16,18 +16,17 @@ import java.math.BigDecimal;
  * @time 上午9:27:30
  *
  */
-@ApiModel(" 营业厅个人提现请求对象")
+@ApiModel(" 营业厅提现请求对象")
 public class HallWithdrawApplyDTO {
 
-    /** 商户号**/
-    @ApiModelProperty(name = "merchantId", value = "营业厅商户id", required = true)
+    /** 营业厅商户号 **/
+    @ApiModelProperty(name = "merchantId", value = "营业厅商户号", required = true)
     @NotNull(message = "PWM10010")
     private String merchantId;
 
-    /** 商户名**/
-    @ApiModelProperty(name = "merchantName", value = "营业厅商户名称", required = true)
+    /** 营业厅商户名 **/
+    @ApiModelProperty(name = "merchantName", value = "营业厅商户名", required = true)
     private String merchantName;
-
 
     /** 用户手机号 */
     @ApiModelProperty(name = "mblNo", value = "提现用户手机号", required = true)
@@ -35,9 +34,9 @@ public class HallWithdrawApplyDTO {
     @Length(max = 20)
     private String mblNo;
 
+    /** 币种 */
     @ApiModelProperty(name = "orderCcy", value = "币种(USD:美元)")
     @NotEmpty(message="PWM10020")
-    @Length(max =3)
     private String orderCcy;
 
     /** 结算金额 */
@@ -46,13 +45,13 @@ public class HallWithdrawApplyDTO {
     @Min(value=0, message="PWM10029")
     private BigDecimal withdrawAmt;
 
-    //提现手续费
-    @ApiModelProperty(name = "feeAmt", value = "提现手续费")
+    /** 提现手续费 */
+    @ApiModelProperty(name = "feeAmt", value = "提现手续费", required = true)
     @Min(value=0, message="PWM10030")
     private BigDecimal feeAmt;
 
-    /** 业务订单号 */
-    @ApiModelProperty(name = "busOrderNo", value = "业务订单号(营业厅请求订单号)", required = true)
+    /** 营业厅订单号 */
+    @ApiModelProperty(name = "busOrderNo", value = "营业厅订单号", required = true)
     @NotNull(message = "PWM10007")
     private String busOrderNo;
 
@@ -66,12 +65,20 @@ public class HallWithdrawApplyDTO {
     @NotNull(message = "PWM10054")
     private String payPwdRandom;
 
-    public String getMblNo() {
-        return mblNo;
+    public String getMerchantId() {
+        return merchantId;
     }
 
-    public void setMblNo(String mblNo) {
-        this.mblNo = mblNo;
+    public void setMerchantId(String merchantId) {
+        this.merchantId = merchantId;
+    }
+
+    public String getMerchantName() {
+        return merchantName;
+    }
+
+    public void setMerchantName(String merchantName) {
+        this.merchantName = merchantName;
     }
 
     public String getOrderCcy() {
@@ -88,6 +95,14 @@ public class HallWithdrawApplyDTO {
 
     public void setWithdrawAmt(BigDecimal withdrawAmt) {
         this.withdrawAmt = withdrawAmt;
+    }
+
+    public BigDecimal getFeeAmt() {
+        return feeAmt;
+    }
+
+    public void setFeeAmt(BigDecimal feeAmt) {
+        this.feeAmt = feeAmt;
     }
 
     public String getBusOrderNo() {
@@ -114,27 +129,11 @@ public class HallWithdrawApplyDTO {
         this.payPwdRandom = payPwdRandom;
     }
 
-    public BigDecimal getFeeAmt() {
-        return feeAmt;
+    public String getMblNo() {
+        return mblNo;
     }
 
-    public void setFeeAmt(BigDecimal feeAmt) {
-        this.feeAmt = feeAmt;
-    }
-
-    public String getMerchantId() {
-        return merchantId;
-    }
-
-    public void setMerchantId(String merchantId) {
-        this.merchantId = merchantId;
-    }
-
-    public String getMerchantName() {
-        return merchantName;
-    }
-
-    public void setMerchantName(String merchantName) {
-        this.merchantName = merchantName;
+    public void setMblNo(String mblNo) {
+        this.mblNo = mblNo;
     }
 }

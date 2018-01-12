@@ -102,7 +102,7 @@ public class PaymentHandler {
     }
 
     @Producers({
-            @Producer(beanName= "merchantTradeFeeConsumer", channelName= MultiOutput.OUTPUT_THREE)
+            @Producer(beanName= "merchantTransferTradeFeeConsumer", channelName= MultiOutput.OUTPUT_THREE)
     })
     public TradeFeeReqDTO registMerChantWithdrawFee(WithdrawOrderDO orderDO,String payeeId){
         if(StringUtils.equals(orderDO.getBusType(), PwmConstants.BUS_TYPE_WITHDRAW_HALL)){
@@ -112,7 +112,8 @@ public class PaymentHandler {
             tradeFeeReqDTO.setBusOrderNo(orderDO.getOrderNo());
             tradeFeeReqDTO.setBusOrderTime(DateTimeUtils.getCurrentLocalDateTime());
             tradeFeeReqDTO.setTradeAmt(orderDO.getWcApplyAmt());
-            tradeFeeReqDTO.setBusType("0405");//tfm计费模块已经定义0405为营业厅取现
+            //tfm计费模块已经定义0405为营业厅取现
+            tradeFeeReqDTO.setBusType("0405");
             String data = ObjectMapperHelper.writeValueAsString(objectMapper, tradeFeeReqDTO, true);
             logger.info("登记商户id为:" + payeeId + "手续费写入消息队列数据：" + data);
             return tradeFeeReqDTO;

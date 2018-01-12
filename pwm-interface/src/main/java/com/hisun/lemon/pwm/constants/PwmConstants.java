@@ -259,6 +259,12 @@ public class PwmConstants {
     public static final String AC_ITEM_FEE_PAY_WIDR="6021010002";
 
 	/**
+	 * 内部科目
+	 * 手续费收入-支付账户-商户结算
+	 */
+	public static final String AC_ITEM_FEE_MERC_WIDR="6021010004";
+
+	/**
 	 * 手机号国家编码
 	 * 柬埔寨：
 	 */

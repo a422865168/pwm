@@ -196,4 +196,29 @@ public class AcmComponent {
 		return null;
 	}
 
+	public GenericRspDTO<NoBody> accountingTreatment(List<AccountingReqDTO> accountingReqDTOList) {
+		BigDecimal dAmt = BigDecimal.ZERO;
+		BigDecimal cAmt = BigDecimal.ZERO;
+		for (AccountingReqDTO accountingReqDTO : accountingReqDTOList) {
+			if (JudgeUtils.isNotNull(accountingReqDTO)) {
+				if (JudgeUtils.equals(accountingReqDTO.getDcFlg(), ACMConstants.AC_D_FLG)) {
+					dAmt = dAmt.add(accountingReqDTO.getTxAmt());
+				} else {
+					cAmt = cAmt.add(accountingReqDTO.getTxAmt());
+				}
+			}
+		}
+		// 借贷平衡校验
+		if (cAmt.compareTo(dAmt) != 0) {
+			LemonException.throwBusinessException("PWM40002");
+		}
+		GenericDTO<List<AccountingReqDTO>> userAccDto = new GenericDTO<>();
+		userAccDto.setBody(accountingReqDTOList);
+		GenericRspDTO<NoBody> genericRspDTO = accountingTreatmentClient.accountingTreatment(userAccDto);
+		if (JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())) {
+			LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+		}
+		return genericRspDTO;
+	}
+
 }
