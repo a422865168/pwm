@@ -1248,7 +1248,14 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				if(JudgeUtils.isNotSuccess(genericRounteListRsp.getMsgCd())) {
 					LemonException.throwBusinessException(genericRounteListRsp.getMsgCd());
 				}
-				RouteRspDTO.RouteDTO routeDTO = rounteList.get(0);
+				RouteRspDTO.RouteDTO routeDTO = null;
+				for(RouteRspDTO.RouteDTO route : rounteList){
+					if(JudgeUtils.equals(route.getCrdCorpOrg(),rechargeOrderDO.getCrdCorpOrg())){
+						routeDTO = new RouteRspDTO.RouteDTO();
+						BeanUtils.copyProperties(routeDTO,route);
+						break;
+					}
+				}
 				if(JudgeUtils.isNull(routeDTO)){
 					throw new LemonException("PWM30015");
 				}
