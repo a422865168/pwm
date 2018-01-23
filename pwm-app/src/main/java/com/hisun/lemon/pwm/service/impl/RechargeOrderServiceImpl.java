@@ -1975,7 +1975,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
         }
 		GenericRspDTO<UserBasicInfDTO> genericUserInfoRspDTO = userBasicInfClient.queryUserByLoginId(bussinessBody.getMblNo());
         if(JudgeUtils.isNotSuccess(genericUserInfoRspDTO.getMsgCd())){
-        	LemonException.throwBusinessException("查询手机号为: " + bussinessBody.getMblNo() + " 用户信息失败>>"+genericUserInfoRspDTO.getMsgCd());
+        	logger.error("查询手机号为: " + bussinessBody.getMblNo() + " 用户信息失败>>"+genericUserInfoRspDTO.getMsgCd());
+        	LemonException.throwBusinessException(genericUserInfoRspDTO.getMsgCd());
 		}
 		UserBasicInfDTO userBasicInfDTO = genericUserInfoRspDTO.getBody();
         RiskCheckUserStatusReqDTO riskCheckUserStatusReqDTO = new RiskCheckUserStatusReqDTO();
