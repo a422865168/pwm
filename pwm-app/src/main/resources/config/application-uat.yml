@@ -1,9 +1,9 @@
 redis :
-  host : 172.22.189.138
-  password : seatelRedis
+  host : 10.9.10.120
+  password : redis@123
 
 rabbitmq :
-  addresses : 172.22.189.138:5672
+  addresses : 10.9.10.130:5672
   password : Rabbitmq123
 
 #Multiple dataSources
@@ -11,7 +11,7 @@ dataSource :
   lemon :
     type : com.alibaba.druid.pool.DruidDataSource
     driverClassName : com.mysql.cj.jdbc.Driver
-    url : jdbc:mysql://172.22.181.196:3306/lemon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    url : jdbc:mysql://10.9.10.120:3306/lemon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
     username : lemon
     password : lemon@123
     initialSize : 5
@@ -39,9 +39,9 @@ dataSource :
   primary :
     type : com.alibaba.druid.pool.DruidDataSource
     driverClassName : com.mysql.cj.jdbc.Driver
-    url : jdbc:mysql://172.22.181.196:3306/seatelpay_pwm?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
-    username : pwm
-    password : pwm
+    url : jdbc:mysql://10.9.10.120:3306/xxpay_csh?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    username : csh
+    password : csh
     initialSize : 5
     minIdle : 5
     maxActive : 20
@@ -67,6 +67,6 @@ dataSource :
 
 
 eureka :
-  zone : http://172.22.189.138:9002/eureka/
-  instance:
-    ip-address: 172.22.189.138
+  zone : http://10.9.10.130:9003/eureka/
+  #instance:
+   # ip-address: 219.135.153.39

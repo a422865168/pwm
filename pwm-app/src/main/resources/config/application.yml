@@ -1,6 +1,6 @@
 spring :
   redis :
-    database : 0
+    database : 1
     host : ${redis.host:192.168.3.39}
     port : 6379
     password : ${redis.password:Hisunpay2017}
@@ -43,7 +43,7 @@ spring :
       provider : org.ehcache.jsr107.EhcacheCachingProvider
   #see rabbitProperties
   rabbitmq :
-    addresses : ${rabbitmq.addresses:192.168.3.38:5672}
+    addresses : ${rabbitmq.addresses:219.135.153.39:5672}
     virtualHost : /lemon
     username : rabbitmq
     password : ${rabbitmq.password:Rabbitmq123}
@@ -197,7 +197,7 @@ dataSource :
   lemon :
     type : com.alibaba.druid.pool.DruidDataSource
     driverClassName : com.mysql.cj.jdbc.Driver
-    url : jdbc:mysql://119.23.126.119:3306/lemon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
+    url : jdbc:mysql://219.135.153.39:5672/lemon?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
     username : lemon
     password : lemon@123
     initialSize : 5
