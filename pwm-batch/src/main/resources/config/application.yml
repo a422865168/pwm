@@ -173,7 +173,7 @@ lemon :
     redis :
       expires :
         #redis cache expire time; cacheName : expireTime/s; 0 - never expire
-        ${lemon.cache.cacheName.prefix}.user : 140 
+        ${lemon.cache.cacheName.prefix}.user : 140
   # distributed lock dependence on redisson
   redisson :
     enabled : true

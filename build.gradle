@@ -21,7 +21,7 @@ subprojects{
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
 
-    version = '1.0.0-SNAPSHOT'
+    version = '1.0.0-SNAPSHOT-XXPAY'
     group = 'com.hisun'
     
     sourceCompatibility = 1.8
@@ -52,16 +52,17 @@ subprojects{
 	        dependency 'com.hisun:lemon-framework:1.0.1-SNAPSHOT'
 	        dependency 'com.hisun:lemon-swagger:1.0.1-SNAPSHOT'
             dependency 'com.hisun:jcommon:1.0.1-SNAPSHOT'
-	        dependency 'com.hisun:csh-interface:1.0.0-SNAPSHOT'
-            dependency 'com.hisun:cpo-interface:1.0.0-SNAPSHOT'
+	        dependency 'com.hisun:csh-interface:1.0.0-SNAPSHOT-XXPAY'
+            dependency 'com.hisun:cpo-interface:1.0.0-SNAPSHOT-XXPAY'
             dependency 'com.hisun:acm-interface:1.0.1-SNAPSHOT'
-            dependency 'com.hisun:urm-interface:1.0.0-SNAPSHOT'
+            dependency 'com.hisun:acs-interface:1.0.5-SNAPSHOT-XXPAY'
+            dependency 'com.hisun:urm-interface:1.0.0-SNAPSHOT-XXPAY'
             dependency 'com.hisun:tfm-interface:1.0.0-SNAPSHOT'
             dependency 'com.hisun:mkm-interface:1.0.0-SNAPSHOT'
-            dependency 'com.hisun:cpi-interface:1.0.0-SNAPSHOT'
+            dependency 'com.hisun:cpi-interface:1.0.0-SNAPSHOT-XXPAY'
             dependency 'com.hisun:rsm-interface:1.0.0-SNAPSHOT'
-            dependency 'com.hisun:urm-interface:1.0.0-SNAPSHOT'
-            dependency 'com.hisun:bil-interface:1.0.0-SNAPSHOT'
+            dependency 'com.hisun:urm-interface:1.0.4-SNAPSHOT-XXPAY'
+            dependency 'com.hisun:bil-interface:1.0.0-SNAPSHOT-XXPAY'
             dependency 'com.hisun:cmm-interface:1.0.0-SNAPSHOT'
             dependency 'com.hisun:lemon-framework-lock:1.0.1-SNAPSHOT'
         }

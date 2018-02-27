@@ -12,7 +12,3 @@ catalina*
 *.iml
 .idea
 .DS_Store
-gradlew.bat
-gradlew
-gradle/wrapper/gradle-wrapper.properties
-gradle/wrapper/gradle-wrapper.jar

@@ -159,9 +159,9 @@ public class PwmConstants {
 	public static final String BUS_TYPE_HCOUPON="0501";
 
 	/**
-	 * 营业厅充值币种：USD美元
+	 * 营业厅充值币种：CNY美元
 	 */
-	public static final String HALL_PAY_CCY="USD";
+	public static final String HALL_PAY_CCY="CNY";
 	
 	/**
 	 * 内部科目

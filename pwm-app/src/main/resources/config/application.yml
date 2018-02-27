@@ -313,13 +313,13 @@ pwm :
        password: Hisunpay2017
        connectTimeout: 120000
   sftp :
-    ip : 192.168.3.38
+    ip : 10.9.10.127
     port : 22
-    name : payment
-    password : Hisunpay2017
+    name : oper
+    password : h4y]nrTDvq8,XjBG
     connectTimeout : 120000
   chk :
-    remotePath : /home/payment/data/pwm/
-    localPath : /home/payment/data/localchk/pwm/
+    remotePath : /home/oper/data/pwm/
+    localPath : /home/oper/data/localchk/pwm/
     #营业厅指定对账文件目录地址
-    hallRemotePath: /home/payment/data/pwm/hall/
+    hallRemotePath: /home/oper/data/pwm/hall/

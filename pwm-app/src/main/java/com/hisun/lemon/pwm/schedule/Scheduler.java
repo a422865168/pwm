@@ -22,7 +22,7 @@ public class Scheduler {
 
 
 //    @Scheduled(cron="0 0/1 * * * ?")
-	@BatchScheduled(cron="0 0 0/1 * * ?")
+	@BatchScheduled(cron="0 0/30 9-12 * * ?")
 	public void createChkFile(){
 		for(AbstractChkFileService item:scheduleService){
 			executorService.submit(item);

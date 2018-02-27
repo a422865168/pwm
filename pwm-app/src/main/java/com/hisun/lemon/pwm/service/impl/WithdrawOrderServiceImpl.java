@@ -19,6 +19,7 @@ import com.hisun.lemon.common.utils.BeanUtils;
 import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.JudgeUtils;
 import com.hisun.lemon.common.utils.StringUtils;
+import com.hisun.lemon.constants.AccConstants;
 import com.hisun.lemon.cpo.client.RouteClient;
 import com.hisun.lemon.cpo.client.WithdrawClient;
 import com.hisun.lemon.cpo.dto.RouteRspDTO;
@@ -28,6 +29,7 @@ import com.hisun.lemon.cpo.dto.WithdrawResDTO;
 import com.hisun.lemon.cpo.enums.CorpBusSubTyp;
 import com.hisun.lemon.cpo.enums.CorpBusTyp;
 import com.hisun.lemon.csh.enums.AcItem;
+import com.hisun.lemon.dto.AccDataListDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
@@ -47,6 +49,7 @@ import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import com.hisun.lemon.pwm.mq.BillSyncHandler;
 import com.hisun.lemon.pwm.mq.PaymentHandler;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
+import com.hisun.lemon.pwm.utils.AcsUtils;
 import com.hisun.lemon.rsm.Constants;
 import com.hisun.lemon.rsm.client.RiskCheckClient;
 import com.hisun.lemon.rsm.dto.req.checkstatus.RiskCheckUserStatusReqDTO;
@@ -57,6 +60,7 @@ import com.hisun.lemon.urm.client.UserAuthenticationClient;
 import com.hisun.lemon.urm.client.UserBasicInfClient;
 import com.hisun.lemon.urm.dto.CheckPayPwdDTO;
 import com.hisun.lemon.urm.dto.UserBasicInfDTO;
+import com.hisun.lemon.xxka.client.XXAccHandleClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -131,6 +135,9 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 
     @Resource
     protected AccountingTreatmentClient accountingTreatmentClient;
+
+    @Resource
+    private XXAccHandleClient acsTreatmentClient;
     /**
      * 生成提现订单
      * @param genericWithdrawDTO
@@ -311,7 +318,13 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         String jrnNo = LemonUtils.getRequestId();
         //资金属性
         String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
-		//借：其他应付款-支付账户-现金账户  102
+        try{
+            innerAccAcsDeal(acNo,acNo.substring(0,3),balCapType,totalAmt.subtract(fee).floatValue(),acNo,totalAmt.floatValue(),orderNo);
+        }catch (Exception e){
+            LemonException.throwBusinessException(e.getMessage());
+        }
+
+		/*//借：其他应付款-支付账户-现金账户  102
         AccountingReqDTO userAccountReqDTO = acmComponent.createAccountingReqDTO(orderNo, jrnNo, withdrawOrderDO.getTxType(),
                 ACMConstants.ACCOUNTING_NOMARL, withdrawOrderDO.getWcTotalAmt(), acNo, ACMConstants.USER_AC_TYP, balCapType,
                 ACMConstants.AC_D_FLG, PwmConstants.AC_ITEM_PAY_CASH_ACNO, null, null, null,
@@ -332,7 +345,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }else {
             //调用账务处理
             acmComponent.requestAc(userAccountReqDTO, payItemReqDTO);
-        }
+        }*/
 
         //国际化订单信息
         WithdrawCardBindDO withdrawCardBindDO = withdrawCardBindDao.query(withdrawOrderDO.getCapCardNo(), userId);
@@ -392,7 +405,12 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             String jrnNo = LemonUtils.getRequestId();
             //资金属性
             String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
-            //借：应付账款-待结算款-批量付款  100
+            try{
+                innerAccAcsDealFail(acNo,acNo.substring(0,3),balCapType,withdrawOrderDO.getWcActAmt().floatValue(),acNo,withdrawOrderDO.getWcTotalAmt().floatValue(),withdrawOrderDO.getOrderNo());
+            }catch (Exception e){
+                LemonException.throwLemonException(e.getMessage());
+            }
+            /*//借：应付账款-待结算款-批量付款  100
             AccountingReqDTO payItemReqDTO = acmComponent.createAccountingReqDTO(withdrawOrderDO.getOrderNo(), jrnNo, PwmConstants.TX_TYPE_WITHDRAW,
                     ACMConstants.ACCOUNTING_NOMARL, withdrawOrderDO.getWcActAmt(), null, ACMConstants.ITM_AC_TYP, balCapType,
                     ACMConstants.AC_D_FLG, PwmConstants.AC_ITEM_FOR_PAY, null, null, null,
@@ -416,7 +434,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             }else {
                 //调用账务处理
                 acmComponent.requestAc(userAccountReqDTO, payItemReqDTO);
-            }
+            }*/
         }
         withdrawOrderDO.setAcTm(LemonUtils.getAccDate());
         //若更新提现单据状态及相关信息
@@ -812,7 +830,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         withdrawOrderDO.setCapCardNo("");
         withdrawOrderDO.setFeeAmt(feeAmt);
         withdrawOrderDO.setNtfMbl(mblNo);
-        withdrawOrderDO.setOrderCcy("USD");
+        withdrawOrderDO.setOrderCcy("CNY");
         withdrawOrderDO.setOrderExpTm(null);
         withdrawOrderDO.setOrderNo(orderNo);
         withdrawOrderDO.setCapCardType("");
@@ -1218,5 +1236,81 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 
         return accList;
     }
+    /**
+     * InnerAccDebit 内部账户处理(个人提现)
+     */
+    private String innerAccAcsDeal(String acNo, String acTyp ,String capTyp , Float accAmt, String oppAcNo,  Float txAmt, String ordNo) throws Exception {
+        GenericDTO<AccDataListDTO> genericReqDTO = new GenericDTO<>();
+        AccDataListDTO accDataListDTO=new AccDataListDTO();
+        List<Map<String,Object>> accDataMapList=new ArrayList<>();
 
+        //内部账户借记处理:  DR-借:个人账户
+        Map<String,Object> accDataMap1= AcsUtils.getAccDataListDTO(AccConstants.USR_ACC_DR,acNo,"个人账户",
+                acTyp,capTyp,accAmt, AccConstants.DC_FLG_D,"1401",AccConstants.BUS_TYP_WEB,"4010002","应付账款-待结算款-用户提现",
+                txAmt,"04",ordNo,"1",AccConstants.NOT_TX_FLG_NOT_TX,"個人提現");
+
+        //内部账户贷记处理 :    CR-贷:应付账款-待结算款-用户提现
+        Map<String,Object> accDataMap2=AcsUtils.getAccDataListDTO(AccConstants.INNER_ACC_CR,"4010002","应付账款-待结算款-用户提现","401", capTyp,accAmt,
+                AccConstants.DC_FLG_C,"1401",AccConstants.BUS_TYP_WEB,oppAcNo,"个人账户",
+                txAmt,"04",ordNo,"2",AccConstants.NOT_TX_FLG_NOT_TX,"個人提現");
+
+        //内部账户借记处理:  DR-借:个人账户
+        Map<String,Object> accDataMap3= AcsUtils.getAccDataListDTO(AccConstants.USR_ACC_DR,acNo,"个人账户",
+                acTyp,capTyp,accAmt, AccConstants.DC_FLG_D,"1401",AccConstants.BUS_TYP_WEB,"4040004","其他应付款-暂收款项-手续费",
+                txAmt,"04",ordNo,"3",AccConstants.NOT_TX_FLG_NOT_TX,"個人提現");
+
+        //内部账户贷记处理 :    CR-贷:其他应付款-暂收款项-手续费
+        Map<String,Object> accDataMap4=AcsUtils.getAccDataListDTO(AccConstants.INNER_ACC_CR,"4040004","其他应付款-暂收款项-手续费","404", capTyp,accAmt,
+                AccConstants.DC_FLG_C,"1401",AccConstants.BUS_TYP_WEB,oppAcNo,"个人账户",
+                txAmt,"04",ordNo,"4",AccConstants.NOT_TX_FLG_NOT_TX,"個人提現");
+        accDataMapList.add(accDataMap1);
+        accDataMapList.add(accDataMap2);
+        accDataMapList.add(accDataMap3);
+        accDataMapList.add(accDataMap4);
+
+        accDataListDTO.setAccDataMapList(accDataMapList);
+        accDataListDTO.setMainTxTyp("14");
+        accDataListDTO.setMiniTxTyp("1401");
+        accDataListDTO.setRvsTxFlg(AccConstants.RVS_TX_FLG_N);//正常交易
+
+        genericReqDTO.setBody(accDataListDTO);
+        GenericRspDTO genericRspDTO=acsTreatmentClient.xxAccHandle(genericReqDTO);
+        return genericRspDTO.getMsgCd();
+    }
+
+    /**
+     * InnerAccDebit 内部账户处理(付款失败)
+     */
+    private String innerAccAcsDealFail(String acNo, String acTyp ,String capTyp , Float accAmt, String oppAcNo,  Float txAmt, String ordNo) throws Exception {
+        GenericDTO<AccDataListDTO> genericReqDTO = new GenericDTO<>();
+        AccDataListDTO accDataListDTO=new AccDataListDTO();
+        List<Map<String,Object>> accDataMapList=new ArrayList<>();
+
+        //内部账户借记处理:  DR-借:银行存款-人民币-XX银行客户备付金
+        Map<String,Object> accDataMap1= AcsUtils.getAccDataListDTO(AccConstants.INNER_ACC_DR,"5020001","银行存款-人民币-XX银行客户备付金",
+                "502",capTyp,accAmt, AccConstants.DC_FLG_D,"1502",AccConstants.BUS_TYP_WEB,oppAcNo,"商户账户",
+                txAmt,"04",ordNo,"1",AccConstants.NOT_TX_FLG_NOT_TX,"付款失败");
+
+        //内部账户借记处理:  DR-借:其他应付款-暂收款项-手续费
+        Map<String,Object> accDataMap2= AcsUtils.getAccDataListDTO(AccConstants.INNER_ACC_DR,"4040004","其他应付款-暂收款项-手续费",
+                "404",capTyp,accAmt, AccConstants.DC_FLG_D,"1502",AccConstants.BUS_TYP_WEB,oppAcNo,"商户账户",
+                txAmt,"04",ordNo,"2",AccConstants.NOT_TX_FLG_NOT_TX,"付款失败");
+
+        //内部账户贷记处理 :    CR-贷:商户账户
+        Map<String,Object> accDataMap3=AcsUtils.getAccDataListDTO(AccConstants.MERC_ACC_CR,acNo,"商户账户",acTyp, capTyp,accAmt,
+                AccConstants.DC_FLG_C,"1502",AccConstants.BUS_TYP_WEB,"5020001","银行存款-人民币-XX银行客户备付金",
+                txAmt,"04",ordNo,"3",AccConstants.NOT_TX_FLG_NOT_TX,"付款失败");
+        accDataMapList.add(accDataMap1);
+        accDataMapList.add(accDataMap2);
+        accDataMapList.add(accDataMap3);
+
+        accDataListDTO.setAccDataMapList(accDataMapList);
+        accDataListDTO.setMainTxTyp("15");
+        accDataListDTO.setMiniTxTyp("1502");
+        accDataListDTO.setRvsTxFlg(AccConstants.RVS_TX_FLG_N);//正常交易
+
+        genericReqDTO.setBody(accDataListDTO);
+        GenericRspDTO genericRspDTO=acsTreatmentClient.xxAccHandle(genericReqDTO);
+        return genericRspDTO.getMsgCd();
+    }
 }
