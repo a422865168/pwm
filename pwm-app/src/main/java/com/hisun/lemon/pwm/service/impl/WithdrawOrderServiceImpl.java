@@ -13,7 +13,6 @@ import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.hisun.lemon.acm.client.AccountManagementClient;
 import com.hisun.lemon.acm.client.AccountingTreatmentClient;
@@ -156,7 +155,6 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
      */
 	@Override
 	public WithdrawRspDTO createOrder(GenericDTO<WithdrawDTO> genericWithdrawDTO) {
-       System.out.println("提现申请");
         //生成订单号
         WithdrawDTO withdrawDTO = genericWithdrawDTO.getBody();
 
@@ -273,6 +271,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
 		BeanUtils.copyProperties(withdrawOrderDO, withdrawDTO);
 		withdrawOrderDO.setOrderNo(orderNo);
+		withdrawOrderDO.setAcTm(genericWithdrawDTO.getAccDate());
 		//交易类型 04提现
 		withdrawOrderDO.setTxType(PwmConstants.TX_TYPE_WITHDRAW);
 		//提现总金额=实际提现金额+手续费
@@ -334,9 +333,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         //流水号s
         String jrnNo = LemonUtils.getRequestId();
         //资金属性
-        String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
-        	//账务处理
-            //innerAccAcsDeal(acNo,acNo.substring(0,3),balCapType,totalAmt.subtract(fee).floatValue(),acNo,totalAmt.floatValue(),orderNo);
+        String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();  
         	// 账务处理
     		GenericRspDTO<AccDataListDTO> generic = UserAccAcsDeal(withdrawOrderDO,acNo);
     		if(!JudgeUtils.isSuccess(generic.getMsgCd())){
@@ -874,8 +871,8 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
      * acNo  主账户
      */
     private GenericRspDTO<AccDataListDTO> UserAccAcsDeal(WithdrawOrderDO withdrawOrderDO,String acNo){
-    	GenericRspDTO<AccDataListDTO> genericRspDTO = null;
-		try {
+    	GenericRspDTO<AccDataListDTO> GenericRspDTO=new GenericRspDTO<>();
+    	try {
 			GenericDTO<AccDataListDTO> genericReqDTO = new GenericDTO<>();
 			AccDataListDTO accDataListDTO=new  AccDataListDTO();
 			List<Map<String,Object>> accDataMapList=new ArrayList<>();
@@ -902,16 +899,14 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 			System.out.println("账务请求报文："+accDataMapList);
 			logger.info("用户转账账务处理请求报文:"+accDataMapList);
 			accDataListDTO.setAccDataMapList(accDataMapList);
-			accDataListDTO.setMainTxTyp("25");
-			accDataListDTO.setMiniTxTyp("2501");
+			accDataListDTO.setMainTxTyp("14");
+			accDataListDTO.setMiniTxTyp("1401");
 			accDataListDTO.setRvsTxFlg(AccConstants.RVS_TX_FLG_N);//正常交易
-
 			genericReqDTO.setBody(accDataListDTO);
-			genericRspDTO=xxAccService.xxAccHandle(genericReqDTO);
-
-		} catch (Exception e) {
+			GenericRspDTO=xxAccService.xxAccHandle(genericReqDTO);
+    	} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return genericRspDTO;
+		return GenericRspDTO;
 	}
 }
