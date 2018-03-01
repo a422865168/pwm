@@ -7,8 +7,8 @@ import com.hisun.lemon.pwm.dto.*;
 import java.util.List;
 
 /**
- * @author tone
- * @date 2017年6月7日
+ * @author ruan
+ * @date 2018年3月1日
  * @time 下午2:13:58
  *
  */
@@ -64,20 +64,5 @@ public interface IWithdrawOrderService {
      * @return
      */
     public GenericRspDTO withdrawErrorHandler(GenericDTO<WithdrawErrorHandleDTO> genericWithdrawErrorHandleDTO);
-
-    /**
-     * 营业厅提现
-     * @param genericWithdrawHallDTO
-     * @return
-     */
-    public HallWithdrawResultDTO handleHallWithdraw(GenericDTO<HallWithdrawApplyDTO> genericWithdrawHallDTO);
-
-
-    /**
-     * 处理个人营业厅取现长款处理
-     * @param genericWithdrawRevokeDTO
-     * @return
-     */
-    public void hallWithdrawRevokeHandle(GenericDTO<HallWithdrawRevokeDTO> genericWithdrawRevokeDTO);
 
 }

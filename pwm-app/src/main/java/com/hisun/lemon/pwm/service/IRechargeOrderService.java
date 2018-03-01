@@ -1,11 +1,23 @@
 package com.hisun.lemon.pwm.service;
 
-import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
-import com.hisun.lemon.framework.data.GenericDTO;
-import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.pwm.dto.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.pwm.dto.HallChkDTO;
+import com.hisun.lemon.pwm.dto.HallOrderQueryResultDTO;
+import com.hisun.lemon.pwm.dto.HallQueryDTO;
+import com.hisun.lemon.pwm.dto.HallQueryResultDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeErrorFundDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeMatchDTO;
+import com.hisun.lemon.pwm.dto.HallRechargeResultDTO;
+import com.hisun.lemon.pwm.dto.OfflineRechargeApplyDTO;
+import com.hisun.lemon.pwm.dto.OfflineRechargeResultDTO;
+import com.hisun.lemon.pwm.dto.RechargeDTO;
+import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
+import com.hisun.lemon.pwm.dto.RemittanceUploadDTO;
 
 
 /**
@@ -38,26 +50,7 @@ public interface IRechargeOrderService {
     public HallRechargeResultDTO hallRechargePay(HallRechargeApplyDTO dto);
 
     
-    /**
-     * 海币充值下单
-     * @param rechargeHCouponDTO
-     * @return
-     */
-    public GenericRspDTO<CashierViewDTO> createHCouponOrder(GenericDTO<RechargeHCouponDTO> rechargeHCouponDTO);
     
-    /**
-     * 海币充值下单(对外接口)
-     * @param rechargeHCouponDTO
-     * @return
-     */
-    public GenericRspDTO<RechargeRspHCouponDTO> createOutHCouponOrder(GenericDTO<RechargeReqHCouponDTO> rechargeHCouponDTO);
-    
-    /**
-     * 海币充值结果处理
-     * @param rechargeHCouponDTO
-     */
-    public void handleHCouponResult(GenericDTO<RechargeHCouponResultDTO> rechargeHCouponDTO);
-
     /**
      * 营业厅充值撤销处理
      * @param dto

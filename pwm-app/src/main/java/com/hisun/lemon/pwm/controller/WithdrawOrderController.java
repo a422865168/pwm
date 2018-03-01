@@ -1,27 +1,41 @@
 package com.hisun.lemon.pwm.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
-import com.hisun.lemon.common.exception.LemonException;
-import com.hisun.lemon.framework.controller.BaseController;
-import com.hisun.lemon.framework.data.GenericRspDTO;
-import com.hisun.lemon.framework.data.NoBody;
-import com.hisun.lemon.pwm.dto.*;
-import io.swagger.annotations.ApiImplicitParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.hisun.lemon.framework.controller.BaseController;
 import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.utils.LemonUtils;
+import com.hisun.lemon.pwm.dto.WithdrawBankRspDTO;
+import com.hisun.lemon.pwm.dto.WithdrawCardBindDTO;
+import com.hisun.lemon.pwm.dto.WithdrawCardDelDTO;
+import com.hisun.lemon.pwm.dto.WithdrawCardDelRspDTO;
+import com.hisun.lemon.pwm.dto.WithdrawCardQueryDTO;
+import com.hisun.lemon.pwm.dto.WithdrawDTO;
+import com.hisun.lemon.pwm.dto.WithdrawErrorHandleDTO;
+import com.hisun.lemon.pwm.dto.WithdrawRateDTO;
+import com.hisun.lemon.pwm.dto.WithdrawRateResultDTO;
+import com.hisun.lemon.pwm.dto.WithdrawResultDTO;
+import com.hisun.lemon.pwm.dto.WithdrawRspDTO;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
-
-import java.util.List;
 
 
 @Api(value = "处理提现")
@@ -130,25 +144,5 @@ public class WithdrawOrderController  extends BaseController {
 	@PostMapping(value = "/chk/error/handle")
 	public GenericRspDTO withdrawErrorHandler(@Validated @RequestBody GenericDTO<WithdrawErrorHandleDTO> genericWithdrawErrorHandleDTO) {
 		return withdrawOrderService.withdrawErrorHandler(genericWithdrawErrorHandleDTO);
-	}
-
-	@ApiOperation(value = "营业厅提现", notes = "营业厅提现处理")
-	@ApiResponse(code = 200, message = "营业厅提现结果")
-	@PostMapping(value = "/hall")
-	public GenericRspDTO<HallWithdrawResultDTO> hallWithdrawHandle(@Validated @RequestBody GenericDTO<HallWithdrawApplyDTO> genericWithdrawResultDTO) {
-		HallWithdrawResultDTO hallWithdrawResultDTO = withdrawOrderService.handleHallWithdraw(genericWithdrawResultDTO);
-		return GenericRspDTO.newSuccessInstance(hallWithdrawResultDTO);
-	}
-
-	@ApiOperation(value = "个人营业厅提现对账撤单处理", notes = "个人营业厅提现对账撤单处理")
-	@ApiResponse(code = 200, message = "个人营业厅提现对账撤单处理")
-	@PostMapping(value = "/hall/revoke")
-	public GenericRspDTO<NoBody> hallWithdrawRevokeHandle(@Validated @RequestBody GenericDTO<HallWithdrawRevokeDTO> genericWithdrawRevokeDTO) {
-		try{
-			withdrawOrderService.hallWithdrawRevokeHandle(genericWithdrawRevokeDTO);
-		}catch (LemonException e){
-			LemonException.throwBusinessException(e.getMsgCd());
-		}
-		return GenericRspDTO.newSuccessInstance();
 	}
 }

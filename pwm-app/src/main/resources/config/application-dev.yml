@@ -65,12 +65,14 @@ dataSource :
       # 合并多个DruidDataSource的监控数据
       useGlobalDataSourceStat : true
 
-
 eureka :
   zone : http://10.9.10.130:9002/eureka/
   instance:
+      preferIpAddress : true
+  #instance:
    # ip-address: 219.135.153.39
-   preferIpAddress : true
-lemon:
-  batch:
+
+#启动定时批处理
+lemon :
+  batch :
     enabled : true

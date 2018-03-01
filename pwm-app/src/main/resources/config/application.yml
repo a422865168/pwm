@@ -43,7 +43,7 @@ spring :
       provider : org.ehcache.jsr107.EhcacheCachingProvider
   #see rabbitProperties
   rabbitmq :
-    addresses : ${rabbitmq.addresses:219.135.153.39:5672}
+    addresses : ${rabbitmq.addresses:192.168.3.38:5672}
     virtualHost : /lemon
     username : rabbitmq
     password : ${rabbitmq.password:Rabbitmq123}
@@ -302,22 +302,12 @@ security :
     password : lemon123
 
 pwm :
-  recharge :
-    #营业厅充值签名KEY值
-    HALLKEY : 304B5C6562C7A43498760FD93209ABBE
-    #营业厅ftp服务器配置
-    hall-sftp:
-       ip: 192.168.3.38
-       port: 22
-       name: payment
-       password: Hisunpay2017
-       connectTimeout: 120000
   sftp :
     ip : 10.9.10.127
     port : 22
     name : oper
     password : h4y]nrTDvq8,XjBG
-    connectTimeout : 120000
+    connectTimeout : 2000
   chk :
     remotePath : /home/oper/data/pwm/
     localPath : /home/oper/data/localchk/pwm/

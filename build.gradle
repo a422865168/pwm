@@ -54,7 +54,6 @@ subprojects{
             dependency 'com.hisun:jcommon:1.0.1-SNAPSHOT'
 	        dependency 'com.hisun:csh-interface:1.0.0-SNAPSHOT-XXPAY'
             dependency 'com.hisun:cpo-interface:1.0.0-SNAPSHOT-XXPAY'
-            dependency 'com.hisun:acm-interface:1.0.1-SNAPSHOT'
             dependency 'com.hisun:acs-interface:1.0.5-SNAPSHOT-XXPAY'
             dependency 'com.hisun:urm-interface:1.0.0-SNAPSHOT-XXPAY'
             dependency 'com.hisun:tfm-interface:1.0.0-SNAPSHOT'
