@@ -268,7 +268,7 @@ eureka :
       enabled : true
   
 swagger :
-  profiles : dev,sit,ci
+  profiles : dev,sit,ci,uat
   show : true
   version : 1.0
   globleRequestParams :
