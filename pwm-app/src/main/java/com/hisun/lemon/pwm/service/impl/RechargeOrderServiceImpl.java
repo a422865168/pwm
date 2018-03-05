@@ -591,6 +591,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 						return null;
 					});
 		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
 			LemonException.create(e);
 		}
 	}
