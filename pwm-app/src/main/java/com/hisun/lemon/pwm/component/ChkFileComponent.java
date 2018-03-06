@@ -90,7 +90,7 @@ public class ChkFileComponent {
 	 */
 	public LocalDate getChkDate(){
 		LocalDate today= DateTimeUtils.getCurrentLocalDate();
-		return today.minusDays(1);
+		return today.minusDays(0);
 	}
 
 	/**

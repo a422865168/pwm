@@ -35,7 +35,7 @@ public class WithdrawResultDTO {
 	@ApiModelProperty(name = "acTm", value = "记账时间")
     private LocalDate acTm;
     //提现状态
-    @ApiModelProperty(name = "orderStatus", value = "提现状态")
+    @ApiModelProperty(name = "orderStatus", value = "提现状态  F1：失败")
     @NotEmpty(message="PWM10009")
     private String orderStatus;
     //银行卡后四位

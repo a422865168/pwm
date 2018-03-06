@@ -1,10 +1,9 @@
 package com.hisun.lemon.pwm.dto;
 
-import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import java.time.LocalDate;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 提现对账处理请求 传输对象

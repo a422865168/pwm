@@ -21,9 +21,10 @@ public class Scheduler {
 	private List<AbstractChkFileService> scheduleService;
 
 
-//    @Scheduled(cron="0 0/1 * * * ?")
-	@BatchScheduled(cron="0 0/30 9-12 * * ?")
+	@BatchScheduled(cron="0 0/1 * * * ?")
+	//@BatchScheduled(cron="0 0/30 9-12 * * ?")
 	public void createChkFile(){
+		System.out.println("生成对账文件");
 		for(AbstractChkFileService item:scheduleService){
 			executorService.submit(item);
 		}
