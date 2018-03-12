@@ -1,15 +1,16 @@
 package com.hisun.lemon.pwm.dto;
 
-import com.hisun.lemon.framework.data.GenericDTO;
-import com.hisun.lemon.framework.data.NoBody;
-import com.hisun.lemon.framework.validation.ClientValidated;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
-
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.validator.constraints.Length;
+
+import com.hisun.lemon.framework.data.GenericDTO;
+import com.hisun.lemon.framework.data.NoBody;
+import com.hisun.lemon.framework.validation.ClientValidated;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 交易费率查询请求传输对象

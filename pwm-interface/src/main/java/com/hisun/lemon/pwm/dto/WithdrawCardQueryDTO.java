@@ -2,9 +2,6 @@ package com.hisun.lemon.pwm.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
-
 
 /**
  * 查询提现银行卡返回参数 传输对象

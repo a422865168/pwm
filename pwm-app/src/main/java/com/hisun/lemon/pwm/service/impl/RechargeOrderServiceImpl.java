@@ -2,6 +2,7 @@ package com.hisun.lemon.pwm.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.hisun.lemon.acm.client.AccountingTreatmentClient;
-import com.hisun.lemon.acm.constants.CapTypEnum;
 import com.hisun.lemon.cmm.client.CmmServerClient;
 import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
 import com.hisun.lemon.common.exception.LemonException;
@@ -22,6 +21,7 @@ import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.JudgeUtils;
 import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.constants.AccConstants;
+import com.hisun.lemon.constants.RiskConstants;
 import com.hisun.lemon.cpi.client.RemittanceClient;
 import com.hisun.lemon.cpi.client.RouteClient;
 import com.hisun.lemon.csh.client.CshOrderClient;
@@ -32,6 +32,7 @@ import com.hisun.lemon.csh.dto.order.OrderDTO;
 import com.hisun.lemon.csh.dto.refund.RefundOrderDTO;
 import com.hisun.lemon.csh.dto.refund.RefundOrderRspDTO;
 import com.hisun.lemon.dto.AccDataListDTO;
+import com.hisun.lemon.dto.RiskDataDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
@@ -40,9 +41,6 @@ import com.hisun.lemon.framework.lock.DistributedLocker;
 import com.hisun.lemon.framework.service.BaseService;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
-import com.hisun.lemon.jcommon.file.FileSftpUtils;
-import com.hisun.lemon.mkm.client.MarketActivityClient;
-import com.hisun.lemon.pwm.component.AcmComponent;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.dto.RechargeDTO;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
@@ -53,12 +51,13 @@ import com.hisun.lemon.pwm.mq.BillSyncHandler;
 import com.hisun.lemon.pwm.mq.PaymentHandler;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
 import com.hisun.lemon.pwm.utils.AcsUtils;
-import com.hisun.lemon.rsm.client.RiskCheckClient;
+import com.hisun.lemon.rsk.client.XXRiskHandleClient;
 import com.hisun.lemon.tfm.client.TfmServerClient;
 import com.hisun.lemon.tfm.dto.MerchantRefundFeeReversalReqDTO;
 import com.hisun.lemon.urm.client.UserBasicInfClient;
 import com.hisun.lemon.urm.dto.UserBasicInfDTO;
 import com.hisun.lemon.xxka.client.XXAccHandleClient;
+
 
 @Service
 public class RechargeOrderServiceImpl extends BaseService implements IRechargeOrderService {
@@ -75,9 +74,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 	@Resource
 	CshOrderClient cshOrderClient;
-
 	@Resource
-	private AcmComponent acmComponent;
+    private XXRiskHandleClient riskCheckClient;
 
 	@Resource
 	UserBasicInfClient userBasicInfClient;
@@ -85,14 +83,10 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	@Resource
 	TfmServerClient fmServerClient;
 
-	@Resource
-	MarketActivityClient mkmClient;
 
 	@Resource
 	private RouteClient routeClient;
 
-	@Resource
-	protected AccountingTreatmentClient accountingTreatmentClient;
 
 	@Resource
 	protected DistributedLocker locker;
@@ -103,8 +97,6 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	@Resource
 	private CshRefundClient cshRefundClient;
 
-	@Resource
-	private RiskCheckClient riskCheckClient;
 
 	@Resource
 	protected PaymentHandler paymentHandler;
@@ -152,17 +144,44 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	}
 
 	
-
+	/**
+	 * 充值下单
+	 */
 	@Override
-	public GenericRspDTO createOrder(RechargeDTO rechargeDTO) {
+	public GenericRspDTO<CashierViewDTO> createOrder(GenericDTO<RechargeDTO> genRechargeDTO) {
+		RechargeDTO rechargeDTO = genRechargeDTO.getBody();
 		if (!rechargeDTO.getBusType().startsWith(PwmConstants.TX_TYPE_RECHANGE)) {
 			throw new LemonException("PWM20001");
 		}
-
+		String payer = LemonUtils.getUserId();
 		String ymd = DateTimeUtils.getCurrentDateStr();
 		String orderNo = IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 11);
 		orderNo = rechargeDTO.getBusType() + ymd + orderNo;
 
+		// Step3:风控，黑名单检查
+		GenericDTO<RiskDataDTO> genericReqDTO = new GenericDTO<>();
+		RiskDataDTO riskDataDTO = new RiskDataDTO();
+		Map<String, Object> riskDataMap = new HashMap();
+		riskDataDTO.setRiskType(RiskConstants.RISK_TYPE_BLACK);
+		// 对象规则
+		//对公对私标志(0:个人|1:商户)
+		if(JudgeUtils.equals(rechargeDTO.getPsnFlag(), "0")){
+			riskDataMap.put("RULE_ROLE", RiskConstants.RULE_ROLE_REAL_USER);
+			// 用户内部用户号
+			riskDataMap.put("USER_USR_NO", LemonUtils.getUserId());
+		}else if (JudgeUtils.equals(rechargeDTO.getPsnFlag(), "1")){
+			riskDataMap.put("RULE_ROLE", RiskConstants.RULE_ROLE_MERC);
+			// 用户内部用户号
+			riskDataMap.put("MERC_USR_NO", LemonUtils.getUserId());
+		}
+		
+		riskDataDTO.setRiskDataMap(riskDataMap);
+		genericReqDTO.setBody(riskDataDTO);
+		GenericRspDTO<RiskDataDTO> riskDataDTOGenericRspDTO = riskCheckClient.xxRiskHandle(genericReqDTO);
+		 if(JudgeUtils.isNotSuccess(riskDataDTOGenericRspDTO.getMsgCd())){
+	        	logger.info("黑白名单风控检查失败");
+	        	LemonException.throwBusinessException("PWM30001");
+	        }
 		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
 		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		rechargeOrderDO.setBusType(rechargeDTO.getBusType());
@@ -290,8 +309,6 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 							throw new LemonException("PWM20003");
 						}
 
-						// 账号资金属性：1 现金 8 待结算
-						String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();
 						// 总金额
 						BigDecimal rechargeTotalAmt = rechargeOrderDO.getOrderAmt();
 						// 用户账户金额
@@ -311,7 +328,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 							miniTxTyp = mainTxTyp + "01";
 							try {
 								//个人账务处理
-								innerAccAcsDealPerson(acNo, acNo.substring(0, 3), balCapType, userAmt.floatValue(),
+								innerAccAcsDealPerson(acNo, acNo.substring(0, 3), AccConstants.CAP_TYP_CASH, userAmt.floatValue(),
 										acNo, rechargeTotalAmt.floatValue(), orderNo, mainTxTyp, miniTxTyp);
 							} catch (Exception e) {
 								LemonException.throwBusinessException(e.getMessage());
@@ -320,13 +337,36 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 							miniTxTyp = mainTxTyp + "02";
 							try {
 								//商户账务处理
-								innerAccAcsDealMer(acNo, acNo.substring(0, 3), balCapType, userAmt.floatValue(), acNo,
+								innerAccAcsDealMer(acNo, acNo.substring(0, 3), AccConstants.CAP_TYP_CASH, userAmt.floatValue(), acNo,
 										rechargeTotalAmt.floatValue(), orderNo, mainTxTyp, miniTxTyp);
 							} catch (Exception e) {
 								LemonException.throwBusinessException(e.getMessage());
 							}
 						}
 						
+						//累计风控
+						logger.info("累计风控");
+						GenericDTO<RiskDataDTO> genericTimeDTO = new GenericDTO<>();
+						RiskDataDTO riskDataTimeDTO = new RiskDataDTO();
+						Map<String, Object> riskDataTimeMap = new HashMap();
+						riskDataTimeDTO.setRiskType(RiskConstants.RISK_TYPE_REALTIME);
+						riskDataTimeMap.put("RULE_ROLE", RiskConstants.RULE_ROLE_REAL_USER);
+						riskDataTimeMap.put("USER_USR_NO", rechargeOrderDO.getPayerId());
+						riskDataTimeMap.put("TX_ORD_AMT", rechargeTotalAmt);
+						riskDataTimeMap.put("TX_TYP", RiskConstants.TX_TYP_CZ);
+						riskDataTimeMap.put("TX_ORD_NO", orderNo);
+						DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
+						String actDate = df.format(rechargeOrderDO.getAcTm());
+						riskDataTimeMap.put("TX_ORD_DT", actDate);
+						riskDataTimeMap.put("CARD_TYP", RiskConstants.CARD_TYP_DEBIT);
+						riskDataTimeMap.put("PAY_TYP", RiskConstants.PAY_TYP_QUICK_PAY);
+						riskDataTimeDTO.setRiskDataMap(riskDataTimeMap);
+						genericTimeDTO.setBody(riskDataTimeDTO);
+						GenericRspDTO<RiskDataDTO> riskTimeDTO = riskCheckClient.xxRiskHandle(genericTimeDTO);
+						if (JudgeUtils.isNotSuccess(riskTimeDTO.getMsgCd())) {
+							logger.info("累计风控检查失败");
+							LemonException.throwBusinessException("PWM30001");
+						}
 						// 更新订单
 						RechargeOrderDO updOrderDO = new RechargeOrderDO();
 						updOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
@@ -446,7 +486,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 				language = "en";
 				logger.error("setting default language : " + language);
 			}
-			Map<String, String> map = new HashMap<>();
+			Map<String, String> map = new HashMap();
 			GenericDTO<MessageSendReqDTO> reqDTO = new GenericDTO();
 			MessageSendReqDTO messageSendReqDTO = new MessageSendReqDTO();
 			messageSendReqDTO.setUserId(userId);
@@ -577,7 +617,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			Float txAmt, String ordNo, String mainTxTyp, String miniTxTyp) throws Exception {
 		GenericDTO<AccDataListDTO> genericReqDTO = new GenericDTO<>();
 		AccDataListDTO accDataListDTO = new AccDataListDTO();
-		List<Map<String, Object>> accDataMapList = new ArrayList<>();
+		List<Map<String, Object>> accDataMapList = new ArrayList();
 
 		// 内部账户借记处理: DR-借:应收账款-渠道充值款-xx银行/中国银联/网联
 		Map<String, Object> accDataMap1 = AcsUtils.getAccDataListDTO(AccConstants.INNER_ACC_DR, "3010001",
@@ -612,7 +652,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			String ordNo, String mainTxTyp, String miniTxTyp) throws Exception {
 		GenericDTO<AccDataListDTO> genericReqDTO = new GenericDTO<>();
 		AccDataListDTO accDataListDTO = new AccDataListDTO();
-		List<Map<String, Object>> accDataMapList = new ArrayList<>();
+		List<Map<String, Object>> accDataMapList = new ArrayList();
 
 		// 内部账户借记处理: DR-借:应收账款-渠道充值款-xx银行/中国银联/网联
 		Map<String, Object> accDataMap1 = AcsUtils.getAccDataListDTO(AccConstants.INNER_ACC_DR, "3010001",

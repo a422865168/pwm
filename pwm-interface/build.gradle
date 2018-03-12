@@ -1,4 +1,3 @@
 dependencies {
-    compile("com.hisun:lemon-framework")
-    compile("com.hisun:lemon-swagger")
+    compile("com.hisun:lemon-interface")
 }

@@ -1,21 +1,65 @@
+#########
 spring :
   application :
     name : PWM
+  http :
+    encoding :
+      force : true
+  mvc :
+    throw-exception-if-no-handler-found : true
+  messages :
+    basename : i18n/messages
+  jackson :
+    serialization :
+      write_dates_as_timestamps : false
+  cache :
+    jcache :
+      config : classpath:config/ehcache3.xml
+      provider : org.ehcache.jsr107.EhcacheCachingProvider
 
 server :
   port : 9018
+
+#logging configuration
+logging :
+  config : classpath:config/logback-spring.xml
+  level :
+    com.hisun.lemon.framework.dao : ${lemon.sql.level:DEBUG}
 
 eureka :
   client :
     serviceUrl :
       defaultZone : ${eureka.zone}
     registerWithEureka : ${registerWithEureka:true}
+    healthcheck :
+      enabled : true
   instance :
     preferIpAddress : true
-    
+
+ribbon :
+  #retry next Server times
+  MaxAutoRetriesNextServer : 0
+  #retry same Server times
+  MaxAutoRetries : 0
+  ReadTimeout : 20000
+  ConnectTimeout : 5000
+
+feign :
+  httpclient :
+    maxConnections : 300
+    maxConnectionsPerRoute : 20
+    timeToLive : 900
+    connectionTimeout : 2000
+  # feign compression support
+  compression :
+    request :
+      enabled : true
+      mime-types : application/json
+      min-request-size : 2048
+    response:
+      enabled : true
+
 endpoints :
   shutdown :
     enabled : true
     sensitive : false
-logging :
-  config : classpath:config/logback-spring.xml

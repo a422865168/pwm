@@ -1,14 +1,15 @@
 package com.hisun.lemon.pwm.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import javax.validation.constraints.Min;
+
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.Min;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 /**
  * 提现结果处理：等待异步通知，传输对象

@@ -10,7 +10,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-
 /**
  * 充值结果通知 传输对象
  * @author tone

@@ -10,6 +10,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModelProperty;
 
+//import io.swagger.annotations.ApiModelProperty;
+
 
 /**
  * 充值请求 传输对象
@@ -48,7 +50,7 @@ public class RechargeDTO {
 	/**
 	 * 业务类型
 	 */
-	@ApiModelProperty(name = "busType", value = "业务类型(充值[0101:快捷|0102:线下|0103:营业厅|0104:网银] 提现[0401:个人|0402:商户])")
+	@ApiModelProperty(name = "busType", value = "业务类型(充值[0101:快捷|0102:线下|0103:营业厅|0104:企业网银]|0105:个人网银] 提现[0401:个人|0402:商户])")
     @NotEmpty(message="PWM10004")
 	@Length(max =4)
     private String busType;

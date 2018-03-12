@@ -3,7 +3,6 @@ package com.hisun.lemon.pwm.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-
 /**
  * 提现银行列表返回参数 传输对象
  * @author leon

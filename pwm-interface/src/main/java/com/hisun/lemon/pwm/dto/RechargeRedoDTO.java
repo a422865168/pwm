@@ -1,8 +1,9 @@
 package com.hisun.lemon.pwm.dto;
 
-import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 充值补单传输DTO

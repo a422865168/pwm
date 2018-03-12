@@ -14,9 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.hisun.lemon.acm.client.AccountManagementClient;
-import com.hisun.lemon.acm.client.AccountingTreatmentClient;
-import com.hisun.lemon.acm.constants.CapTypEnum;
 import com.hisun.lemon.bil.dto.CreateUserBillDTO;
 import com.hisun.lemon.bil.dto.UpdateUserBillDTO;
 import com.hisun.lemon.cmm.client.CmmServerClient;
@@ -29,13 +26,17 @@ import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.JudgeUtils;
 import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.constants.AccConstants;
+import com.hisun.lemon.constants.RiskConstants;
+import com.hisun.lemon.cpo.dto.RouteRspDTO;
 import com.hisun.lemon.cpo.client.RouteClient;
 import com.hisun.lemon.cpo.client.WithdrawClient;
-import com.hisun.lemon.cpo.dto.RouteRspDTO;
 import com.hisun.lemon.cpo.dto.WithdrawReqDTO;
 import com.hisun.lemon.cpo.enums.CorpBusSubTyp;
 import com.hisun.lemon.cpo.enums.CorpBusTyp;
+import com.hisun.lemon.csh.dto.tradeFee.TradeFeeReqDTO;
+import com.hisun.lemon.csh.dto.tradeFee.TradeFeeRspDTO;
 import com.hisun.lemon.dto.AccDataListDTO;
+import com.hisun.lemon.dto.RiskDataDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.framework.data.NoBody;
@@ -65,15 +66,10 @@ import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
 import com.hisun.lemon.pwm.mq.BillSyncHandler;
 import com.hisun.lemon.pwm.mq.PaymentHandler;
 import com.hisun.lemon.pwm.service.IWithdrawOrderService;
-import com.hisun.lemon.rsm.Constants;
-import com.hisun.lemon.rsm.client.RiskCheckClient;
-import com.hisun.lemon.rsm.dto.req.checkstatus.RiskCheckUserStatusReqDTO;
-import com.hisun.lemon.rsm.dto.req.riskJrn.JrnReqDTO;
+import com.hisun.lemon.rsk.client.XXRiskHandleClient;
 import com.hisun.lemon.tfm.client.TfmServerClient;
 import com.hisun.lemon.tfm.dto.TradeFeeCaculateReqDTO;
 import com.hisun.lemon.tfm.dto.TradeFeeCaculateRspDTO;
-import com.hisun.lemon.tfm.dto.TradeFeeReqDTO;
-import com.hisun.lemon.tfm.dto.TradeFeeRspDTO;
 import com.hisun.lemon.tfm.dto.TradeRateReqDTO;
 import com.hisun.lemon.urm.client.UserAuthenticationClient;
 import com.hisun.lemon.urm.client.UserBasicInfClient;
@@ -102,10 +98,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
     private AcmComponent acmComponent;
 
     @Resource
-    private AccountManagementClient accountManagementClient;
-
-    @Resource
-    private RiskCheckClient riskCheckClient;
+    private XXRiskHandleClient riskCheckClient;
 
     @Resource
     private UserAuthenticationClient userAuthenticationClient;
@@ -142,11 +135,23 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 
     @Resource
     protected DistributedLocker locker;
-
     @Resource
-    protected AccountingTreatmentClient accountingTreatmentClient;
-    @Resource
-	protected XXAccHandleClient xxAccService;//账务处理
+	protected XXAccHandleClient xxAccService;
+    
+    public String card(String cardNo){
+   	 GenericDTO<CommonEncryptReqDTO> reqDTO = new GenericDTO<>();
+		CommonEncryptReqDTO commonEncryptReqDTO = new CommonEncryptReqDTO();
+		commonEncryptReqDTO.setData(cardNo);// 加解密数据
+		commonEncryptReqDTO.setType("encrypt");// 加解密类型
+		reqDTO.setBody(commonEncryptReqDTO);
+		logger.info("====================银行卡号加密=====" +cardNo + "=====类型" + commonEncryptReqDTO.getType());
+		GenericRspDTO<CommonEncryptRspDTO> commonEncrtyRspDTO = cmmServerClient.encrypt(reqDTO);
+		if (JudgeUtils.isNotSuccess(commonEncrtyRspDTO.getMsgCd())) {
+			LemonException.throwBusinessException(commonEncrtyRspDTO.getMsgCd());
+		}
+		String crdNoEnc = commonEncrtyRspDTO.getBody().getData();
+		return crdNoEnc;
+    }
     /**
      * 生成提现订单
      * @param genericWithdrawDTO
@@ -155,53 +160,44 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 	public WithdrawRspDTO createOrder(GenericDTO<WithdrawDTO> genericWithdrawDTO) {
         //生成订单号
         WithdrawDTO withdrawDTO = genericWithdrawDTO.getBody();
-
         String userId = withdrawDTO.getUserId();
         String ymd= DateTimeUtils.getCurrentDateStr();
         String orderNo= IdGenUtils.generateId(PwmConstants.W_ORD_GEN_PRE+ymd,15);
         orderNo = PwmConstants.BUS_TYPE_WITHDRAW_P+ymd+orderNo;
-
         GenericRspDTO genericRspDTO = new  GenericRspDTO();
         GenericDTO genericDTO = new GenericDTO();
-
-        //调用风控接口 校验用户是否为黑名单
-        JrnReqDTO jrnReqDTO = new JrnReqDTO();
-        jrnReqDTO.setTxSts(PwmConstants.WITHDRAW_ORD_W1);
-        jrnReqDTO.setTxCnl("app");
-        jrnReqDTO.setTxDate(DateTimeUtils.getCurrentLocalDate());
-        jrnReqDTO.setTxTime(DateTimeUtils.getCurrentLocalTime());
-        jrnReqDTO.setTxJrnNo(orderNo);
-        jrnReqDTO.setTxOrdNo(orderNo);
-        jrnReqDTO.setStlUserId(userId);
-        jrnReqDTO.setStlUserTyp(Constants.ID_TYP_USER_NO);
-        jrnReqDTO.setTxTyp(Constants.TX_TYP_WITHDRAW);
-        jrnReqDTO.setPayTyp(Constants.PAY_TYP_ACCOUNT);
-        jrnReqDTO.setTxAmt(withdrawDTO.getWcApplyAmt());
-        jrnReqDTO.setCcy(withdrawDTO.getOrderCcy());
-        genericRspDTO = riskCheckClient.riskControl(jrnReqDTO);
-		if(JudgeUtils.isNull(genericRspDTO)){
-		    LemonException.throwBusinessException("PWM30007");
+       
+        //实时风控
+        logger.info("实时风控校验");
+        GenericDTO<RiskDataDTO> genericTimeDTO = new GenericDTO<>();
+        RiskDataDTO riskDataTimeDTO = new RiskDataDTO();
+        Map<String,Object> riskDataTimeMap =new HashMap<>();
+        riskDataTimeDTO.setRiskType(RiskConstants.RISK_TYPE_REALTIME);
+        //对象规则
+        riskDataTimeMap.put("RULE_ROLE",RiskConstants.RULE_ROLE_REAL_USER);
+        riskDataTimeMap.put("USER_USR_NO",userId);
+        riskDataTimeMap.put("TX_ORD_AMT",withdrawDTO.getWcApplyAmt());
+        riskDataTimeMap.put("TX_TYP",RiskConstants.TX_TYP_TX);
+        riskDataTimeMap.put("TX_ORD_NO",orderNo);
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
+		String actDate = df.format(genericWithdrawDTO.getAccDate());
+		 riskDataTimeMap.put("TX_ORD_DT",actDate);
+		 riskDataTimeMap.put("PAY_TYP",RiskConstants.PAY_TYP_BAL_PAY);
+        riskDataTimeDTO.setRiskDataMap(riskDataTimeMap);
+        genericTimeDTO.setBody(riskDataTimeDTO);
+        GenericRspDTO<RiskDataDTO> riskTimeDTO = riskCheckClient.xxRiskHandle(genericTimeDTO);
+        if(JudgeUtils.isNotSuccess(riskTimeDTO.getMsgCd())){
+        	logger.info("实时风控检查失败");
+        	LemonException.throwBusinessException("PWM30001");
         }
-        //校验用户如为黑名单，则抛出异常信息
-		if(JudgeUtils.equals("RSM30002", genericRspDTO.getMsgCd())){
-			LemonException.throwBusinessException("PWM30001");
-		}
-        if(JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())){
-            if(JudgeUtils.isNotBlank(genericRspDTO.getMsgInfo())) {
-                LemonException.throwLemonException(genericRspDTO.getMsgCd(), genericRspDTO.getMsgInfo());
-            }else{
-                LemonException.throwBusinessException(genericRspDTO.getMsgCd());
-            }
-        }
-
         //填充查询手续费数据
         TradeFeeReqDTO tradeFeeReqDTO = new TradeFeeReqDTO();
-        tradeFeeReqDTO.setBusOrderNo(orderNo);
-        tradeFeeReqDTO.setBusOrderTime(DateTimeUtils.getCurrentLocalDateTime());
+      /*  tradeFeeReqDTO.setBusOrderNo(orderNo);
+        tradeFeeReqDTO.setBusOrderTime(DateTimeUtils.getCurrentLocalDateTime());*/
         tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_P);
         tradeFeeReqDTO.setCcy(withdrawDTO.getOrderCcy());
         tradeFeeReqDTO.setTradeAmt(withdrawDTO.getWcApplyAmt());
-        tradeFeeReqDTO.setUserId(userId);
+        //tradeFeeReqDTO.setUserId(userId);
         genericDTO.setBody(tradeFeeReqDTO);
 
         //调用tfm接口查询手续费
@@ -241,7 +237,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		
 		
 		//查询用户支付密码，校验支付密码，错误则抛异常
-       /* CheckPayPwdDTO checkPayPwdDTO =new CheckPayPwdDTO();
+        CheckPayPwdDTO checkPayPwdDTO =new CheckPayPwdDTO();
         checkPayPwdDTO.setUserId(userId);
         checkPayPwdDTO.setPayPwd(withdrawDTO.getPayPassWord());
         checkPayPwdDTO.setPayPwdRandom(withdrawDTO.getPayPassWordRand());
@@ -263,12 +259,13 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             }else{
                 LemonException.throwBusinessException(genericRspDTO.getMsgCd());
             }
-        }*/
+        }
 
 		//初始化提现订单数据
 		WithdrawOrderDO withdrawOrderDO = new WithdrawOrderDO();
 		BeanUtils.copyProperties(withdrawOrderDO, withdrawDTO);
 		withdrawOrderDO.setOrderNo(orderNo);
+		withdrawOrderDO.setUserId(userId);
 		withdrawOrderDO.setAcTm(genericWithdrawDTO.getAccDate());
 		//交易类型 04提现
 		withdrawOrderDO.setTxType(PwmConstants.TX_TYPE_WITHDRAW);
@@ -301,8 +298,6 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		}
         //流水号s
         String jrnNo = LemonUtils.getRequestId();
-        //资金属性
-        String balCapType = CapTypEnum.CAP_TYP_CASH.getCapTyp();  
 		// 账务处理
     	GenericRspDTO<AccDataListDTO> generic = UserAccAcsDeal(withdrawOrderDO,acNo);
     	if(JudgeUtils.isNotSuccess(generic.getMsgCd())){
@@ -391,6 +386,37 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 	           }
 		}
 		withdrawOrderDO.setAcTm(LemonUtils.getAccDate());
+		
+		 //累计风控
+        logger.info("累计风控校验");
+        GenericDTO<RiskDataDTO> genericAccumDTO = new GenericDTO<>();
+        RiskDataDTO riskDataAccumDTO = new RiskDataDTO();
+        Map<String,Object> accumMap =new HashMap<>();
+        riskDataAccumDTO.setRiskType(RiskConstants.RISK_TYPE_ACCUMULATE);
+        //对象规则
+        accumMap.put("RULE_ROLE",RiskConstants.RULE_ROLE_REAL_USER);
+        accumMap.put("USER_USR_NO",queryWithdrawOrderDO.getUserId());
+        accumMap.put("TX_ORD_AMT",queryWithdrawOrderDO.getWcApplyAmt());
+        accumMap.put("TX_TYP",RiskConstants.TX_TYP_TX);
+        
+        accumMap.put("TX_ORD_NO",withdrawOrderDO.getOrderNo());
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyyMMdd");
+		String actDate = df.format(genericWithdrawResultDTO.getAccDate());
+		accumMap.put("TX_ORD_DT",actDate);
+	    String crdNoEnc=card(queryWithdrawOrderDO.getCapCardNo());
+        //加密银行卡号
+	    accumMap.put("CARD_NO",crdNoEnc);
+	    accumMap.put("CARD_TYP",RiskConstants.CARD_TYP_DEBIT);
+	    accumMap.put("PAY_TYP",RiskConstants.PAY_TYP_BAL_PAY);
+        riskDataAccumDTO.setRiskDataMap(accumMap);
+        genericAccumDTO.setBody(riskDataAccumDTO);
+        GenericRspDTO<RiskDataDTO> riskAccDTO = riskCheckClient.xxRiskHandle(genericAccumDTO);
+        if(JudgeUtils.isNotSuccess(riskAccDTO.getMsgCd())){
+        	logger.info("风控累计失败");
+        	LemonException.throwBusinessException(riskAccDTO.getMsgCd());
+        }
+     
+        
 		// 若更新提现单据状态及相关信息
 		withdrawOrderTransactionalService.updateOrder(withdrawOrderDO);
 
@@ -443,32 +469,35 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         return genericRspDTO;
     }
 
-    /**
-     * 查询提现银行
-     * @return
-     */
-    @Override
-    public List<WithdrawBankRspDTO> queryBank(GenericDTO genericDTO) {
+	/**
+	 * 查询提现银行
+	 * 
+	 * @return
+	 */
+	@Override
+	public List<WithdrawBankRspDTO> queryBank(GenericDTO genericDTO) {
 
-        //List<WithdrawCardInfoDO> withdrawCardInfoDO = withdrawCardInfoDao.query();
-        //查询路由
-        RouteRspDTO routeRspDTO = routeClient.queryEffCapOrgInfo(CorpBusTyp.WITHDRAW, CorpBusSubTyp.PER_WITHDRAW).getBody();
-        List<WithdrawBankRspDTO> withdrawBankRspDTO = new ArrayList();
-        List<RouteRspDTO.RouteDTO> list = null;
-        if(JudgeUtils.isNotNull(routeRspDTO)){
-            list = routeRspDTO.getList();
+		// List<WithdrawCardInfoDO> withdrawCardInfoDO =
+		// withdrawCardInfoDao.query();
+		// 查询路由
+		RouteRspDTO routeRspDTO = routeClient.queryEffCapOrgInfo(CorpBusTyp.WITHDRAW, CorpBusSubTyp.PER_WITHDRAW)
+				.getBody();
+		List<WithdrawBankRspDTO> withdrawBankRspDTO = new ArrayList();
+		List<RouteRspDTO.RouteDTO> list = null;
+		if (JudgeUtils.isNotNull(routeRspDTO)) {
+			list = routeRspDTO.getList();
 
-            for(RouteRspDTO.RouteDTO routeDTO : list) {
-                WithdrawBankRspDTO withdrawBankRspDTO1 = new WithdrawBankRspDTO();
-                withdrawBankRspDTO1.setCapCorg(routeDTO.getCrdCorpOrg());
-                withdrawBankRspDTO1.setBankName(routeDTO.getCorpOrgNm());
-                withdrawBankRspDTO1.setCardAcType(routeDTO.getCrdAcTyp());
-                withdrawBankRspDTO.add(withdrawBankRspDTO1);
-            }
-        }
+			for (RouteRspDTO.RouteDTO routeDTO : list) {
+				WithdrawBankRspDTO withdrawBankRspDTO1 = new WithdrawBankRspDTO();
+				withdrawBankRspDTO1.setCapCorg(routeDTO.getCrdCorpOrg());
+				withdrawBankRspDTO1.setBankName(routeDTO.getCorpOrgNm());
+				withdrawBankRspDTO1.setCardAcType(routeDTO.getCrdAcTyp());
+				withdrawBankRspDTO.add(withdrawBankRspDTO1);
+			}
+		}
 
-        return withdrawBankRspDTO;
-    }
+		return withdrawBankRspDTO;
+	}
 
     /**
      * 添加提现银行卡
@@ -718,11 +747,11 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }
     }
 
-    /**
+   /* *//**
      * 根据用户id检查用户状态
      * @param userId
      * @throws LemonException
-     */
+     *//*
     private void checkUserStatus(String userId) throws LemonException {
         RiskCheckUserStatusReqDTO reqDTO = new RiskCheckUserStatusReqDTO();
         reqDTO.setId(userId);
@@ -734,7 +763,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             logger.info("user :" + userId + " status check failure!");
             LemonException.throwBusinessException(rspDTO.getMsgCd());
         }
-    }
+    }*/
 
     /**
      * 根据用户手机号查询用户信息

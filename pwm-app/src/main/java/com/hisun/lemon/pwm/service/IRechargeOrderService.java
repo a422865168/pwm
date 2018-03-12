@@ -1,5 +1,6 @@
 package com.hisun.lemon.pwm.service;
 
+import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.pwm.dto.RechargeDTO;
@@ -13,7 +14,7 @@ import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
  *
  */
 public interface IRechargeOrderService {
-    public GenericRspDTO createOrder(RechargeDTO rechargeDTO);
+    public GenericRspDTO<CashierViewDTO> createOrder(GenericDTO<RechargeDTO> genRechargeDTO);
 
     /**
      * 接收收银台的结果通知

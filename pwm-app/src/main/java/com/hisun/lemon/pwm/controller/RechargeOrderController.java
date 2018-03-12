@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.JudgeUtils;
+import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.controller.BaseController;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
@@ -38,15 +39,14 @@ public class RechargeOrderController extends BaseController {
 	@ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
 	@ApiResponse(code = 200, message = "充值下单")
 	@PostMapping(value = "/order")
-	public GenericRspDTO createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
-		RechargeDTO rechargeDTO = genRechargeDTO.getBody();
-		return service.createOrder(rechargeDTO);
+	public GenericRspDTO<CashierViewDTO> createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
+		return service.createOrder(genRechargeDTO);
 	}
 
 	@ApiOperation(value = "充值处理结果通知", notes = "接收收银台的处理结果通知")
 	@ApiResponse(code = 200, message = "处理通知结果")
 	@PostMapping(value = "/result")
-	public GenericRspDTO completeOrder(@Validated @RequestBody GenericDTO<RechargeResultDTO> genericResultDTO) {
+	public GenericRspDTO<NoBody> completeOrder(@Validated @RequestBody GenericDTO<RechargeResultDTO> genericResultDTO) {
 		service.handleResult(genericResultDTO);
 		return GenericRspDTO.newSuccessInstance();
 	}
