@@ -7,26 +7,26 @@
         <result column="order_tm" property="orderTm" jdbcType="TIMESTAMP" />
         <result column="order_exp_tm" property="orderExpTm" jdbcType="TIMESTAMP" />
         <result column="ac_tm" property="acTm" jdbcType="DATE" />
-        <result column="order_ccy" property="orderCcy" jdbcType="CHAR" />
+        <result column="order_ccy" property="orderCcy" jdbcType="VARCHAR" />
         <result column="order_succ_tm" property="orderSuccTm" jdbcType="TIMESTAMP" />
-        <result column="wc_type" property="wcType" jdbcType="CHAR" />
+        <result column="wc_type" property="wcType" jdbcType="VARCHAR" />
         <result column="tx_type" property="txType" jdbcType="VARCHAR" />
         <result column="bus_type" property="busType" jdbcType="VARCHAR" />
         <result column="wc_apply_amt" property="wcApplyAmt" jdbcType="DECIMAL" />
         <result column="wc_act_amt" property="wcActAmt" jdbcType="DECIMAL" />
         <result column="wc_total_amt" property="wcTotalAmt" jdbcType="DECIMAL" />
         <result column="fee_amt" property="feeAmt" jdbcType="DECIMAL" />
-        <result column="pay_urge_flg" property="payUrgeFlg" jdbcType="CHAR" />
+        <result column="pay_urge_flg" property="payUrgeFlg" jdbcType="VARCHAR" />
         <result column="user_id" property="userId" jdbcType="VARCHAR" />
         <result column="user_name" property="userName" jdbcType="VARCHAR" />
         <result column="agr_no" property="agrNo" jdbcType="VARCHAR" />
         <result column="cap_corg_no" property="capCorgNo" jdbcType="VARCHAR" />
         <result column="cap_card_no" property="capCardNo" jdbcType="VARCHAR" />
-        <result column="cap_card_type" property="capCardType" jdbcType="CHAR" />
+        <result column="cap_card_type" property="capCardType" jdbcType="VARCHAR" />
         <result column="cap_card_name" property="capCardName" jdbcType="VARCHAR" />
         <result column="wc_remark" property="wcRemark" jdbcType="VARCHAR" />
         <result column="ntf_mbl" property="ntfMbl" jdbcType="VARCHAR" />
-        <result column="order_status" property="orderStatus" jdbcType="CHAR" />
+        <result column="order_status" property="orderStatus" jdbcType="VARCHAR" />
         <result column="rsp_order_no" property="rspOrderNo" jdbcType="VARCHAR" />
         <result column="rsp_succ_tm" property="rspSuccTm" jdbcType="TIMESTAMP" />
         <result column="bus_cnl" property="busCnl" jdbcType="VARCHAR" />
@@ -159,13 +159,13 @@
                 #{acTm,jdbcType=DATE},
             </if>
             <if test="orderCcy != null" >
-                #{orderCcy,jdbcType=CHAR},
+                #{orderCcy,jdbcType=VARCHAR},
             </if>
             <if test="orderSuccTm != null" >
                 #{orderSuccTm,jdbcType=TIMESTAMP},
             </if>
             <if test="wcType != null" >
-                #{wcType,jdbcType=CHAR},
+                #{wcType,jdbcType=VARCHAR},
             </if>
             <if test="txType != null" >
                 #{txType,jdbcType=VARCHAR},
@@ -186,7 +186,7 @@
                 #{feeAmt,jdbcType=DECIMAL},
             </if>
             <if test="payUrgeFlg != null" >
-                #{payUrgeFlg,jdbcType=CHAR},
+                #{payUrgeFlg,jdbcType=VARCHAR},
             </if>
             <if test="userId != null" >
                 #{userId,jdbcType=VARCHAR},
@@ -204,7 +204,7 @@
                 #{capCardNo,jdbcType=VARCHAR},
             </if>
             <if test="capCardType != null" >
-                #{capCardType,jdbcType=CHAR},
+                #{capCardType,jdbcType=VARCHAR},
             </if>
             <if test="capCardName != null" >
                 #{capCardName,jdbcType=VARCHAR},
@@ -216,7 +216,7 @@
                 #{ntfMbl,jdbcType=VARCHAR},
             </if>
             <if test="orderStatus != null" >
-                #{orderStatus,jdbcType=CHAR},
+                #{orderStatus,jdbcType=VARCHAR},
             </if>
             <if test="rspOrderNo != null" >
                 #{rspOrderNo,jdbcType=VARCHAR},
@@ -249,13 +249,13 @@
                 ac_tm = #{acTm,jdbcType=DATE},
             </if>
             <if test="orderCcy != null" >
-                order_ccy = #{orderCcy,jdbcType=CHAR},
+                order_ccy = #{orderCcy,jdbcType=VARCHAR},
             </if>
             <if test="orderSuccTm != null" >
                 order_succ_tm = #{orderSuccTm,jdbcType=TIMESTAMP},
             </if>
             <if test="wcType != null" >
-                wc_type = #{wcType,jdbcType=CHAR},
+                wc_type = #{wcType,jdbcType=VARCHAR},
             </if>
             <if test="txType != null" >
                 tx_type = #{txType,jdbcType=VARCHAR},
@@ -276,7 +276,7 @@
                 fee_amt = #{feeAmt,jdbcType=DECIMAL},
             </if>
             <if test="payUrgeFlg != null" >
-                pay_urge_flg = #{payUrgeFlg,jdbcType=CHAR},
+                pay_urge_flg = #{payUrgeFlg,jdbcType=VARCHAR},
             </if>
             <if test="userId != null" >
                 user_id = #{userId,jdbcType=VARCHAR},
@@ -294,7 +294,7 @@
                 cap_card_no = #{capCardNo,jdbcType=VARCHAR},
             </if>
             <if test="capCardType != null" >
-                cap_card_type = #{capCardType,jdbcType=CHAR},
+                cap_card_type = #{capCardType,jdbcType=VARCHAR},
             </if>
             <if test="capCardName != null" >
                 cap_card_name = #{capCardName,jdbcType=VARCHAR},
@@ -306,7 +306,7 @@
                 ntf_mbl = #{ntfMbl,jdbcType=VARCHAR},
             </if>
             <if test="orderStatus != null" >
-                order_status = #{orderStatus,jdbcType=CHAR},
+                order_status = #{orderStatus,jdbcType=VARCHAR},
             </if>
             <if test="rspOrderNo != null" >
                 rsp_order_no = #{rspOrderNo,jdbcType=VARCHAR},
@@ -359,13 +359,13 @@
                 ac_tm = #{acTm,jdbcType=DATE}
             </if>
             <if test="orderCcy != null" >
-                order_ccy = #{orderCcy,jdbcType=CHAR}
+                order_ccy = #{orderCcy,jdbcType=VARCHAR}
             </if>
             <if test="orderSuccTm != null" >
                 order_succ_tm = #{orderSuccTm,jdbcType=TIMESTAMP}
             </if>
             <if test="wcType != null" >
-                wc_type = #{wcType,jdbcType=CHAR}
+                wc_type = #{wcType,jdbcType=VARCHAR}
             </if>
             <if test="txType != null" >
                 tx_type = #{txType,jdbcType=VARCHAR}
@@ -386,7 +386,7 @@
                 fee_amt = #{feeAmt,jdbcType=DECIMAL}
             </if>
             <if test="payUrgeFlg != null" >
-                pay_urge_flg = #{payUrgeFlg,jdbcType=CHAR}
+                pay_urge_flg = #{payUrgeFlg,jdbcType=VARCHAR}
             </if>
             <if test="userId != null" >
                 user_id = #{userId,jdbcType=VARCHAR}
@@ -404,7 +404,7 @@
                 cap_card_no = #{capCardNo,jdbcType=VARCHAR}
             </if>
             <if test="capCardType != null" >
-                cap_card_type = #{capCardType,jdbcType=CHAR}
+                cap_card_type = #{capCardType,jdbcType=VARCHAR}
             </if>
             <if test="capCardName != null" >
                 cap_card_name = #{capCardName,jdbcType=VARCHAR}
@@ -416,7 +416,7 @@
                 ntf_mbl = #{ntfMbl,jdbcType=VARCHAR}
             </if>
             <if test="orderStatus != null" >
-                order_status = #{orderStatus,jdbcType=CHAR}
+                order_status = #{orderStatus,jdbcType=VARCHAR}
             </if>
             <if test="rspOrderNo != null" >
                 rsp_order_no = #{rspOrderNo,jdbcType=VARCHAR}

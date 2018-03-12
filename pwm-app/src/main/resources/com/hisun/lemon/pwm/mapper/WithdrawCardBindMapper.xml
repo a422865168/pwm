@@ -9,7 +9,7 @@
         <result column="branch_name" property="branchName" jdbcType="VARCHAR" />
         <result column="user_id" property="userId" jdbcType="VARCHAR" />
         <result column="cap_corg" property="capCorg" jdbcType="VARCHAR" />
-        <result column="card_status" property="cardStatus" jdbcType="CHAR" />
+        <result column="card_status" property="cardStatus" jdbcType="VARCHAR" />
         <result column="eft_tm" property="eftTm" jdbcType="TIMESTAMP" />
         <result column="fail_tm" property="failTm" jdbcType="VARCHAR" />
         <result column="remark" property="remark" jdbcType="VARCHAR" />
@@ -117,7 +117,7 @@
                 #{capCorg,jdbcType=VARCHAR},
             </if>
             <if test="cardStatus != null" >
-                #{cardStatus,jdbcType=CHAR},
+                #{cardStatus,jdbcType=VARCHAR},
             </if>
             <if test="eftTm != null" >
                 #{eftTm,jdbcType=TIMESTAMP},
@@ -156,7 +156,7 @@
                 cap_corg = #{capCorg,jdbcType=VARCHAR},
             </if>
             <if test="cardStatus != null" >
-                card_status = #{cardStatus,jdbcType=CHAR},
+                card_status = #{cardStatus,jdbcType=VARCHAR},
             </if>
             <if test="eftTm != null" >
                 eft_tm = #{eftTm,jdbcType=TIMESTAMP},

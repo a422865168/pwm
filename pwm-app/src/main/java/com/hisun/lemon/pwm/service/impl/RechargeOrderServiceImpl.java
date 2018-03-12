@@ -194,7 +194,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setPsnFlag(rechargeDTO.getPsnFlag());
 		rechargeOrderDO.setRemark("");
-		rechargeOrderDO.setPayerId(LemonUtils.getUserId());
+		rechargeOrderDO.setPayerId("12345697");
 		rechargeOrderDO.setSysChannel(rechargeDTO.getSysChannel());
 		rechargeOrderDO.setTxType("01");
 		service.initOrder(rechargeOrderDO);
@@ -207,8 +207,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		initCashierDTO.setBusType(rechargeOrderDO.getBusType());
 		initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
 		initCashierDTO.setSysChannel(rechargeDTO.getSysChannel());
-		initCashierDTO.setPayerId(LemonUtils.getUserId());
-		initCashierDTO.setPayeeId(LemonUtils.getUserId());
+		initCashierDTO.setPayerId(payer);
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());

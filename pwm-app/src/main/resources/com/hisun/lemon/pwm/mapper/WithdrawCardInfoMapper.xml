@@ -7,7 +7,7 @@
         <result column="card_bin" property="cardBin" jdbcType="VARCHAR" />
         <result column="cap_corg" property="capCorg" jdbcType="VARCHAR" />
         <result column="bank_name" property="bankName" jdbcType="VARCHAR" />
-        <result column="card_ac_type" property="cardAcType" jdbcType="CHAR" />
+        <result column="card_ac_type" property="cardAcType" jdbcType="VARCHAR" />
         <result column="card_length" property="cardLength" jdbcType="INTEGER" />
         <result column="opr_id" property="oprId" jdbcType="VARCHAR" />
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -81,7 +81,7 @@
                 #{bankName,jdbcType=VARCHAR},
             </if>
             <if test="cardAcType != null" >
-                #{cardAcType,jdbcType=CHAR},
+                #{cardAcType,jdbcType=VARCHAR},
             </if>
             <if test="cardLength != null" >
                 #{cardLength,jdbcType=INTEGER},
@@ -111,7 +111,7 @@
                 bank_name = #{bankName,jdbcType=VARCHAR},
             </if>
             <if test="cardAcType != null" >
-                card_ac_type = #{cardAcType,jdbcType=CHAR},
+                card_ac_type = #{cardAcType,jdbcType=VARCHAR},
             </if>
             <if test="cardLength != null" >
                 card_length = #{cardLength,jdbcType=INTEGER},
