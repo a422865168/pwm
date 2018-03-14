@@ -12,6 +12,8 @@ import com.hisun.lemon.framework.data.NoBody;
 import com.hisun.lemon.pwm.dto.RechargeRedoDTO;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
+import com.hisun.lemon.pwm.dto.TransferenceReqDTO;
+import com.hisun.lemon.pwm.dto.TransferenceRspDTO;
 
 /**
  * 充提  充值服务接口
@@ -22,6 +24,15 @@ import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
  */
 @FeignClient("PWM")
 public interface PwmRechargeClient {
+	
+	/**
+	 * 圈存
+	 * @param genRechargeDTO
+	 * @return
+	 */
+	@PostMapping("/pwm/recharge/order/transference")
+    public GenericRspDTO<TransferenceRspDTO> createTransference(@Validated @RequestBody GenericDTO<TransferenceReqDTO> genRechargeDTO);
+	
 	/**
      * 充值结果通知
      * @param rechargeResultDTO 通知数据
