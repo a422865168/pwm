@@ -20,7 +20,7 @@ subprojects{
     apply plugin: 'maven'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'lemon'
+    //apply plugin: 'lemon'
 
     version = '1.0.0-XXPAY-SNAPSHOT'
     group = 'com.hisun'
