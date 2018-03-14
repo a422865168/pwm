@@ -208,13 +208,15 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		tradeFeeReqDTO.setBusType(PwmConstants.BUS_TYPE_WITHDRAW_P);
 		tradeFeeReqDTO.setCcy(withdrawDTO.getOrderCcy());
 		tradeFeeReqDTO.setTradeAmt(withdrawDTO.getWcApplyAmt());
-		// tradeFeeReqDTO.setUserId(userId);
+		tradeFeeReqDTO.setUserId(userId);
 		genericDTO.setBody(tradeFeeReqDTO);
 
 		// 调用tfm接口查询手续费
 		GenericRspDTO<TradeFeeRspDTO> tradeGenericRspDTO = tfmServerClient.tradeFee(genericDTO);
-		if (JudgeUtils.isNull(tradeGenericRspDTO.getBody())) {
-			LemonException.throwBusinessException("PWM30008");
+		if (JudgeUtils.isNotSuccess(tradeGenericRspDTO.getMsgCd())) {
+			logger.info("调用计费失败："+tradeGenericRspDTO.getMsgCd());
+			//LemonException.throwBusinessException("PWM30008");
+			LemonException.throwBusinessException(tradeGenericRspDTO.getMsgCd());
 		}
 		// 手续费
 		BigDecimal fee = tradeGenericRspDTO.getBody().getTradeFee();

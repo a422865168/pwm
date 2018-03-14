@@ -24,7 +24,6 @@ public interface IRechargeOrderService {
      * 圈存请求
      */
     public TransferenceRspDTO createTransference(GenericDTO<TransferenceReqDTO> genRechargeDTO);
-
     /**
      * 接收收银台的结果通知
      * @param resultDto

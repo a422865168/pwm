@@ -10,11 +10,14 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import com.gexin.fastjson.JSON;
+import com.google.gson.JsonObject;
 import com.hisun.lemon.cmm.client.CmmServerClient;
 import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
 import com.hisun.lemon.common.exception.LemonException;
@@ -365,7 +368,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		handleSuccess(rechargeResultDTO.getStatus(), rechargeResultDTO.getOrderCcy(), rechargeResultDTO.getAmount(),
 				orderNo, rechargeResultDTO.getExtOrderNo(), rechargeResultDTO.getRemark(),
 				rechargeResultDTO.getBusType(), rechargeResultDTO.getPayerId(), rechargeResultDTO.getFee(),
-				genericResultDTO.getAccDate(), mainTxTyp,rechargeResultDTO.getPayTypes());
+				genericResultDTO.getAccDate(), mainTxTyp,rechargeResultDTO.getPayTypes(),rechargeResultDTO.getTxJrnNo());
 	}
 
 	/**
@@ -381,7 +384,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			
 				handleSuccess(PwmConstants.RECHARGE_ORD_S, null, orderDTO.getOrderAmt(), orderNo,
 						orderDTO.getBusOrderNo(), null, orderDTO.getBusType(), orderDTO.getPayerId(), orderDTO.getFee(),
-						LemonUtils.getAccDate(), mainTxTyp,"");
+						LemonUtils.getAccDate(), mainTxTyp,"","");
 		} else {
 			LemonException.throwBusinessException(genDto.getMsgCd());
 		}
@@ -389,8 +392,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 	private void handleSuccess(String status, String ccy, BigDecimal amount, String orderNo, String extOrderNo,
 			String remark, String busType, String payerId, BigDecimal fee, LocalDate acDt, String mainTxTyp,
-			String payType) {
-		/*try {
+			String payType,String txJrnNo) {
+		try {
 			RechargeOrderDO rechargeOrderDO = service.getRechangeOrderDao().get(orderNo);
 			String acNo = getAccountNo(rechargeOrderDO.getPayerId());
 			locker.lock(//
@@ -437,10 +440,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 						if (JudgeUtils.isNotSuccess(userBasicInfDTO.getMsgCd())) {
 							LemonException.throwBusinessException(userBasicInfDTO.getMsgCd());
 						}
-						
-						 * UserBasicInfDTO user = userBasicInfDTO.getBody();
-						 * String acNo = user.getAcNo();
-						 
+
 						if (JudgeUtils.isEmpty(acNo)) {
 							LemonException.throwBusinessException("PWM40006");
 						}
@@ -497,33 +497,48 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 						updOrderDO.setModifyTime(DateTimeUtils.getCurrentLocalDateTime());
 						updOrderDO.setOrderNo(orderNo);
-						service.updateOrder(updOrderDO);*/
+						service.updateOrder(updOrderDO);
 						logger.info("更新完订单状态 根据交易类型判断是否为0106圈存  若果是需要通知对方");
-						if(JudgeUtils.equals(busType, PwmConstants.BUS_TYPE_RECHARGE_TRANSFRENS)){
-							String url=env.getProperty("pwm.transference.path");
-							logger.info("对方接口地址是:"+url);
-							Map<String, String> params = new HashMap<>();
+						if (JudgeUtils.equals(busType, PwmConstants.BUS_TYPE_RECHARGE_TRANSFRENS)) {
+							String url = env.getProperty("pwm.transference.path");
+							logger.info("对方接口地址是:" + url);
+							JsonObject json = new JsonObject();
 							Map<String, String> heads = new HashMap<>();
-							params.put("status", "00");
-							params.put("err_msg", "");
-							params.put("order_no", "01061565484884");
-							params.put("charge_no", "010620180314654544");
-							params.put("recharge_amount", "10");
+							
+							if(StringUtils.equals(status, PwmConstants.RECHARGE_ORD_S)){
+								json.addProperty("status", "00");
+								json.addProperty("err_msg", "");
+								json.addProperty("order_no",rechargeOrderDO.getExtOrderNo());
+								json.addProperty("charge_no",txJrnNo);
+								json.addProperty("recharge_amount", rechargeOrderDO.getOrderAmt());
+							}else
+							{
+								json.addProperty("status", "01");
+								json.addProperty("err_msg", "异常");
+								json.addProperty("charge_no", "010620180314654544");
+								json.addProperty("recharge_amount", "");
+							}
+							
 							try {
-								HttpResult result=httpAPIService.doPostAsJson(url, params.toString(), heads);
-								logger.info("返回码是:"+result.getBody());
+								HttpResult result = httpAPIService.doPostAsJson(url, json.toString(), heads);
+								logger.info("返回码是:" + result.getBody());
+								JSONObject jsonStr = new JSONObject(result.getBody());
+								String msage = jsonStr.get("msgCd").toString();
+								if (!JudgeUtils.equals(msage, "0000")) {
+									logger.info("通知失败  调补偿异常");
+								}
 							} catch (Exception e) {
 								logger.info("通知异常  调补偿机制");
 							}
 						}
-					/*	// 推送充值信息到消息中心
+						// 推送充值信息到消息中心
 						sendMsgCenterInfo(updOrderDO, RECHARGE_SUCCESS);
 						return null;
 					});
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			LemonException.create(e);
-		}*/
+		}
 	}
 	
 	/**
