@@ -33,5 +33,3 @@ pwm :
   chk :
     remotePath : /home/oper/data/pwm/
     localPath : /home/oper/data/localchk/pwm/
-    #营业厅指定对账文件目录地址
-    hallRemotePath: /home/oper/data/pwm/hall/

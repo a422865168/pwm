@@ -94,6 +94,12 @@ public class UserInfoRspDTO {
     @Length(max = 64)
     private String usrNmHid;
     
+    /**
+     * acNo 用户账户编号
+     */
+    @ApiModelProperty(name = "acNo", value = "用户账户编码")
+    private String acNo;
+    
 	public String getUserId() {
 		return userId;
 	}
@@ -178,4 +184,11 @@ public class UserInfoRspDTO {
 	public void setUsrBirthDt(String usrBirthDt) {
 		this.usrBirthDt = usrBirthDt;
 	}
+	public String getAcNo() {
+		return acNo;
+	}
+	public void setAcNo(String acNo) {
+		this.acNo = acNo;
+	}
+	
 }

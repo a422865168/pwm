@@ -78,6 +78,21 @@ public class RechargeResultDTO {
 	 */
 	@ApiModelProperty(name = "remark", value = "备注")
 	private String remark;
+	
+	/**
+	 * 支付方式
+	 */
+	@ApiModelProperty(name = "payTypes", value = "支付方式   0.余额支付   1.快捷支付")
+	private String payTypes;
+
+
+	public String getPayTypes() {
+		return payTypes;
+	}
+
+	public void setPayTypes(String payTypes) {
+		this.payTypes = payTypes;
+	}
 
 	public String getOrderNo() {
 		return orderNo;
@@ -166,4 +181,7 @@ public class RechargeResultDTO {
 	public void setTotalAmount(BigDecimal totalAmount) {
 		this.totalAmount = totalAmount;
 	}
+
+	
+	
 }

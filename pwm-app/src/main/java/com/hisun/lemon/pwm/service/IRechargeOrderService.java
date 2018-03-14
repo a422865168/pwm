@@ -4,7 +4,10 @@ import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
 import com.hisun.lemon.pwm.dto.RechargeDTO;
+import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
+import com.hisun.lemon.pwm.dto.TransferenceReqDTO;
+import com.hisun.lemon.pwm.dto.TransferenceRspDTO;
 
 
 /**
@@ -14,13 +17,19 @@ import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
  *
  */
 public interface IRechargeOrderService {
+	//充值下单
     public GenericRspDTO<CashierViewDTO> createOrder(GenericDTO<RechargeDTO> genRechargeDTO);
+    
+    /*
+     * 圈存请求
+     */
+    public TransferenceRspDTO createTransference(GenericDTO<TransferenceReqDTO> genRechargeDTO);
 
     /**
      * 接收收银台的结果通知
      * @param resultDto
      */
-    public void handleResult(GenericDTO resultDto);
+    public void handleResult(GenericDTO<RechargeResultDTO> genericResultDTO);
 
    
    

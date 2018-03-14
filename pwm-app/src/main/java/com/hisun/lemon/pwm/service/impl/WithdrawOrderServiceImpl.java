@@ -152,7 +152,16 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		String crdNoEnc = commonEncrtyRspDTO.getBody().getData();
 		return crdNoEnc;
     }
-
+    private String getAccountNo(String userId) {
+        GenericRspDTO<UserBasicInfDTO> rspDTO = userBasicInfClient.queryUser(userId);
+        if (JudgeUtils.isNotSuccess(rspDTO.getMsgCd())) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("user:" + userId + " get account no failure");
+            }
+            LemonException.throwBusinessException(rspDTO.getMsgCd());
+        }
+        return rspDTO.getBody().getAcNo();
+    }
 	/**
 	 * 生成提现订单
 	 * 
@@ -292,11 +301,12 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		if (JudgeUtils.isNotSuccess(userBasicInfDTO.getMsgCd())) {
 			LemonException.throwBusinessException(userBasicInfDTO.getMsgCd());
 		}
-		UserBasicInfDTO user = userBasicInfDTO.getBody();
+		/*UserBasicInfDTO user = userBasicInfDTO.getBody();
 		String acNo = user.getAcNo();
 		if (JudgeUtils.isEmpty(acNo)) {
 			LemonException.throwBusinessException("PWM40006");
-		}
+		}*/
+		String acNo=getAccountNo(withdrawOrderDO.getUserId());
 		// 流水号s
 		String jrnNo = LemonUtils.getRequestId();
 		// 账务处理
@@ -325,12 +335,14 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		genericRspDTO = withdrawClient.createOrder(genericDTO);
 		System.out.println("提现申请到银行卡");
 		if (JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())) {
-			logger.info("申请提现失败   回滚前账务");
+			logger.info("申请提现到银行卡失败");
+			LemonException.throwBusinessException(genericRspDTO.getMsgCd());
+			/*logger.info("申请提现失败   回滚前账务");
 			// 回滚前账务
 			GenericRspDTO<AccDataListDTO> userAccAcsFail = UserAccAcsFail(withdrawOrderDO, userId);
 			if (JudgeUtils.isNotSuccess(userAccAcsFail.getMsgCd())) {
 				logger.info("回滚账务失败");
-			}
+			}*/
 		}
 
 		// 国际化订单信息
@@ -379,12 +391,12 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		// 若订单状态为'F1'失败，则做账，并把手续费退了
 		if (JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_F1, withdrawOrderDO.getOrderStatus())) {
 			//账务做失败账务处理   提现
-			String actNo=queryWithdrawOrderDO.getUserId();
+			/*String actNo=queryWithdrawOrderDO.getUserId();
 			logger.info("提现失败   账务处理  用户"+actNo);
 			 GenericRspDTO<AccDataListDTO> userAccAcsFail=UserAccAcsFail(queryWithdrawOrderDO,actNo);
 			if(JudgeUtils.isNotSuccess(userAccAcsFail.getMsgCd())){
 	        	   logger.info("回滚账务失败");
-	           }
+	           }*/
 		}
 		withdrawOrderDO.setAcTm(LemonUtils.getAccDate());
 		
@@ -688,11 +700,11 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         //若订单状态为'F1'失败，则做账，并把手续费退了
         if(JudgeUtils.equals(PwmConstants.WITHDRAW_ORD_F1, withdrawOrderDO2.getOrderStatus())){
             //账务处理
-            String userId = queryWithdrawOrderDO.getUserId();
+           /* String userId = queryWithdrawOrderDO.getUserId();
             GenericRspDTO<AccDataListDTO> userAccAcsFail=UserAccAcsFail(queryWithdrawOrderDO,userId);
             if(JudgeUtils.isNotSuccess(userAccAcsFail.getMsgCd())){
          	   logger.info("提现对账差错处理账务失败");
-            }
+            }*/
         }
         withdrawOrderDO2.setAcTm(LemonUtils.getAccDate());
         //若更新提现单据状态及相关信息
@@ -766,12 +778,12 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
         }
     }*/
 
-    /**
+/*    *//**
      * 根据用户手机号查询用户信息
      * @param mblNo
      * @return
      * @throws LemonException
-     */
+     *//*
     private UserBasicInfDTO getUserBasicInfo(String mblNo) throws LemonException {
         GenericRspDTO<UserBasicInfDTO> rspDTO = userBasicInfClient.queryUserByLoginId(mblNo);
         if (JudgeUtils.isNotSuccess(rspDTO.getMsgCd())) {
@@ -780,7 +792,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
             LemonException.throwBusinessException(rspDTO.getMsgCd());
         }
         return rspDTO.getBody();
-    }
+    }*/
 
     private TradeFeeCaculateRspDTO caculateHallWithdrawFee(BigDecimal orderAmt){
         if(JudgeUtils.isNull(orderAmt)){
@@ -903,12 +915,12 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
     
     
     
-    /**
+   /* *//**
      * 用户提现失败账务处理
      * UserAccAcsDeal 账务处理
      * crossAcNo对手方账户
      * acNo  主账户
-     */
+     *//*
     private GenericRspDTO<AccDataListDTO> UserAccAcsFail(WithdrawOrderDO withdrawOrderDO,String acNo){
     	GenericRspDTO<AccDataListDTO> GenericRspDTO=new GenericRspDTO<>();
     	try {
@@ -961,5 +973,5 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 			e.printStackTrace();
 		}
 		return GenericRspDTO;
-	}
+	}*/
 }

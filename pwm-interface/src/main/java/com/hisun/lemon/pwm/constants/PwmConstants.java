@@ -38,6 +38,10 @@ public class PwmConstants {
 	 */
 	public static final String BUS_TYPE_RECHARGE_HALL ="0103";
 	/**
+	 * 业务类型：圈存
+	 */
+	public static final String BUS_TYPE_RECHARGE_TRANSFRENS ="0106";
+	/**
 	 * 业务类型：充值--企业网银充值
 	 */
 	public static final String BUS_TYPE_RECHARGE_BNB ="0104";

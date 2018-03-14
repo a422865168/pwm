@@ -20,6 +20,8 @@ import com.hisun.lemon.pwm.dto.RechargeDTO;
 import com.hisun.lemon.pwm.dto.RechargeRedoDTO;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
+import com.hisun.lemon.pwm.dto.TransferenceReqDTO;
+import com.hisun.lemon.pwm.dto.TransferenceRspDTO;
 import com.hisun.lemon.pwm.service.IRechargeOrderService;
 
 import io.swagger.annotations.Api;
@@ -42,6 +44,16 @@ public class RechargeOrderController extends BaseController {
 	public GenericRspDTO<CashierViewDTO> createOrder(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
 		return service.createOrder(genRechargeDTO);
 	}
+	
+	
+	@ApiOperation(value = "圈存", notes = "圈存")
+	@ApiResponse(code = 200, message = "圈存下单")
+	@PostMapping(value = "/order/transference")
+	public GenericRspDTO<TransferenceRspDTO> createTransference(@Validated @RequestBody GenericDTO<TransferenceReqDTO> genRechargeDTO) {
+		TransferenceRspDTO transferenceRspDTO=service.createTransference(genRechargeDTO);
+		return GenericRspDTO.newSuccessInstance(transferenceRspDTO);
+	}
+	
 
 	@ApiOperation(value = "充值处理结果通知", notes = "接收收银台的处理结果通知")
 	@ApiResponse(code = 200, message = "处理通知结果")
