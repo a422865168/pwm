@@ -303,11 +303,6 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		if (JudgeUtils.isNotSuccess(userBasicInfDTO.getMsgCd())) {
 			LemonException.throwBusinessException(userBasicInfDTO.getMsgCd());
 		}
-		/*UserBasicInfDTO user = userBasicInfDTO.getBody();
-		String acNo = user.getAcNo();
-		if (JudgeUtils.isEmpty(acNo)) {
-			LemonException.throwBusinessException("PWM40006");
-		}*/
 		String acNo=getAccountNo(withdrawOrderDO.getUserId());
 		// 流水号s
 		String jrnNo = LemonUtils.getRequestId();
@@ -322,6 +317,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		WithdrawReqDTO withdrawReqDTO = new WithdrawReqDTO();
 		withdrawReqDTO.setCapTyp("1");
 		withdrawReqDTO.setCapCorg(withdrawOrderDO.getCapCorgNo());
+		withdrawReqDTO.setUserNo(withdrawOrderDO.getUserId());
 		withdrawReqDTO.setCcy(withdrawOrderDO.getOrderCcy());
 		withdrawReqDTO.setCorpBusTyp(CorpBusTyp.WITHDRAW);
 		withdrawReqDTO.setCorpBusSubTyp(CorpBusSubTyp.PER_WITHDRAW);
@@ -329,22 +325,19 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		withdrawReqDTO.setUserNm(withdrawOrderDO.getUserName());
 		withdrawReqDTO.setCrdNoEnc(withdrawOrderDO.getCapCardNo());
 		withdrawReqDTO.setCapCrdNm(withdrawOrderDO.getUserName());
+		withdrawReqDTO.setCrdAcTyp("D");
 		withdrawReqDTO.setReqOrdNo(withdrawOrderDO.getOrderNo());
 		withdrawReqDTO.setReqOrdDt(DateTimeUtils.getCurrentLocalDate());
 		withdrawReqDTO.setReqOrdTm(DateTimeUtils.getCurrentLocalTime());
 		withdrawReqDTO.setMblNo(withdrawOrderDO.getNtfMbl());
+		withdrawReqDTO.setPsnCrpFlg("C");
 		genericDTO.setBody(withdrawReqDTO);
 		genericRspDTO = withdrawClient.createOrder(genericDTO);
 		System.out.println("提现申请到银行卡");
 		if (JudgeUtils.isNotSuccess(genericRspDTO.getMsgCd())) {
 			logger.info("申请提现到银行卡失败");
 			LemonException.throwBusinessException(genericRspDTO.getMsgCd());
-			/*logger.info("申请提现失败   回滚前账务");
-			// 回滚前账务
-			GenericRspDTO<AccDataListDTO> userAccAcsFail = UserAccAcsFail(withdrawOrderDO, userId);
-			if (JudgeUtils.isNotSuccess(userAccAcsFail.getMsgCd())) {
-				logger.info("回滚账务失败");
-			}*/
+		
 		}
 
 		// 国际化订单信息
