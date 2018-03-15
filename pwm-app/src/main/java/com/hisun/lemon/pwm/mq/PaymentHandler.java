@@ -2,15 +2,19 @@ package com.hisun.lemon.pwm.mq;
 
 import java.math.BigDecimal;
 
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.StringUtils;
 import com.hisun.lemon.framework.stream.MultiOutput;
 import com.hisun.lemon.framework.stream.producer.Producer;
 import com.hisun.lemon.framework.stream.producer.Producers;
+import com.hisun.lemon.framework.utils.ObjectMapperHelper;
 import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
@@ -27,8 +31,8 @@ import com.hisun.lemon.tfm.dto.TradeFeeReqDTO;
 public class PaymentHandler {
     protected static final Logger logger = LoggerFactory.getLogger(PaymentHandler.class);
 
- //   @Resource
-  //  LemonObjectMapper objectMapper;
+     @Resource
+     ObjectMapper objectMapper;
 
     /**
      * 登记用户手续费
@@ -47,8 +51,8 @@ public class PaymentHandler {
         tradeFeeReqDTO.setBusOrderTime(DateTimeUtils.getCurrentLocalDateTime());
         tradeFeeReqDTO.setTradeAmt(orderDO.getOrderAmt());
         tradeFeeReqDTO.setBusType(orderDO.getBusType());
-      //  String data = LemonObjectMapper.writeValueAsString(objectMapper, tradeFeeReqDTO, true);
-       // logger.info("登记用户手续费写入消息队列数据：" + data);
+       String data = ObjectMapperHelper.writeValueAsString(objectMapper, tradeFeeReqDTO, true);
+        logger.info("登记用户手续费写入消息队列数据：" + data);
         return tradeFeeReqDTO;
     }
 
@@ -67,8 +71,8 @@ public class PaymentHandler {
             tradeFeeReqDTO.setBusOrderTime(DateTimeUtils.getCurrentLocalDateTime());
             tradeFeeReqDTO.setTradeAmt(orderDO.getOrderAmt());
             tradeFeeReqDTO.setBusType(orderDO.getBusType());
-         //   String data = ObjectMapperHelper.writeValueAsString(objectMapper, tradeFeeReqDTO, true);
-         //   logger.info("登记商户id为:" + payeeId + "手续费写入消息队列数据：" + data);
+        String data = ObjectMapperHelper.writeValueAsString(objectMapper, tradeFeeReqDTO, true);
+        logger.info("登记商户id为:" + payeeId + "手续费写入消息队列数据：" + data);
             return tradeFeeReqDTO;
         }
         logger.info("非营业厅充值订单，不登记商户手续费：" + orderDO.getOrderNo());
@@ -93,30 +97,28 @@ public class PaymentHandler {
         tradeFeeReqDTO.setBusOrderTime(DateTimeUtils.getCurrentLocalDateTime());
         tradeFeeReqDTO.setTradeAmt(orderDO.getWcApplyAmt());
         tradeFeeReqDTO.setBusType(orderDO.getBusType());
-      //  String data = ObjectMapperHelper.writeValueAsString(objectMapper, tradeFeeReqDTO, true);
-     //   logger.info("登记用户手续费写入消息队列数据：" + data);
+     String data = ObjectMapperHelper.writeValueAsString(objectMapper, tradeFeeReqDTO, true);
+     logger.info("登记用户手续费写入消息队列数据：" + data);
         return tradeFeeReqDTO;
     }
 
-    @Producers({
-            @Producer(beanName= "merchantTransferTradeFeeConsumer", channelName= MultiOutput.OUTPUT_THREE)
-    })
-    public TradeFeeReqDTO registMerChantWithdrawFee(WithdrawOrderDO orderDO,String payeeId){
-        if(StringUtils.equals(orderDO.getBusType(), PwmConstants.BUS_TYPE_WITHDRAW_HALL)){
-            TradeFeeReqDTO tradeFeeReqDTO=new TradeFeeReqDTO();
-            tradeFeeReqDTO.setCcy(orderDO.getOrderCcy());
-            tradeFeeReqDTO.setUserId(payeeId);
-            tradeFeeReqDTO.setBusOrderNo(orderDO.getOrderNo());
-            tradeFeeReqDTO.setBusOrderTime(DateTimeUtils.getCurrentLocalDateTime());
-            tradeFeeReqDTO.setTradeAmt(orderDO.getWcApplyAmt());
-            //tfm计费模块已经定义0405为营业厅取现
-            tradeFeeReqDTO.setBusType("0405");
-           // String data = ObjectMapperHelper.writeValueAsString(objectMapper, tradeFeeReqDTO, true);
-          //  logger.info("登记商户id为:" + payeeId + "手续费写入消息队列数据：" + data);
-            return tradeFeeReqDTO;
-        }
-        logger.info("非营业厅提现订单，不登记商户手续费：" + orderDO.getOrderNo());
-        return null;
-    }
+	@Producers({ @Producer(beanName = "merchantTransferTradeFeeConsumer", channelName = MultiOutput.OUTPUT_THREE) })
+	public TradeFeeReqDTO registMerChantWithdrawFee(WithdrawOrderDO orderDO, String payeeId) {
+		if (StringUtils.equals(orderDO.getBusType(), PwmConstants.BUS_TYPE_WITHDRAW_HALL)) {
+			TradeFeeReqDTO tradeFeeReqDTO = new TradeFeeReqDTO();
+			tradeFeeReqDTO.setCcy(orderDO.getOrderCcy());
+			tradeFeeReqDTO.setUserId(payeeId);
+			tradeFeeReqDTO.setBusOrderNo(orderDO.getOrderNo());
+			tradeFeeReqDTO.setBusOrderTime(DateTimeUtils.getCurrentLocalDateTime());
+			tradeFeeReqDTO.setTradeAmt(orderDO.getWcApplyAmt());
+			// tfm计费模块已经定义0405为营业厅取现
+			tradeFeeReqDTO.setBusType("0405");
+			String data = ObjectMapperHelper.writeValueAsString(objectMapper, tradeFeeReqDTO, true);
+			logger.info("登记商户id为:" + payeeId + "手续费写入消息队列数据：" + data);
+			return tradeFeeReqDTO;
+		}
+		logger.info("非营业厅提现订单，不登记商户手续费：" + orderDO.getOrderNo());
+		return null;
+	}
 
 }

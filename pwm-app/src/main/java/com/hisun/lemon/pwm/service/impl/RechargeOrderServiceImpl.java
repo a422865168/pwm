@@ -2,7 +2,6 @@ package com.hisun.lemon.pwm.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,14 +9,13 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.gexin.fastjson.JSON;
-import com.google.gson.JsonObject;
+import com.gexin.fastjson.JSONObject;
 import com.hisun.lemon.cmm.client.CmmServerClient;
 import com.hisun.lemon.cmm.dto.MessageSendReqDTO;
 import com.hisun.lemon.common.exception.LemonException;
@@ -51,7 +49,6 @@ import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
 import com.hisun.lemon.pwm.dto.TransferenceReqDTO;
 import com.hisun.lemon.pwm.dto.TransferenceRspDTO;
-import com.hisun.lemon.pwm.dto.UserInfoRspDTO;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import com.hisun.lemon.pwm.mq.BillSyncHandler;
 import com.hisun.lemon.pwm.mq.PaymentHandler;
@@ -502,31 +499,34 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 						if (JudgeUtils.equals(busType, PwmConstants.BUS_TYPE_RECHARGE_TRANSFRENS)) {
 							String url = env.getProperty("pwm.transference.path");
 							logger.info("对方接口地址是:" + url);
-							JsonObject json = new JsonObject();
+							JSONObject json =new JSONObject();
 							Map<String, String> heads = new HashMap<>();
 							
 							if(StringUtils.equals(status, PwmConstants.RECHARGE_ORD_S)){
-								json.addProperty("status", "00");
-								json.addProperty("err_msg", "");
-								json.addProperty("order_no",rechargeOrderDO.getExtOrderNo());
-								json.addProperty("charge_no",txJrnNo);
-								json.addProperty("recharge_amount", rechargeOrderDO.getOrderAmt());
+							    json.putIfAbsent("status", "00");
+								json.putIfAbsent("err_msg", "");
+								json.putIfAbsent("order_no",rechargeOrderDO.getExtOrderNo());
+								json.putIfAbsent("charge_no",txJrnNo);
+								json.putIfAbsent("recharge_amount", rechargeOrderDO.getOrderAmt());
 							}else
 							{
-								json.addProperty("status", "01");
-								json.addProperty("err_msg", "异常");
-								json.addProperty("charge_no", "010620180314654544");
-								json.addProperty("recharge_amount", "");
+								json.putIfAbsent("status", "01");
+								json.putIfAbsent("err_msg", "异常");
+								json.putIfAbsent("charge_no", "010620180314654544");
+								json.putIfAbsent("recharge_amount", "");
 							}
 							
 							try {
 								HttpResult result = httpAPIService.doPostAsJson(url, json.toString(), heads);
-								logger.info("返回码是:" + result.getBody());
-								JSONObject jsonStr = new JSONObject(result.getBody());
-								String msage = jsonStr.get("msgCd").toString();
-								if (!JudgeUtils.equals(msage, "0000")) {
-									logger.info("通知失败  调补偿异常");
+								if(JudgeUtils.isNotNull(result)){
+									logger.info("返回码是:" + result.getBody());
+									JSONObject jsonStr=JSON.parseObject(result.getBody());
+									String msage = jsonStr.get("msgCd").toString();
+									if (!JudgeUtils.equals(msage, "0000")) {
+										logger.info("通知失败  调补偿异常");
+									}
 								}
+								
 							} catch (Exception e) {
 								logger.info("通知异常  调补偿机制");
 							}
