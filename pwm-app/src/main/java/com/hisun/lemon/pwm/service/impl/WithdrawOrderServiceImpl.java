@@ -355,7 +355,7 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 		createUserBillDTO.setFee(withdrawOrderDO.getFeeAmt());
 		createUserBillDTO.setGoodsInfo(desc);
 		billSyncHandler.createBill(createUserBillDTO);
-
+        logger.info("同步账单数据完成");
 		WithdrawRspDTO withdrawRspDTO = new WithdrawRspDTO();
 		withdrawRspDTO.setOrderNo(withdrawOrderDO.getOrderNo());
 		withdrawRspDTO.setOrderStatus(withdrawOrderDO.getOrderStatus());
@@ -868,13 +868,13 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 			BigDecimal amount = withdrawOrderDO.getWcTotalAmt();
 				//借：个人账户
 			Map<String, Object> accDataMap1 = AcmComponent.getUserAccDataListDTO(AccConstants.USR_ACC_DR, acNo, AccConstants.AC_TYP_USR_CASH,actDate, AccConstants.CAP_TYP_CASH, amount.floatValue(),
-					AccConstants.DC_FLG_D, "1401","14", "2181010002", "0401", amount.floatValue(),"个人提现",
+					AccConstants.DC_FLG_D, "1401","01", "4040004", "个人账户", amount.floatValue(),"个人提现",
 					"04", withdrawOrderDO.getOrderNo(), "1", AccConstants.NOT_TX_FLG_NOT_TX);
 			accDataMapList.add(accDataMap1);
 				
 				//贷：应付账款-待结算款-用户提现
 				Map<String, Object> accDataMap2 = AcmComponent.getInnerAccDataListDTO(AccConstants.INNER_ACC_CR,"4010002", "应付账款-待结算款-用户提现", "401",actDate, AccConstants.CAP_TYP_CASH ,amount.floatValue(), AccConstants.DC_FLG_C,
-						"1401","14","212101", "应付账款-待结算款-用户提现", amount.floatValue(), "04",
+						"1401","01",acNo, "个人账户", amount.floatValue(), "04",
 						withdrawOrderDO.getOrderNo(),"提现","2", AccConstants.NOT_TX_FLG_NOT_TX);	
 				accDataMapList.add(accDataMap2);
 				
@@ -883,14 +883,14 @@ public class WithdrawOrderServiceImpl extends BaseService implements IWithdrawOr
 					// 借：个人账户
 					Map<String, Object> accDataMap3 = AcmComponent.getUserAccDataListDTO(AccConstants.USR_ACC_DR, acNo,
 							AccConstants.AC_TYP_USR_CASH, actDate, AccConstants.CAP_TYP_CASH,withdrawOrderDO.getFeeAmt().floatValue(),
-							AccConstants.DC_FLG_D, "1401", "14", "2181010002", "0401", withdrawOrderDO.getFeeAmt().floatValue(), "个人提现",
+							AccConstants.DC_FLG_D, "1401", "01", "4040004", "个人账户", withdrawOrderDO.getFeeAmt().floatValue(), "个人提现",
 							"04", withdrawOrderDO.getOrderNo(), "3", AccConstants.NOT_TX_FLG_NOT_TX);
 					accDataMapList.add(accDataMap3);
 
 					// 贷：其他应付款-暂收款项-手续费
 					Map<String, Object> accDataMap4 = AcmComponent.getInnerAccDataListDTO(AccConstants.INNER_ACC_CR, "4040004",
 							"其他应付款-暂收款项-手续费", "404", actDate, AccConstants.CAP_TYP_CASH, withdrawOrderDO.getFeeAmt().floatValue(),
-							AccConstants.DC_FLG_C, "1401", "14", "218104", "其他应付款-暂收款项-手续费",withdrawOrderDO.getFeeAmt().floatValue(),
+							AccConstants.DC_FLG_C, "1401", "01", acNo, "其他应付款-暂收款项-手续费",withdrawOrderDO.getFeeAmt().floatValue(),
 							"04", withdrawOrderDO.getOrderNo(), "个人提现", "4", AccConstants.NOT_TX_FLG_NOT_TX);
 					accDataMapList.add(accDataMap4);
 				}	

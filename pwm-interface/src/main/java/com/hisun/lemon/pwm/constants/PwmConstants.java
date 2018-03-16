@@ -45,6 +45,11 @@ public class PwmConstants {
 	 * 业务类型：充值--企业网银充值
 	 */
 	public static final String BUS_TYPE_RECHARGE_BNB ="0104";
+	
+	/**
+	 * 业务类型：充值--个人网银充值
+	 */
+	public static final String BUS_TYPE_RECHARGE_USER ="0105";
 	/**
 	 * 业务类型：充值短款撤单退款
 	 */

@@ -10,7 +10,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import io.swagger.annotations.ApiModelProperty;
 
-//import io.swagger.annotations.ApiModelProperty;
 
 
 /**
@@ -61,7 +60,10 @@ public class RechargeDTO {
 	@ApiModelProperty(name = "fee", value = " 充值手续费")
 	@Min(value=0, message="PWM10016")
 	private BigDecimal fee;
-
+	
+	@ApiModelProperty(name = "crdCorpOrg", value = "资金机构")
+	private String crdCorpOrg;
+	
 	public BigDecimal getAmount() {
 		return amount;
 	}
@@ -93,4 +95,21 @@ public class RechargeDTO {
 	public void setBusType(String busType) {
 		this.busType = busType;
 	}
+
+	public BigDecimal getFee() {
+		return fee;
+	}
+
+	public void setFee(BigDecimal fee) {
+		this.fee = fee;
+	}
+
+	public String getCrdCorpOrg() {
+		return crdCorpOrg;
+	}
+
+	public void setCrdCorpOrg(String crdCorpOrg) {
+		this.crdCorpOrg = crdCorpOrg;
+	}
+	
 }

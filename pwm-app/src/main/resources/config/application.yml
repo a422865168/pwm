@@ -53,18 +53,18 @@ spring :
             deliveryMode : PERSISTENT
         #channel
         output :
-          enable : true
+          enabled : true
           #binder topic
           destination : ${spring.application.name}
           producer :
             deliveryMode : PERSISTENT
-        output3 :
-          enable : true
+        output1 :
+          enabled : true
           destination : TFM
           producer :
             deliveryMode : PERSISTENT
         output6 :
-          enable : true
+          enabled : true
           destination : BIL
           producer :
             deliveryMode : PERSISTENT

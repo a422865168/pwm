@@ -78,11 +78,11 @@ spring :
             deliveryMode : PERSISTENT
         #channel
         output :
-          enable : true
+          enabled : true
           #binder topic
           destination : ${spring.application.name}
         output6 :
-          enable : true
+          enabled : true
           destination : BIL
 
 ribbon :

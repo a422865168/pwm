@@ -28,11 +28,15 @@ import com.hisun.lemon.cpi.client.RemittanceClient;
 import com.hisun.lemon.cpi.client.RouteClient;
 import com.hisun.lemon.csh.client.CshOrderClient;
 import com.hisun.lemon.csh.client.CshRefundClient;
+import com.hisun.lemon.csh.constants.CshConstants;
+import com.hisun.lemon.csh.dto.cashier.BackstageViewDTO;
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
+import com.hisun.lemon.csh.dto.cashier.InitBackstageDTO;
 import com.hisun.lemon.csh.dto.cashier.InitCashierDTO;
 import com.hisun.lemon.csh.dto.order.OrderDTO;
 import com.hisun.lemon.csh.dto.refund.RefundOrderDTO;
 import com.hisun.lemon.csh.dto.refund.RefundOrderRspDTO;
+import com.hisun.lemon.csh.enums.AcItem;
 import com.hisun.lemon.dto.AccDataListDTO;
 import com.hisun.lemon.dto.RiskDataDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
@@ -125,32 +129,6 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	@Resource
 	private XXAccHandleClient acsTreatmentClient;
 
-/*	*//**
-	 * 查询账户信息
-	 *//*
-	public UserInfoRspDTO userInfo(String mblNo) {
-		GenericRspDTO<UserBasicInfDTO> infoDTO = userBasicInfClient.queryUserByLoginId(mblNo);
-		if (!JudgeUtils.isSuccess(infoDTO.getMsgCd())) {
-			logger.error("查询账户信息失败:" + mblNo);
-			throw new LemonException(infoDTO.getMsgCd());
-		}
-		UserInfoRspDTO userInfo = new UserInfoRspDTO();
-		userInfo.setUserId(infoDTO.getBody().getUserId());
-		userInfo.setMblNo(infoDTO.getBody().getMblNo());
-		userInfo.setDisplayNm(infoDTO.getBody().getDisplayNm());
-		userInfo.setAvatarPath(infoDTO.getBody().getAvatarPath());
-		userInfo.setUsrSts(infoDTO.getBody().getUsrSts());
-		userInfo.setUsrLvl(infoDTO.getBody().getUsrLvl());
-		userInfo.setIdChkFlg(infoDTO.getBody().getIdChkFlg());
-		userInfo.setUsrNmHid(infoDTO.getBody().getUsrNmHid());
-		userInfo.setIdType(infoDTO.getBody().getIdType());
-		userInfo.setIdNo(infoDTO.getBody().getIdNo());
-		userInfo.setUsrNm(infoDTO.getBody().getUsrNm());
-		userInfo.setUsrGender(infoDTO.getBody().getUsrGender());
-		userInfo.setUsrNation(infoDTO.getBody().getUsrNation());
-		userInfo.setUsrBirthDt(infoDTO.getBody().getUsrBirthDt());
-		return userInfo;
-	}*/
 	private String getAccountNo(String userId) {
         GenericRspDTO<UserBasicInfDTO> rspDTO = userBasicInfClient.queryUser(userId);
         if (JudgeUtils.isNotSuccess(rspDTO.getMsgCd())) {
@@ -162,15 +140,24 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
         return rspDTO.getBody().getAcNo();
     }
 
-	
 	/**
-	 * 充值下单
+	 * 商户充值下单
 	 */
 	@Override
-	public GenericRspDTO<CashierViewDTO> createOrder(GenericDTO<RechargeDTO> genRechargeDTO) {
+	public GenericRspDTO<BackstageViewDTO> createOrderMer(GenericDTO<RechargeDTO> genRechargeDTO) {
 		RechargeDTO rechargeDTO = genRechargeDTO.getBody();
 		if (!rechargeDTO.getBusType().startsWith(PwmConstants.TX_TYPE_RECHANGE)) {
 			throw new LemonException("PWM20001");
+		}
+		// 商户网银充值 必须传递资金机构号
+		if (JudgeUtils.equals(rechargeDTO.getPsnFlag(), "1")
+				|| JudgeUtils.equals(rechargeDTO.getBusType(), PwmConstants.BUS_TYPE_RECHARGE_BNB)
+				|| JudgeUtils.equals(rechargeDTO.getBusType(), PwmConstants.BUS_TYPE_RECHARGE_USER)) {
+			if (JudgeUtils.isEmpty(rechargeDTO.getCrdCorpOrg())) {
+				logger.info("商户网银充值必须传递资金机构号");
+				LemonException.throwBusinessException("PWM10021");
+			}
+
 		}
 		String payer = LemonUtils.getUserId();
 		String ymd = DateTimeUtils.getCurrentDateStr();
@@ -183,24 +170,130 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		Map<String, Object> riskDataMap = new HashMap();
 		riskDataDTO.setRiskType(RiskConstants.RISK_TYPE_BLACK);
 		// 对象规则
-		//对公对私标志(0:个人|1:商户)
-		if(JudgeUtils.equals(rechargeDTO.getPsnFlag(), "0")){
+		// 对公对私标志(0:个人|1:商户)
+		if (JudgeUtils.equals(rechargeDTO.getPsnFlag(), "0")) {
 			riskDataMap.put("RULE_ROLE", RiskConstants.RULE_ROLE_REAL_USER);
 			// 用户内部用户号
 			riskDataMap.put("USER_USR_NO", LemonUtils.getUserId());
-		}else if (JudgeUtils.equals(rechargeDTO.getPsnFlag(), "1")){
+		} else if (JudgeUtils.equals(rechargeDTO.getPsnFlag(), "1")) {
 			riskDataMap.put("RULE_ROLE", RiskConstants.RULE_ROLE_MERC);
 			// 用户内部用户号
 			riskDataMap.put("MERC_USR_NO", LemonUtils.getUserId());
 		}
-		riskDataMap.put("TX_TYP",RiskConstants.TX_TYP_CREATE_ORDER);
+		riskDataMap.put("TX_TYP", RiskConstants.TX_TYP_CREATE_ORDER);
 		riskDataDTO.setRiskDataMap(riskDataMap);
 		genericReqDTO.setBody(riskDataDTO);
 		GenericRspDTO<RiskDataDTO> riskDataDTOGenericRspDTO = riskCheckClient.xxRiskHandle(genericReqDTO);
-		 if(JudgeUtils.isNotSuccess(riskDataDTOGenericRspDTO.getMsgCd())){
-	        	logger.info("黑白名单风控检查失败");
-	        	LemonException.throwBusinessException("PWM30001");
-	        }
+		if (JudgeUtils.isNotSuccess(riskDataDTOGenericRspDTO.getMsgCd())) {
+			logger.info("黑白名单风控检查失败");
+			LemonException.throwBusinessException("PWM30001");
+		}
+		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
+		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
+		rechargeOrderDO.setBusType(rechargeDTO.getBusType());
+		rechargeOrderDO.setModifyOpr("");
+		rechargeOrderDO.setOrderAmt(rechargeDTO.getAmount());
+		rechargeOrderDO.setOrderCcy("CNY");
+		rechargeOrderDO.setOrderExpTm(DateTimeUtils.getCurrentLocalDateTime().plusDays(2));
+		rechargeOrderDO.setOrderNo(orderNo);
+		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
+		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
+		rechargeOrderDO.setPsnFlag(rechargeDTO.getPsnFlag());
+		rechargeOrderDO.setRemark("");
+		rechargeOrderDO.setPayerId(payer);
+		rechargeOrderDO.setSysChannel(rechargeDTO.getSysChannel());
+		rechargeOrderDO.setTxType(PwmConstants.TX_TYPE_RECHANGE);
+		service.initOrder(rechargeOrderDO);
+
+		logger.info("登记充值订单成功，订单号：" + rechargeOrderDO.getOrderNo());
+		// 调用收银
+		InitBackstageDTO initCashierDTO = new InitBackstageDTO();
+		initCashierDTO.setBusPaytype(null);// 业务指定支付方式 PwmConstants.BUS_PAY_TYPE
+		// initCashierDTO.setBusPaytype(PwmConstants.BUS_PAY_TYPE);
+		initCashierDTO.setBusType(rechargeOrderDO.getBusType());
+		initCashierDTO.setExtOrderNo(rechargeOrderDO.getOrderNo());
+		initCashierDTO.setSysChannel(rechargeDTO.getSysChannel());
+		initCashierDTO.setPayeeId(payer);
+		initCashierDTO.setPayerId(payer);
+		initCashierDTO.setRutCorgNo(rechargeDTO.getCrdCorpOrg());
+		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
+		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
+		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
+		initCashierDTO.setEffTm(rechargeOrderDO.getOrderExpTm());
+		// 快捷充值订单信息国际化
+		Object[] args = new Object[] { rechargeOrderDO.getOrderAmt() };
+		String descStr = getViewOrderInfo(rechargeOrderDO.getBusType(), args);
+
+		initCashierDTO.setGoodsDesc(descStr);
+		GenericDTO<InitBackstageDTO> genericDTO = new GenericDTO<>();
+		genericDTO.setBody(initCashierDTO);
+		logger.info("订单：" + rechargeOrderDO.getOrderNo() + " 请求收银台");
+		// 调用收银服务接口 初始化收银订单 (商户充值单独调CSH下单接口)
+		BackstageViewDTO cashierViewDTO = new BackstageViewDTO();
+		GenericRspDTO<BackstageViewDTO> genericCashierViewRspDTO = cshOrderClient.initBackstage(genericDTO);
+		cashierViewDTO = genericCashierViewRspDTO.getBody();
+		if (JudgeUtils.isNotSuccess(genericCashierViewRspDTO.getMsgCd())) {
+			LemonException.throwBusinessException(genericCashierViewRspDTO.getMsgCd());
+		}
+		logger.info("订单：" + rechargeOrderDO.getOrderNo() + " 请求收银台完成  更新订单信息");
+		// 更新充值订单信息
+		RechargeOrderDO updateDO = new RechargeOrderDO();
+		updateDO.setOrderNo(rechargeOrderDO.getOrderNo());
+		updateDO.setFee(cashierViewDTO.getFeeAmt());// 充值手续费
+		updateDO.setFeeFlag(cashierViewDTO.getFeeAmt()+"");// 手续费类型 IN 内扣 EX 外扣
+		updateDO.setExtOrderNo(cashierViewDTO.getOrderNo());
+		service.updateOrder(updateDO);
+		return genericCashierViewRspDTO;
+	}
+	
+	/**
+	 * 充值下单
+	 */
+	@Override
+	public GenericRspDTO<CashierViewDTO> createOrder(GenericDTO<RechargeDTO> genRechargeDTO) {
+		RechargeDTO rechargeDTO = genRechargeDTO.getBody();
+		if (!rechargeDTO.getBusType().startsWith(PwmConstants.TX_TYPE_RECHANGE)) {
+			throw new LemonException("PWM20001");
+		}
+		// 商户网银充值 必须传递资金机构号
+		if (JudgeUtils.equals(rechargeDTO.getPsnFlag(), "1")
+				|| JudgeUtils.equals(rechargeDTO.getBusType(), PwmConstants.BUS_TYPE_RECHARGE_BNB)
+				|| JudgeUtils.equals(rechargeDTO.getBusType(), PwmConstants.BUS_TYPE_RECHARGE_USER)) {
+			if (JudgeUtils.isEmpty(rechargeDTO.getCrdCorpOrg())) {
+				logger.info("商户网银充值必须传递资金机构号");
+				LemonException.throwBusinessException("PWM10021");
+			}
+
+		}
+		String payer = LemonUtils.getUserId();
+		String ymd = DateTimeUtils.getCurrentDateStr();
+		String orderNo = IdGenUtils.generateId(PwmConstants.R_ORD_GEN_PRE + ymd, 11);
+		orderNo = rechargeDTO.getBusType() + ymd + orderNo;
+
+		// Step3:风控，黑名单检查
+		GenericDTO<RiskDataDTO> genericReqDTO = new GenericDTO<>();
+		RiskDataDTO riskDataDTO = new RiskDataDTO();
+		Map<String, Object> riskDataMap = new HashMap();
+		riskDataDTO.setRiskType(RiskConstants.RISK_TYPE_BLACK);
+		// 对象规则
+		// 对公对私标志(0:个人|1:商户)
+		if (JudgeUtils.equals(rechargeDTO.getPsnFlag(), "0")) {
+			riskDataMap.put("RULE_ROLE", RiskConstants.RULE_ROLE_REAL_USER);
+			// 用户内部用户号
+			riskDataMap.put("USER_USR_NO", LemonUtils.getUserId());
+		} else if (JudgeUtils.equals(rechargeDTO.getPsnFlag(), "1")) {
+			riskDataMap.put("RULE_ROLE", RiskConstants.RULE_ROLE_MERC);
+			// 用户内部用户号
+			riskDataMap.put("MERC_USR_NO", LemonUtils.getUserId());
+		}
+		riskDataMap.put("TX_TYP", RiskConstants.TX_TYP_CREATE_ORDER);
+		riskDataDTO.setRiskDataMap(riskDataMap);
+		genericReqDTO.setBody(riskDataDTO);
+		GenericRspDTO<RiskDataDTO> riskDataDTOGenericRspDTO = riskCheckClient.xxRiskHandle(genericReqDTO);
+		if (JudgeUtils.isNotSuccess(riskDataDTOGenericRspDTO.getMsgCd())) {
+			logger.info("黑白名单风控检查失败");
+			LemonException.throwBusinessException("PWM30001");
+		}
 		RechargeOrderDO rechargeOrderDO = new RechargeOrderDO();
 		rechargeOrderDO.setAcTm(DateTimeUtils.getCurrentLocalDate());
 		rechargeOrderDO.setBusType(rechargeDTO.getBusType());
@@ -228,6 +321,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		initCashierDTO.setSysChannel(rechargeDTO.getSysChannel());
 		initCashierDTO.setPayeeId(payer);
 		initCashierDTO.setPayerId(payer);
+		initCashierDTO.setCrdCorpOrg(rechargeDTO.getCrdCorpOrg());
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
@@ -240,12 +334,19 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		GenericDTO<InitCashierDTO> genericDTO = new GenericDTO<>();
 		genericDTO.setBody(initCashierDTO);
 		logger.info("订单：" + rechargeOrderDO.getOrderNo() + " 请求收银台");
-		// 调用收银服务接口 初始化收银订单
-		GenericRspDTO<CashierViewDTO> genericCashierViewRspDTO = cshOrderClient.initCashier(genericDTO);
+		// 调用收银服务接口 初始化收银订单 (商户充值单独调CSH下单接口)
+		CashierViewDTO cashierViewDTO = new CashierViewDTO();
+		GenericRspDTO<CashierViewDTO> genericCashierViewRspDTO = new GenericRspDTO<>();
+		if (JudgeUtils.equals(rechargeDTO.getPsnFlag(), "1")) {
+			logger.info("商户充值下单  调用收银台接口  netBankPayCashier");
+			genericCashierViewRspDTO = cshOrderClient.netBankPayCashier(genericDTO);
+		} else {
+			genericCashierViewRspDTO = cshOrderClient.initCashier(genericDTO);
+		}
+		cashierViewDTO = genericCashierViewRspDTO.getBody();
 		if (JudgeUtils.isNotSuccess(genericCashierViewRspDTO.getMsgCd())) {
 			LemonException.throwBusinessException(genericCashierViewRspDTO.getMsgCd());
 		}
-		CashierViewDTO cashierViewDTO = genericCashierViewRspDTO.getBody();
 		logger.info("订单：" + rechargeOrderDO.getOrderNo() + " 请求收银台完成  更新订单信息");
 		// 更新充值订单信息
 		RechargeOrderDO updateDO = new RechargeOrderDO();
@@ -299,6 +400,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		rechargeOrderDO.setOrderCcy("CNY");
 		rechargeOrderDO.setOrderExpTm(DateTimeUtils.getCurrentLocalDateTime().plusDays(2));
 		rechargeOrderDO.setOrderNo(orderNo);
+		rechargeOrderDO.setHallOrderNo(transferenceReqDTO.getBusOrderNo());
 		rechargeOrderDO.setOrderStatus(PwmConstants.RECHARGE_ORD_W);
 		rechargeOrderDO.setOrderTm(DateTimeUtils.getCurrentLocalDateTime());
 		rechargeOrderDO.setPsnFlag(transferenceReqDTO.getPsnFlag());
@@ -348,8 +450,9 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		logger.info("更新充值订单end    组装对外传输数据");
 		TransferenceRspDTO transferenceRspDTO = new TransferenceRspDTO();
 		transferenceRspDTO.setBusType(rechargeOrderDO.getBusType());
-		transferenceRspDTO.setOrderNo(rechargeOrderDO.getOrderNo());
+		transferenceRspDTO.setOrderNo(rechargeOrderDO.getHallOrderNo());
 		transferenceRspDTO.setOrderStatus(rechargeOrderDO.getOrderStatus());
+		transferenceRspDTO.setBusOrderNo(cashierViewDTO.getOrderNo());
 		transferenceRspDTO.setRechargeAmount(rechargeOrderDO.getOrderAmt());
 		transferenceRspDTO.setUserId(rechargeOrderDO.getPayerId());
 		return transferenceRspDTO;
@@ -365,7 +468,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		handleSuccess(rechargeResultDTO.getStatus(), rechargeResultDTO.getOrderCcy(), rechargeResultDTO.getAmount(),
 				orderNo, rechargeResultDTO.getExtOrderNo(), rechargeResultDTO.getRemark(),
 				rechargeResultDTO.getBusType(), rechargeResultDTO.getPayerId(), rechargeResultDTO.getFee(),
-				genericResultDTO.getAccDate(), mainTxTyp,rechargeResultDTO.getPayTypes(),rechargeResultDTO.getTxJrnNo());
+				genericResultDTO.getAccDate(), mainTxTyp,rechargeResultDTO.getPayTypes(),rechargeResultDTO.getTxJrnNo(),rechargeResultDTO.getCrdCorpOrg());
 	}
 
 	/**
@@ -381,7 +484,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 			
 				handleSuccess(PwmConstants.RECHARGE_ORD_S, null, orderDTO.getOrderAmt(), orderNo,
 						orderDTO.getBusOrderNo(), null, orderDTO.getBusType(), orderDTO.getPayerId(), orderDTO.getFee(),
-						LemonUtils.getAccDate(), mainTxTyp,"","");
+						LemonUtils.getAccDate(), mainTxTyp,"","","");
 		} else {
 			LemonException.throwBusinessException(genDto.getMsgCd());
 		}
@@ -389,11 +492,11 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 
 	private void handleSuccess(String status, String ccy, BigDecimal amount, String orderNo, String extOrderNo,
 			String remark, String busType, String payerId, BigDecimal fee, LocalDate acDt, String mainTxTyp,
-			String payType,String txJrnNo) {
+			String payType,String txJrnNo,String CapCorgNo) {
 		try {
 			RechargeOrderDO rechargeOrderDO = service.getRechangeOrderDao().get(orderNo);
 			String acNo = getAccountNo(rechargeOrderDO.getPayerId());
-			locker.lock(//
+			locker.lock(
 					"PWM.RESULT_RG." + orderNo, 19, 17, () -> {
 						// 未找到订单
 						if (JudgeUtils.isNull(rechargeOrderDO)) {
@@ -453,7 +556,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 									// 个人账务处理
 									innerAccAcsDealPerson(acNo, acNo.substring(0, 3), AccConstants.CAP_TYP_CASH,
 											userAmt.floatValue(), acNo, rechargeTotalAmt.floatValue(), orderNo,
-											mainTxTyp, miniTxTyp);
+											mainTxTyp, miniTxTyp,CapCorgNo);
 								} catch (Exception e) {
 									LemonException.throwBusinessException(e.getMessage());
 								}
@@ -462,7 +565,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 									// 个人账务处理
 									innerAccAcsDealPerson(acNo, acNo.substring(0, 3), AccConstants.CAP_TYP_CASH,
 											userAmt.floatValue(), acNo, rechargeTotalAmt.floatValue(), orderNo,
-											mainTxTyp, miniTxTyp);
+											mainTxTyp, miniTxTyp,CapCorgNo);
 								} catch (Exception e) {
 									LemonException.throwBusinessException(e.getMessage());
 								}
@@ -473,7 +576,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 								// 商户账务处理
 								innerAccAcsDealMer(acNo, acNo.substring(0, 3), AccConstants.CAP_TYP_CASH,
 										userAmt.floatValue(), acNo, rechargeTotalAmt.floatValue(), orderNo, mainTxTyp,
-										miniTxTyp);
+										miniTxTyp,CapCorgNo);
 							} catch (Exception e) {
 								LemonException.throwBusinessException(e.getMessage());
 							}
@@ -505,8 +608,8 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 							if(StringUtils.equals(status, PwmConstants.RECHARGE_ORD_S)){
 							    json.putIfAbsent("status", "00");
 								json.putIfAbsent("err_msg", "");
-								json.putIfAbsent("order_no",rechargeOrderDO.getExtOrderNo());
-								json.putIfAbsent("charge_no",txJrnNo);
+								json.putIfAbsent("order_no",rechargeOrderDO.getHallOrderNo());//业务订单号  对方订单号
+								json.putIfAbsent("charge_no",rechargeOrderDO.getExtOrderNo());//收银订单号
 								json.putIfAbsent("recharge_amount", rechargeOrderDO.getOrderAmt());
 							}else
 							{
@@ -762,21 +865,38 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	 * InnerAccDebit 内部账户处理(个人充值)
 	 */
 	private void innerAccAcsDealPerson(String acNo, String acTyp, String capTyp, Float accAmt, String oppAcNo,
-			Float txAmt, String ordNo, String mainTxTyp, String miniTxTyp) throws Exception {
+			Float txAmt, String ordNo, String mainTxTyp, String miniTxTyp,String CapCorgNo) throws Exception {
 		GenericDTO<AccDataListDTO> genericReqDTO = new GenericDTO<>();
 		AccDataListDTO accDataListDTO = new AccDataListDTO();
 		List<Map<String, Object>> accDataMapList = new ArrayList();
+		
+		String acNoStr=AcItem.IN_CCB.getAcNo();
+		String acName=AcItem.IN_CCB.getAcNm();
+		if(JudgeUtils.equals(CapCorgNo, CshConstants.PAY_TYPE_CCB))
+		{
+			acNoStr=AcItem.IN_CCB.getAcNo();
+			acName=AcItem.IN_CCB.getAcNm();
+		}else if(JudgeUtils.equals(CapCorgNo, CshConstants.PAY_TYPE_UNIONPAY)){
+			acNoStr=AcItem.IN_UNIONPAY.getAcNo();
+			acName=AcItem.IN_UNIONPAY.getAcNm();
+		}else if(JudgeUtils.equals(CapCorgNo, CshConstants.PAY_TYPE_NETPAY)){
+			acNoStr=AcItem.IN_NETPAY.getAcNo();
+			acName=AcItem.IN_NETPAY.getAcNm();
+		}
+		String acTypStr= acNoStr.substring(0, 3);
+		
+		
 
 		// 内部账户借记处理: DR-借:应收账款-渠道充值款-xx银行/中国银联/网联
-		Map<String, Object> accDataMap1 = AcsUtils.getAccDataListDTO(AccConstants.INNER_ACC_DR, "3010001",
-				"应收账款-渠道充值款-xx银行/中国银联/网联", "301", capTyp, accAmt, AccConstants.DC_FLG_D, "0201",
+		Map<String, Object> accDataMap1 = AcsUtils.getAccDataListDTO(AccConstants.INNER_ACC_DR, acNoStr,
+				acName, acTypStr, capTyp, accAmt, AccConstants.DC_FLG_D, "0201",
 				AccConstants.BUS_TYP_WEB, oppAcNo, "个人账户", txAmt, "01", ordNo, "1", AccConstants.NOT_TX_FLG_NOT_TX,
 				"個人充值");
 
 		// 内部账户贷记处理 : CR-贷:个人账户
 		Map<String, Object> accDataMap2 = AcsUtils.getAccDataListDTO(AccConstants.USR_ACC_CR, acNo, "个人账户", acTyp,
-				capTyp, accAmt, AccConstants.DC_FLG_C, "0201", AccConstants.BUS_TYP_WEB, "3010001",
-				"应收账款-渠道充值款-xx银行/中国银联/网联", txAmt, "01", ordNo, "2", AccConstants.NOT_TX_FLG_NOT_TX, "個人充值");
+				capTyp, accAmt, AccConstants.DC_FLG_C, "0201", AccConstants.BUS_TYP_WEB, acNoStr,
+				acName, txAmt, "01", ordNo, "2", AccConstants.NOT_TX_FLG_NOT_TX, "個人充值");
 
 		accDataMapList.add(accDataMap1);
 		accDataMapList.add(accDataMap2);
@@ -797,21 +917,36 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	 * InnerAccDebit 内部账户处理(商户充值)
 	 */
 	private void innerAccAcsDealMer(String acNo, String acTyp, String capTyp, Float accAmt, String oppAcNo, Float txAmt,
-			String ordNo, String mainTxTyp, String miniTxTyp) throws Exception {
+			String ordNo, String mainTxTyp, String miniTxTyp,String CapCorgNo) throws Exception {
 		GenericDTO<AccDataListDTO> genericReqDTO = new GenericDTO<>();
 		AccDataListDTO accDataListDTO = new AccDataListDTO();
 		List<Map<String, Object>> accDataMapList = new ArrayList();
 
+		String acNoStr=AcItem.IN_CCB.getAcNo();
+		String acName=AcItem.IN_CCB.getAcNm();
+		if(JudgeUtils.equals(CapCorgNo, CshConstants.PAY_TYPE_CCB))
+		{
+			acNoStr=AcItem.IN_CCB.getAcNo();
+			acName=AcItem.IN_CCB.getAcNm();
+		}else if(JudgeUtils.equals(CapCorgNo, CshConstants.PAY_TYPE_UNIONPAY)){
+			acNoStr=AcItem.IN_UNIONPAY.getAcNo();
+			acName=AcItem.IN_UNIONPAY.getAcNm();
+		}else if(JudgeUtils.equals(CapCorgNo, CshConstants.PAY_TYPE_NETPAY)){
+			acNoStr=AcItem.IN_NETPAY.getAcNo();
+			acName=AcItem.IN_NETPAY.getAcNm();
+		}
+		String acTypStr= acNoStr.substring(0, 3);
+		
 		// 内部账户借记处理: DR-借:应收账款-渠道充值款-xx银行/中国银联/网联
-		Map<String, Object> accDataMap1 = AcsUtils.getAccDataListDTO(AccConstants.INNER_ACC_DR, "3010001",
-				"应收账款-渠道充值款-xx银行/中国银联/网联", "301", capTyp, accAmt, AccConstants.DC_FLG_D, "0202",
+		Map<String, Object> accDataMap1 = AcsUtils.getAccDataListDTO(AccConstants.INNER_ACC_DR,acNoStr,
+				acName, acTypStr, capTyp, accAmt, AccConstants.DC_FLG_D, "0202",
 				AccConstants.BUS_TYP_WEB, oppAcNo, "商户账户", txAmt, "01", ordNo, "1", AccConstants.NOT_TX_FLG_NOT_TX,
 				"商戶充值");
 
 		// 内部账户贷记处理 : CR-贷:商户账户
 		Map<String, Object> accDataMap2 = AcsUtils.getAccDataListDTO(AccConstants.MERC_ACC_CR, acNo, "商户账户", acTyp,
-				capTyp, accAmt, AccConstants.DC_FLG_C, "0202", AccConstants.BUS_TYP_WEB, "3010001",
-				"应收账款-渠道充值款-xx银行/中国银联/网联", txAmt, "01", ordNo, "2", AccConstants.NOT_TX_FLG_NOT_TX, "商戶充值");
+				capTyp, accAmt, AccConstants.DC_FLG_C, "0202", AccConstants.BUS_TYP_WEB, acNoStr,
+				acName, txAmt, "01", ordNo, "2", AccConstants.NOT_TX_FLG_NOT_TX, "商戶充值");
 		accDataMapList.add(accDataMap1);
 		accDataMapList.add(accDataMap2);
 

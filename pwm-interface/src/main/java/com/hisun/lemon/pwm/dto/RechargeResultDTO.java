@@ -85,7 +85,8 @@ public class RechargeResultDTO {
 	@ApiModelProperty(name = "payTypes", value = "支付方式   0.余额支付   1.快捷支付")
 	private String payTypes;
 
-
+	@ApiModelProperty(name = "crdCorpOrg", value = "资金机构")
+	private String crdCorpOrg;
 	public String getPayTypes() {
 		return payTypes;
 	}
@@ -132,6 +133,14 @@ public class RechargeResultDTO {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getCrdCorpOrg() {
+		return crdCorpOrg;
+	}
+
+	public void setCrdCorpOrg(String crdCorpOrg) {
+		this.crdCorpOrg = crdCorpOrg;
 	}
 
 	public String getBusType() {

@@ -20,8 +20,10 @@ public class TransferenceRspDTO {
 	@ApiModelProperty(name = "rechargeAmount", value = "金额")
     private BigDecimal rechargeAmount;
 	
-	@ApiModelProperty(name = "orderNo", value = "订单号")
+	@ApiModelProperty(name = "orderNo", value = "NFC订单号")
 	private String orderNo;
+	@ApiModelProperty(name = "orderNo", value = "收银订单号")
+	private String busOrderNo;
 
 	@ApiModelProperty(name = "busType", value = "业务类型(充值[0101:快捷|0102:线下|0103:营业厅|0104:企业网银]|0105:个人网银|0106：圈存] 提现[0401:个人|0402:商户])")
     private String busType;
@@ -67,6 +69,14 @@ public class TransferenceRspDTO {
 
 	public void setOrderStatus(String orderStatus) {
 		this.orderStatus = orderStatus;
+	}
+
+	public String getBusOrderNo() {
+		return busOrderNo;
+	}
+
+	public void setBusOrderNo(String busOrderNo) {
+		this.busOrderNo = busOrderNo;
 	}
 	
 }

@@ -130,7 +130,7 @@ values ('PWM10009','zh','订单状态值非法!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10010','zh','商户号不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM10011','zh','营业厅充值订单号不能为空!',now(),now());
+values ('PWM10011','zh','圈存订单号不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10012','zh','充值金额非法!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
@@ -149,7 +149,7 @@ insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10019','zh','查询用户类型不能为空!',now(),now());
 --------------ruan
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
-values ('PWM10021','zh','海币充值订单号不能为空!',now(),now());
+values ('PWM10021','zh','资金结构号不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)
 values ('PWM10022','zh','海币充值订状态不能为空!',now(),now());
 insert into lemon_msg_info(msg_cd,language,msg_info,create_time,modifyTime)

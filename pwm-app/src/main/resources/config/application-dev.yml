@@ -34,4 +34,4 @@ pwm :
     remotePath : /home/oper/data/pwm/
     localPath : /home/oper/data/localchk/pwm/
   transference :
-    path : http://192.168.9.103:8081/xiaoxiangPay-api/nfcRecharge/resultNotice
+    path : http://192.168.9.104:8081/xiaoxiangPay-api/nfcRecharge/resultNotice

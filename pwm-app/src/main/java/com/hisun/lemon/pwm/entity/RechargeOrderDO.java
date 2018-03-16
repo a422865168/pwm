@@ -47,7 +47,7 @@ public class RechargeOrderDO extends BaseDO {
      */
     private BigDecimal fee;
     /**
-     * @Fields hallOrderNo 营业厅充值订单号
+     * @Fields hallOrderNo 圈存充值订单号
      */
     private String hallOrderNo;
     /**

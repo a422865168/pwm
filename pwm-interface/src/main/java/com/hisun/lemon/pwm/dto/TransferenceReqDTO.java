@@ -25,6 +25,12 @@ public class TransferenceReqDTO {
 	@ApiModelProperty(name = "userId", value = "内部用户号")
 	@NotEmpty(message="PWM10023")
 	private String  userId;
+	
+	@ApiModelProperty(name = "busOrderNo", value = "业务订单号")
+	@NotEmpty(message="PWM10011")
+	private String  busOrderNo;
+	
+	
 	/**
 	 * 充值金额
 	 */
@@ -98,6 +104,14 @@ public class TransferenceReqDTO {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public String getBusOrderNo() {
+		return busOrderNo;
+	}
+
+	public void setBusOrderNo(String busOrderNo) {
+		this.busOrderNo = busOrderNo;
 	}
 	
 }

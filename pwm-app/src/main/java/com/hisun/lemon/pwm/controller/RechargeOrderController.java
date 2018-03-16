@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.JudgeUtils;
+import com.hisun.lemon.csh.dto.cashier.BackstageViewDTO;
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.controller.BaseController;
 import com.hisun.lemon.framework.data.GenericDTO;
@@ -46,8 +47,17 @@ public class RechargeOrderController extends BaseController {
 	}
 	
 	
+	@ApiOperation(value = "商户充值下单", notes = "生成商户充值订单，调用收银台")
+	@ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
+	@ApiResponse(code = 200, message = "商户充值下单")
+	@PostMapping(value = "/order/mer")
+	public GenericRspDTO<BackstageViewDTO> createOrderMer(@Validated @RequestBody GenericDTO<RechargeDTO> genRechargeDTO) {
+		return service.createOrderMer(genRechargeDTO);
+	}
+	
 	@ApiOperation(value = "圈存", notes = "圈存")
 	@ApiResponse(code = 200, message = "圈存下单")
+	@ApiImplicitParam(name = "x-lemon-usrid", value = "用户ID", paramType = "header")
 	@PostMapping(value = "/order/transference")
 	public GenericRspDTO<TransferenceRspDTO> createTransference(@Validated @RequestBody GenericDTO<TransferenceReqDTO> genRechargeDTO) {
 		TransferenceRspDTO transferenceRspDTO=service.createTransference(genRechargeDTO);
