@@ -1,5 +1,6 @@
 redis :
   host : 10.9.10.120
+  port : 6379
   password : redis@123
 
 rabbitmq :
@@ -7,17 +8,24 @@ rabbitmq :
   password : Rabbitmq123
 
 lemon :
-  dataSource :
-    lemon :
-      url : jdbc:oracle:thin:@10.9.10.120:1521/orcl
-      username : 'c##lemon'
-      password : lemon
-    primary :
-      url : jdbc:oracle:thin:@10.9.10.120:1521/orcl
-      username : 'c##xxpay_pwm'
-      password : pwm
-  batch :
-    enabled : true
+    #Multiple dataSources
+    dataSources :
+      primary :
+        type : com.alibaba.druid.pool.DruidDataSource
+        driverClassName : oracle.jdbc.driver.OracleDriver
+        url : jdbc:oracle:thin:@10.9.10.120:1521/orcl
+        username : 'c##xxpay_pwm'
+        password : pwm
+      lemon :
+        type : com.alibaba.druid.pool.DruidDataSource
+        driverClassName : oracle.jdbc.driver.OracleDriver
+        url : jdbc:oracle:thin:@10.9.10.120:1521/orcl
+        username : 'c##xxpay_lemon'
+        password : lemon
+    #dynamic datasource
+    dynamicDataSource :
+      enabled : true
+      defaultDataSource : primary
 
 eureka :
   zone : http://10.9.10.130:9002/eureka/
@@ -32,6 +40,6 @@ pwm :
     connectTimeout : 2000
   chk :
     remotePath : /home/oper/data/pwm/
-    localPath : /home/oper/data/localchk/pwm/
+    localPath : /app/data/localchk/pwm/
   transference :
     path : http://192.168.9.104:8081/xiaoxiangPay-api/nfcRecharge/resultNotice

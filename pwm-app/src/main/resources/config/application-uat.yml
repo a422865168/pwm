@@ -1,35 +1,43 @@
 redis :
-  host : 10.9.10.120
-  password : redis@123
+  host : 192.168.100.111
+  port : 6679
+  password : 'Redis#123'
 
 rabbitmq :
-  addresses : 10.9.10.130:5672
-  password : Rabbitmq123
+  addresses : 192.168.100.111:1567
+  password : 'Rabbitmq#123'
 
 lemon :
-  dataSource :
-    lemon :
-      url : jdbc:oracle:thin:@10.9.10.120:1521/orcl
-      username : 'c##lemon'
-      password : lemon
-    primary :
-      url : jdbc:oracle:thin:@10.9.10.120:1521/orcl
-      username : 'c##xxpay_pwm'
-      password : pwm
-  batch :
-    enabled : true
+    #Multiple dataSources
+    dataSources :
+      primary :
+        type : com.alibaba.druid.pool.DruidDataSource
+        driverClassName : oracle.jdbc.driver.OracleDriver
+        url : jdbc:oracle:thin:@192.168.100.201:1521/orcl
+        username : 'c##xxpay_pwm'
+        password : pwm
+      lemon :
+        type : com.alibaba.druid.pool.DruidDataSource
+        driverClassName : oracle.jdbc.driver.OracleDriver
+        url : jdbc:oracle:thin:@192.168.100.201:1521/orcl
+        username : 'c##xxpay_lemon'
+        password : lemon
+    #dynamic datasource
+    dynamicDataSource :
+      enabled : true
+      defaultDataSource : primary
 
 eureka :
-  zone : http://10.9.10.130:9002/eureka/
+  zone : http://192.168.100.111:9002/eureka/
 
 
 pwm :
   sftp :
-    ip : 10.9.10.127
-    port : 22
-    name : oper
-    password : h4y]nrTDvq8,XjBG
+    ip : 192.168.100.100
+    port : 9898
+    name : xxpay
+    password : 'Xxpay#123'
     connectTimeout : 2000
   chk :
-    remotePath : /home/oper/data/pwm/
-    localPath : /home/oper/data/localchk/pwm/
+    remotePath : /home/xxpay/data/pwm/
+    localPath : /data/pwm/data/
