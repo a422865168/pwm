@@ -23,5 +23,4 @@ public interface IRechargeOrderDao extends BaseDao<RechargeOrderDO> {
 
 	public List<RechargeOrderDO> queryList(Map o);
 
-	public List<RechargeOrderDO> queryListOfHall(Map o);
 }

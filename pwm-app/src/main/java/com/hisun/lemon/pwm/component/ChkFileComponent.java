@@ -1,6 +1,19 @@
 package com.hisun.lemon.pwm.component;
 
 
+import java.io.File;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
 import com.hisun.lemon.common.exception.LemonException;
 import com.hisun.lemon.common.utils.DateTimeUtils;
 import com.hisun.lemon.common.utils.StringUtils;
@@ -8,24 +21,12 @@ import com.hisun.lemon.framework.data.BaseDO;
 import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.jcommon.file.FileSftpUtils;
 import com.hisun.lemon.jcommon.file.FileUtils;
-import com.hisun.lemon.pwm.constants.PwmConstants;
 import com.hisun.lemon.pwm.dao.IRechargeHCouponDao;
 import com.hisun.lemon.pwm.dao.IRechargeOrderDao;
 import com.hisun.lemon.pwm.dao.IWithdrawOrderDao;
 import com.hisun.lemon.pwm.entity.RechargeHCouponDO;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
-import java.io.File;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 对账文件组件
@@ -61,28 +62,22 @@ public class ChkFileComponent {
 		return datas;
 	}
 
-	public List<WithdrawOrderDO> queryWithdraws(LocalDate date,String[] chkOrderStatus){
+	  //提现
+	  public List<WithdrawOrderDO> queryWithdraws(LocalDate date,String[] chkOrderStatus){
 		Map queryDo=new HashMap<>();
 		queryDo.put("acTm",date);
 		queryDo.put("statusList",chkOrderStatus);
 		return withdrawOrderDao.queryList(queryDo);
-	}
-
-	public List<RechargeOrderDO> queryHallRecharges(LocalDate date,String[] chkOrderStatus){
+	 }
+	  
+	//充值
+	  public List<RechargeOrderDO> queryRecharge(LocalDate date,String[] chkOrderStatus){
 		Map queryDo=new HashMap<>();
 		queryDo.put("acTm",date);
 		queryDo.put("statusList",chkOrderStatus);
-		queryDo.put("busType", PwmConstants.BUS_TYPE_RECHARGE_HALL);
-		return rechargeOrderDao.queryListOfHall(queryDo);
-	}
+		return rechargeOrderDao.queryList(queryDo);
+	 }
 
-	public List<WithdrawOrderDO> queryHallWithdraw(LocalDate date,String[] chkOrderStatus){
-		Map queryDo=new HashMap<>();
-		queryDo.put("acTm",date);
-		queryDo.put("statusList",chkOrderStatus);
-		queryDo.put("busType", PwmConstants.BUS_TYPE_WITHDRAW_HALL);
-		return withdrawOrderDao.queryListOfHall(queryDo);
-	}
 
 	/**
 	 * 获取对账数据日期

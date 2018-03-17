@@ -1,13 +1,13 @@
 package com.hisun.lemon.pwm.service.chk;
 
-import com.hisun.lemon.pwm.constants.PwmConstants;
-import com.hisun.lemon.pwm.entity.WithdrawOrderDO;
-
 import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.hisun.lemon.pwm.constants.PwmConstants;
+import com.hisun.lemon.pwm.entity.RechargeOrderDO;
 
 
 @Transactional
@@ -40,7 +40,7 @@ public class CshRechargeChkFileServiceImpl extends AbstractChkFileService {
         //生成标志文件
         chkFileComponent.createFlagFile(appCnl,flagName);
         //读取数据
-        List<WithdrawOrderDO> orders=chkFileComponent.queryWithdraws(chkDate,chkOrderStatus);
+        List<RechargeOrderDO> orders=chkFileComponent.queryRecharge(chkDate,chkOrderStatus);
 
         //生成文件
         chkFileComponent.writeToFile(appCnl,orders,chkFileName);
