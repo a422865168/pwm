@@ -4,9 +4,11 @@ import com.hisun.lemon.csh.dto.cashier.BackstageViewDTO;
 import com.hisun.lemon.csh.dto.cashier.CashierViewDTO;
 import com.hisun.lemon.framework.data.GenericDTO;
 import com.hisun.lemon.framework.data.GenericRspDTO;
+import com.hisun.lemon.pwm.dto.OrderSearchRspDTO;
 import com.hisun.lemon.pwm.dto.RechargeDTO;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
+import com.hisun.lemon.pwm.dto.RechargeRspDTO;
 import com.hisun.lemon.pwm.dto.TransferenceReqDTO;
 import com.hisun.lemon.pwm.dto.TransferenceRspDTO;
 
@@ -21,7 +23,9 @@ public interface IRechargeOrderService {
 	//充值下单
     public GenericRspDTO<CashierViewDTO> createOrder(GenericDTO<RechargeDTO> genRechargeDTO);
    //商户充值下单
-    public GenericRspDTO<BackstageViewDTO> createOrderMer(GenericDTO<RechargeDTO> genRechargeDTO);
+    public RechargeRspDTO createOrderMer(GenericDTO<RechargeDTO> genRechargeDTO);
+    //商户充值订单状态查询
+    public OrderSearchRspDTO orderSearch(String orderNo);
     
     /*
      * 圈存请求

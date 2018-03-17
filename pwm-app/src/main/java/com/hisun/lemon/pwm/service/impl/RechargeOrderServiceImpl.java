@@ -48,9 +48,11 @@ import com.hisun.lemon.framework.service.BaseService;
 import com.hisun.lemon.framework.utils.IdGenUtils;
 import com.hisun.lemon.framework.utils.LemonUtils;
 import com.hisun.lemon.pwm.constants.PwmConstants;
+import com.hisun.lemon.pwm.dto.OrderSearchRspDTO;
 import com.hisun.lemon.pwm.dto.RechargeDTO;
 import com.hisun.lemon.pwm.dto.RechargeResultDTO;
 import com.hisun.lemon.pwm.dto.RechargeRevokeDTO;
+import com.hisun.lemon.pwm.dto.RechargeRspDTO;
 import com.hisun.lemon.pwm.dto.TransferenceReqDTO;
 import com.hisun.lemon.pwm.dto.TransferenceRspDTO;
 import com.hisun.lemon.pwm.entity.RechargeOrderDO;
@@ -144,7 +146,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 	 * 商户充值下单
 	 */
 	@Override
-	public GenericRspDTO<BackstageViewDTO> createOrderMer(GenericDTO<RechargeDTO> genRechargeDTO) {
+	public RechargeRspDTO createOrderMer(GenericDTO<RechargeDTO> genRechargeDTO) {
 		RechargeDTO rechargeDTO = genRechargeDTO.getBody();
 		if (!rechargeDTO.getBusType().startsWith(PwmConstants.TX_TYPE_RECHANGE)) {
 			throw new LemonException("PWM20001");
@@ -219,6 +221,12 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		initCashierDTO.setAppCnl(LemonUtils.getApplicationName());
 		initCashierDTO.setTxType(rechargeOrderDO.getTxType());
 		initCashierDTO.setOrderAmt(rechargeDTO.getAmount());
+		initCashierDTO.setBnkPsnFlg(rechargeDTO.getPsnFlag());
+		if(JudgeUtils.equals(rechargeDTO.getPsnFlag(), "0")){
+			initCashierDTO.setBnkPsnFlg("C");
+		}else if(JudgeUtils.equals(rechargeDTO.getPsnFlag(), "1")){
+			initCashierDTO.setBnkPsnFlg("B");
+		}
 		initCashierDTO.setEffTm(rechargeOrderDO.getOrderExpTm());
 		// 快捷充值订单信息国际化
 		Object[] args = new Object[] { rechargeOrderDO.getOrderAmt() };
@@ -233,6 +241,7 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		GenericRspDTO<BackstageViewDTO> genericCashierViewRspDTO = cshOrderClient.initBackstage(genericDTO);
 		cashierViewDTO = genericCashierViewRspDTO.getBody();
 		if (JudgeUtils.isNotSuccess(genericCashierViewRspDTO.getMsgCd())) {
+			logger.info("收银台下单失败  返回码是:"+genericCashierViewRspDTO.getMsgCd());
 			LemonException.throwBusinessException(genericCashierViewRspDTO.getMsgCd());
 		}
 		logger.info("订单：" + rechargeOrderDO.getOrderNo() + " 请求收银台完成  更新订单信息");
@@ -243,7 +252,15 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		updateDO.setFeeFlag(cashierViewDTO.getFeeAmt()+"");// 手续费类型 IN 内扣 EX 外扣
 		updateDO.setExtOrderNo(cashierViewDTO.getOrderNo());
 		service.updateOrder(updateDO);
-		return genericCashierViewRspDTO;
+		logger.info("组装传出数据");
+		RechargeRspDTO RechargeRspDTO=new RechargeRspDTO();
+		RechargeRspDTO.setBalAmt(cashierViewDTO.getBalAmt());
+		RechargeRspDTO.setOrderNo(rechargeOrderDO.getOrderNo());
+		RechargeRspDTO.setFeeAmt(cashierViewDTO.getFeeAmt());
+		RechargeRspDTO.setOrderAmt(cashierViewDTO.getOrderAmt());
+		RechargeRspDTO.setPayAmt(cashierViewDTO.getPayAmt());
+		RechargeRspDTO.setPayUrl(cashierViewDTO.getPayUrl());
+		return RechargeRspDTO;
 	}
 	
 	/**
@@ -356,6 +373,22 @@ public class RechargeOrderServiceImpl extends BaseService implements IRechargeOr
 		updateDO.setExtOrderNo(cashierViewDTO.getOrderNo());
 		service.updateOrder(updateDO);
 		return genericCashierViewRspDTO;
+	}
+	
+	/**
+	 * 商户充值订单状态查询
+	 */
+	@Override
+	public OrderSearchRspDTO orderSearch(String orderNo) {
+		OrderSearchRspDTO orderSearchRspDTO=new OrderSearchRspDTO();
+		RechargeOrderDO rechargeOrderDB=service.getRechangeOrderDao().get(orderNo);
+		if(JudgeUtils.isNotNull(rechargeOrderDB)){
+			orderSearchRspDTO.setOrderNo(rechargeOrderDB.getOrderNo());
+			orderSearchRspDTO.setStatus(rechargeOrderDB.getOrderStatus());
+		}else{
+			LemonException.throwBusinessException("PWM20002");
+		}
+		return orderSearchRspDTO;
 	}
 
 	

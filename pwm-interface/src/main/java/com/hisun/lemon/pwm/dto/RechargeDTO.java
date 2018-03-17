@@ -43,7 +43,6 @@ public class RechargeDTO {
 	 */
 	@ApiModelProperty(name = "psnFlag", value = "对公对私标志(0:个人|1:商户)")
     @NotEmpty(message="PWM10003")
-	@Length(max = 1)
     private String psnFlag;
 
 	/**

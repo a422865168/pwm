@@ -1,17 +1,18 @@
 package com.hisun.lemon.pwm.service.chk;
 
-import com.hisun.lemon.framework.data.BaseDO;
-import com.hisun.lemon.framework.lock.DistributedLocker;
-import com.hisun.lemon.framework.service.BaseService;
-import com.hisun.lemon.pwm.component.ChkFileComponent;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.concurrent.Callable;
+import com.hisun.lemon.framework.data.BaseDO;
+import com.hisun.lemon.framework.lock.DistributedLocker;
+import com.hisun.lemon.pwm.component.ChkFileComponent;
 
 
 /**
@@ -20,7 +21,7 @@ import java.util.concurrent.Callable;
  * @time 下午2:54:28
  *
  */
-public abstract class AbstractChkFileService extends BaseService implements Callable {
+public abstract class AbstractChkFileService  implements Callable {
     protected static final Logger logger = LoggerFactory.getLogger(AbstractChkFileService.class);
 
     @Resource
